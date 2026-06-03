@@ -46,7 +46,7 @@ jobs:
 
       # ── 6. Build APK debug (toujours) ────────────────────────────────────────
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --stacktrace
+        run: ./gradlew assembleDebug --stacktrace --no-build-cache --stacktrace
 
       # ── 7. Build APK release (signé avec debug keystore) ─────────────────────
       - name: Build Release APK
