@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand -->
+    <color name="primary">#1565C0</color>
+    <color name="primary_dark">#0D47A1</color>
+    <color name="primary_light">#1E88E5</color>
+    <color name="accent">#FF6F00</color>
+    <color name="accent_light">#FFA000</color>
+
+    <!-- Semantic -->
+    <color name="success">#43A047</color>
+    <color name="error">#E53935</color>
+    <color name="warning">#FB8C00</color>
+    <color name="info">#039BE5</color>
+
+    <!-- Neutrals -->
+    <color name="white">#FFFFFF</color>
+    <color name="surface">#F5F7FA</color>
+    <color name="card_bg">#FFFFFF</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="divider">#E0E0E0</color>
+
+    <!-- Lock screen -->
+    <color name="lock_bg">#B71C1C</color>
+    <color name="lock_text">#FFFFFF</color>
+    <color name="lock_btn">#FF6F00</color>
+</resources>

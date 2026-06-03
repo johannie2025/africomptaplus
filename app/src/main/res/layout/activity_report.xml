@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/surface">
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabPeriod"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:tabGravity="fill"
+        app:tabMode="fixed"
+        app:tabSelectedTextColor="@color/white"
+        app:tabTextColor="#90CAF9"
+        android:background="@color/primary">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Aujourd'hui"/>
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ce mois"/>
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cette année"/>
+    </com.google.android.material.tabs.TabLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView android:id="@+id/tvPeriod"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary" android:textSize="13sp"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Chiffre d'affaires -->
+            <androidx.cardview.widget.CardView
+                style="@style/DashboardCard"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="vertical" android:padding="20dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="💰 Chiffre d'Affaires" android:textColor="@color/text_secondary" android:textSize="13sp"/>
+                    <TextView android:id="@+id/tvRevenue"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="0 XAF" android:textColor="@color/primary"
+                        android:textSize="26sp" android:textStyle="bold"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Bénéfice brut -->
+            <androidx.cardview.widget.CardView
+                style="@style/DashboardCard"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="vertical" android:padding="20dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="📈 Bénéfice Brut" android:textColor="@color/text_secondary" android:textSize="13sp"/>
+                    <TextView android:id="@+id/tvGrossProfit"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="0 XAF" android:textColor="@color/success"
+                        android:textSize="26sp" android:textStyle="bold"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Dépenses totales -->
+            <androidx.cardview.widget.CardView
+                style="@style/DashboardCard"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="vertical" android:padding="20dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="💸 Total Dépenses" android:textColor="@color/text_secondary" android:textSize="13sp"/>
+                    <TextView android:id="@+id/tvExpenses"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="0 XAF" android:textColor="@color/error"
+                        android:textSize="26sp" android:textStyle="bold"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Bénéfice net -->
+            <androidx.cardview.widget.CardView
+                style="@style/DashboardCard"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="vertical" android:padding="20dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="🏆 Bénéfice Net" android:textColor="@color/text_secondary" android:textSize="13sp"/>
+                    <TextView android:id="@+id/tvNetProfit"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="0 XAF" android:textColor="@color/success"
+                        android:textSize="30sp" android:textStyle="bold"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="= Bénéfice brut − Dépenses"
+                        android:textColor="@color/text_secondary" android:textSize="11sp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

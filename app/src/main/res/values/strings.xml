@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AfriCompta+</string>
+    <string name="wise_design">Wise Design</string>
+    <string name="whatsapp_contact">+240 555 445 514</string>
+    <string name="trial_expired_title">Période d\'évaluation AfriCompta+ Terminée</string>
+    <string name="trial_expired_body">Votre période d\'essai de 14 jours est expirée.\nContactez Wise Design pour activer votre licence complète.</string>
+    <string name="btn_activate">📱 Demander mon Code d\'Activation</string>
+    <string name="dashboard_title">Tableau de bord</string>
+    <string name="sales_today">Ventes du jour</string>
+    <string name="revenue_today">CA du jour</string>
+    <string name="low_stock">Stock critique</string>
+    <string name="module_sale">Nouvelle Vente</string>
+    <string name="module_products">Produits</string>
+    <string name="module_expenses">Dépenses</string>
+    <string name="module_reports">Rapports</string>
+    <string name="module_history">Historique</string>
+</resources>

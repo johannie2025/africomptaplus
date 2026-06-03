@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Fond blanc centré -->
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M20,54 A34,34 0 1 1 88,54 A34,34 0 1 1 20,54 Z"/>
+
+    <!-- Lettre A stylisée -->
+    <path android:fillColor="#1565C0"
+        android:pathData="M44,70 L54,38 L64,70 M48,60 L60,60"/>
+
+    <!-- + signe -->
+    <path android:fillColor="#FF6F00" android:strokeWidth="4"
+        android:strokeColor="#FF6F00"
+        android:pathData="M69,44 L77,44 M73,40 L73,48"/>
+</vector>

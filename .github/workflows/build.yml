@@ -1,0 +1,93 @@
+name: Build AfriCompta+ APK
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Release APK
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout ──────────────────────────────────────────────────────────
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ── 2. Java 17 ───────────────────────────────────────────────────────────
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      # ── 3. Android SDK ───────────────────────────────────────────────────────
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      # ── 4. Gradle permissions ────────────────────────────────────────────────
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # ── 5. Cache Gradle ──────────────────────────────────────────────────────
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # ── 6. Build APK debug (toujours) ────────────────────────────────────────
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --stacktrace
+
+      # ── 7. Build APK release (signé avec debug keystore) ─────────────────────
+      - name: Build Release APK
+        run: ./gradlew assembleRelease --stacktrace
+
+      # ── 8. Rename APK ────────────────────────────────────────────────────────
+      - name: Rename APK files
+        run: |
+          mkdir -p artifacts
+          cp app/build/outputs/apk/debug/app-debug.apk \
+             artifacts/AfriComptaPlus-debug-${{ github.run_number }}.apk
+          cp app/build/outputs/apk/release/app-release.apk \
+             artifacts/AfriComptaPlus-release-${{ github.run_number }}.apk || \
+          cp app/build/outputs/apk/release/app-release-unsigned.apk \
+             artifacts/AfriComptaPlus-release-${{ github.run_number }}.apk
+
+      # ── 9. Upload APK artifact ───────────────────────────────────────────────
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AfriComptaPlus-debug-${{ github.run_number }}
+          path: artifacts/AfriComptaPlus-debug-${{ github.run_number }}.apk
+          retention-days: 30
+
+      - name: Upload Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AfriComptaPlus-release-${{ github.run_number }}
+          path: artifacts/AfriComptaPlus-release-${{ github.run_number }}.apk
+          retention-days: 30
+
+      # ── 10. Résumé ───────────────────────────────────────────────────────────
+      - name: Build Summary
+        run: |
+          echo "## ✅ AfriCompta+ Build #${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Fichier | Taille |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|--------|" >> $GITHUB_STEP_SUMMARY
+          for f in artifacts/*.apk; do
+            size=$(du -sh "$f" | cut -f1)
+            echo "| $(basename $f) | $size |" >> $GITHUB_STEP_SUMMARY
+          done
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📥 Téléchargez l'APK dans l'onglet **Artifacts** ci-dessus." >> $GITHUB_STEP_SUMMARY
