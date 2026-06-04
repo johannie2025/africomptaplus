@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- App -->
+    <!-- App & Splash -->
     <string name="app_name">AfriCompta+</string>
     <string name="app_tagline">Gestion simplifiée pour le commerce africain</string>
+    <string name="splash_subtitle">Gestion simplifiée pour le commerce africain</string>
+    <string name="splash_description">Comptabilité et suivi de stock mobiles</string>
     <string name="by_wise_design">par Wise Design</string>
     <string name="wise_phone">+240 555 445 514</string>
 
-    <!-- Lock screen (Mappé pour activity_lock.xml) -->
+    <!-- Lock screen -->
     <string name="tag_lock_icon">🔒</string>
     <string name="lock_title">Période d\'évaluation AfriCompta+ Terminée</string>
     <string name="trial_expired_title">Période d\'évaluation AfriCompta+ Terminée</string>
@@ -24,7 +26,7 @@
     <string name="trial_badge">Essai : %1$dj restant(s)</string>
     <string name="trial_days_label">Période d\'essai : %1$d jour(s) restant(s)</string>
 
-    <!-- Dashboard (Mappé pour activity_main.xml) -->
+    <!-- Dashboard -->
     <string name="dashboard_title">Tableau de bord</string>
     <string name="kpi_revenue_today">CA Aujourd\'hui</string>
     <string name="revenue_today">CA Aujourd\'hui</string>
@@ -41,7 +43,7 @@
     <string name="module_reports">📊  Rapports Financiers</string>
     <string name="module_history">🕒  Historique Ventes</string>
 
-    <!-- Produits (Mappé pour activity_product_form.xml & activity_product_list.xml) -->
+    <!-- Produits -->
     <string name="product_search_hint">🔍 Rechercher un produit…</string>
     <string name="search_hint">🔍 Rechercher un produit…</string>
     <string name="product_name_hint">Nom du produit *</string>
@@ -70,35 +72,45 @@
 
     <!-- Ventes -->
     <string name="sale_add_product_btn">+ Ajouter un produit</string>
+    <string name="btn_add_product">+ Ajouter un produit</string>
     <string name="sale_payment_label">Mode de paiement :</string>
+    <string name="label_payment_method">Mode de paiement :</string>
     <string name="sale_cash">Espèces</string>
+    <string name="pay_cash">Espèces</string>
     <string name="sale_mobile_money">Mobile Money</string>
+    <string name="pay_momo">Mobile Money</string>
     <string name="sale_credit">Crédit</string>
+    <string name="pay_credit">Crédit</string>
     <string name="sale_total_label">TOTAL : %1$s XAF</string>
     <string name="sale_finalize_btn">✅ Finaliser la Vente &amp; Générer Facture</string>
+    <string name="btn_finalize_sale">✅ Finaliser la Vente &amp; Générer Facture</string>
     <string name="sale_empty_cart">Panier vide</string>
     <string name="sale_success">Vente enregistrée !</string>
     <string name="sale_error">Erreur lors de l\'enregistrement de la vente</string>
     <string name="sale_share_title">Partager la facture via</string>
     <string name="sale_history_tip">Appuyez sur une vente pour re-générer sa facture PDF</string>
+    <string name="history_hint">Appuyez sur une vente pour re-générer sa facture PDF</string>
     <string name="sale_choose_product">Choisir un produit</string>
     <string name="sale_qty_hint">Quantité</string>
     <string name="sale_qty_dialog_title">Quantité : %1$s</string>
     <string name="sale_add">Ajouter</string>
 
-    <!-- Dépenses (Mappé pour activity_expense.xml) -->
+    <!-- Dépenses -->
     <string name="expense_add_btn">+ Nouvelle Dépense</string>
     <string name="btn_add_expense">+ Nouvelle Dépense</string>
     <string name="expense_dialog_title">Nouvelle Dépense</string>
     <string name="expense_category_label">Catégorie</string>
+    <string name="label_category">Catégorie</string>
     <string name="expense_desc_hint">Description (optionnel)</string>
+    <string name="hint_expense_description">Description (optionnel)</string>
     <string name="expense_amount_hint">Montant (XAF) *</string>
+    <string name="hint_expense_amount">Montant (XAF) *</string>
     <string name="expense_amount_required">Montant requis</string>
     <string name="expense_amount_invalid">Montant invalide</string>
     <string name="expense_saved">Dépense enregistrée</string>
     <string name="expense_delete_confirm">Supprimer cette dépense ?</string>
 
-    <!-- Rapports (Mappé pour activity_report.xml) -->
+    <!-- Rapports -->
     <string name="report_tab_today">Aujourd\'hui</string>
     <string name="tab_today">Aujourd\'hui</string>
     <string name="report_tab_month">Ce mois</string>
@@ -106,10 +118,16 @@
     <string name="report_tab_year">Cette année</string>
     <string name="tab_year">Cette année</string>
     <string name="report_revenue">💰 Chiffre d\'Affaires</string>
+    <string name="label_revenue">💰 Chiffre d\'Affaires</string>
     <string name="report_gross_profit">📈 Bénéfice Brut</string>
+    <string name="label_gross_profit">📈 Bénéfice Brut</string>
+    <string name="formula_gross_profit">Valeur des ventes − Coût d\'achat</string>
     <string name="report_expenses">💸 Total Dépenses</string>
+    <string name="label_expenses">💸 Total Dépenses</string>
     <string name="report_net_profit">🏆 Bénéfice Net</string>
+    <string name="label_net_profit">🏆 Bénéfice Net</string>
     <string name="report_net_formula">= Bénéfice brut − Dépenses</string>
+    <string name="formula_net_profit">= Bénéfice brut − Dépenses</string>
     <string name="report_period_today">Aujourd\'hui : %1$s</string>
     <string name="report_period_range">Du %1$s au %2$s</string>
 

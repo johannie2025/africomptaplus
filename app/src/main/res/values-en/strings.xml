@@ -1,8 +1,11 @@
+xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- App -->
+    <!-- App & Splash -->
     <string name="app_name">AfriCompta+</string>
     <string name="app_tagline">Simplified management for African commerce</string>
+    <string name="splash_subtitle">Simplified management for African commerce</string>
+    <string name="splash_description">Mobile accounting and stock tracking</string>
     <string name="by_wise_design">by Wise Design</string>
     <string name="wise_phone">+240 555 445 514</string>
 
@@ -70,17 +73,24 @@
 
     <!-- Sales -->
     <string name="sale_add_product_btn">+ Add product</string>
+    <string name="btn_add_product">+ Add product</string>
     <string name="sale_payment_label">Payment method:</string>
+    <string name="label_payment_method">Payment method:</string>
     <string name="sale_cash">Cash</string>
+    <string name="pay_cash">Cash</string>
     <string name="sale_mobile_money">Mobile Money</string>
+    <string name="pay_momo">Mobile Money</string>
     <string name="sale_credit">Credit</string>
+    <string name="pay_credit">Credit</string>
     <string name="sale_total_label">TOTAL: %1$s XAF</string>
     <string name="sale_finalize_btn">✅ Finalize Sale &amp; Generate Invoice</string>
+    <string name="btn_finalize_sale">✅ Finalize Sale &amp; Generate Invoice</string>
     <string name="sale_empty_cart">Cart is empty</string>
     <string name="sale_success">Sale recorded successfully!</string>
     <string name="sale_error">Error while saving sale</string>
     <string name="sale_share_title">Share invoice via</string>
     <string name="sale_history_tip">Tap on a sale to regenerate its PDF invoice</string>
+    <string name="history_hint">Tap on a sale to regenerate its PDF invoice</string>
     <string name="sale_choose_product">Choose a product</string>
     <string name="sale_qty_hint">Quantity</string>
     <string name="sale_qty_dialog_title">Quantity: %1$s</string>
@@ -91,8 +101,11 @@
     <string name="btn_add_expense">+ New Expense</string>
     <string name="expense_dialog_title">New Expense</string>
     <string name="expense_category_label">Category</string>
+    <string name="label_category">Category</string>
     <string name="expense_desc_hint">Description (optional)</string>
+    <string name="hint_expense_description">Description (optional)</string>
     <string name="expense_amount_hint">Amount (XAF) *</string>
+    <string name="hint_expense_amount">Amount (XAF) *</string>
     <string name="expense_amount_required">Amount required</string>
     <string name="expense_amount_invalid">Invalid amount</string>
     <string name="expense_saved">Expense recorded</string>
@@ -106,10 +119,16 @@
     <string name="report_tab_year">This Year</string>
     <string name="tab_year">This Year</string>
     <string name="report_revenue">💰 Total Revenue</string>
+    <string name="label_revenue">💰 Total Revenue</string>
     <string name="report_gross_profit">📈 Gross Profit</string>
+    <string name="label_gross_profit">📈 Gross Profit</string>
+    <string name="formula_gross_profit">Sales value − Purchase cost</string>
     <string name="report_expenses">💸 Total Expenses</string>
+    <string name="label_expenses">💸 Total Expenses</string>
     <string name="report_net_profit">🏆 Net Profit</string>
+    <string name="label_net_profit">🏆 Net Profit</string>
     <string name="report_net_formula">= Gross profit − Expenses</string>
+    <string name="formula_net_profit">= Gross profit − Expenses</string>
     <string name="report_period_today">Today: %1$s</string>
     <string name="report_period_range">From %1$s to %2$s</string>
 

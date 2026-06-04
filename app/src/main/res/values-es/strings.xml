@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- App -->
+    <!-- App & Splash -->
     <string name="app_name">AfriCompta+</string>
     <string name="app_tagline">Gestión simplificada para el comercio africano</string>
+    <string name="splash_subtitle">Gestión simplificada para el comercio africano</string>
+    <string name="splash_description">Contabilidad y control de stock móvil</string>
     <string name="by_wise_design">por Wise Design</string>
     <string name="wise_phone">+240 555 445 514</string>
 
@@ -42,7 +44,7 @@
     <string name="module_history">🕒  Historial de Ventas</string>
 
     <!-- Productos -->
-    <string name="product_search_hint">🔍 Buscar un producto…</string>
+    <string name="product_search_hint">🔍 Buscar un product…</string>
     <string name="search_hint">🔍 Buscar un producto…</string>
     <string name="product_name_hint">Nombre del producto *</string>
     <string name="hint_product_name">Nombre del producto *</string>
@@ -70,17 +72,24 @@
 
     <!-- Ventas -->
     <string name="sale_add_product_btn">+ Añadir un producto</string>
+    <string name="btn_add_product">+ Añadir un producto</string>
     <string name="sale_payment_label">Método de pago:</string>
+    <string name="label_payment_method">Método de pago:</string>
     <string name="sale_cash">Efectivo</string>
+    <string name="pay_cash">Efectivo</string>
     <string name="sale_mobile_money">Mobile Money</string>
-    <string name="sale_credit">Crédit</string>
+    <string name="pay_momo">Mobile Money</string>
+    <string name="sale_credit">Crédito</string>
+    <string name="pay_credit">Crédito</string>
     <string name="sale_total_label">TOTAL: %1$s XAF</string>
     <string name="sale_finalize_btn">✅ Finalizar Venta y Generar Factura</string>
+    <string name="btn_finalize_sale">✅ Finalizar Venta y Generar Factura</string>
     <string name="sale_empty_cart">Carrito vacío</string>
     <string name="sale_success">¡Venta registrada!</string>
     <string name="sale_error">Error al registrar la venta</string>
     <string name="sale_share_title">Compartir factura a través de</string>
     <string name="sale_history_tip">Toque una venta para volver a generar su factura en PDF</string>
+    <string name="history_hint">Toque una venta para volver a generar su factura en PDF</string>
     <string name="sale_choose_product">Elegir un producto</string>
     <string name="sale_qty_hint">Cantidad</string>
     <string name="sale_qty_dialog_title">Cantidad: %1$s</string>
@@ -91,8 +100,11 @@
     <string name="btn_add_expense">+ Nuevo Gasto</string>
     <string name="expense_dialog_title">Nuevo Gasto</string>
     <string name="expense_category_label">Categoría</string>
+    <string name="label_category">Categoría</string>
     <string name="expense_desc_hint">Descripción (opcional)</string>
+    <string name="hint_expense_description">Descripción (opcional)</string>
     <string name="expense_amount_hint">Importe (XAF) *</string>
+    <string name="hint_expense_amount">Importe (XAF) *</string>
     <string name="expense_amount_required">Importe requerido</string>
     <string name="expense_amount_invalid">Importe inválido</string>
     <string name="expense_saved">Gasto registrado</string>
@@ -106,10 +118,16 @@
     <string name="report_tab_year">Este año</string>
     <string name="tab_year">Este año</string>
     <string name="report_revenue">💰 Volumen de Ventas</string>
+    <string name="label_revenue">💰 Volumen de Ventas</string>
     <string name="report_gross_profit">📈 Beneficio Bruto</string>
+    <string name="label_gross_profit">📈 Beneficio Bruto</string>
+    <string name="formula_gross_profit">Valor de ventas − Costo de compra</string>
     <string name="report_expenses">💸 Total Gastos</string>
+    <string name="label_expenses">💸 Total Gastos</string>
     <string name="report_net_profit">🏆 Beneficio Neto</string>
+    <string name="label_net_profit">🏆 Beneficio Neto</string>
     <string name="report_net_formula">= Beneficio bruto − Gastos</string>
+    <string name="formula_net_profit">= Beneficio bruto − Gastos</string>
     <string name="report_period_today">Hoy: %1$s</string>
     <string name="report_period_range">Del %1$s al %2$s</string>
 
