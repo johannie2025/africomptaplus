@@ -7,26 +7,26 @@
     <string name="wise_phone">+240 555 445 514</string>
 
     <!-- Lock screen -->
-    <string name="lock_title">Período de evaluación AfriCompta+ Terminado</string>
+    <string name="lock_title">Período de Evaluación de AfriCompta+ Finalizado</string>
     <string name="lock_expired">Su período de prueba de 14 días ha terminado.</string>
     <string name="lock_clock_fraud">⚠️ Fraude detectado: modificación del reloj del sistema.</string>
-    <string name="lock_body">Contacte a Wise Design para obtener su código de activación y disfrutar de todas las funcionalidades sin límite.</string>
+    <string name="lock_body">Contacte con Wise Design para obtener su código de activación y disfrutar de todas las funciones sin límites.</string>
     <string name="lock_btn_activate">📱 Solicitar mi Código de Activación</string>
     <string name="lock_whatsapp_label">WhatsApp: +240 555 445 514</string>
     <string name="lock_footer">Wise Design — AfriCompta+</string>
 
     <!-- Trial badge -->
-    <string name="trial_badge">Prueba: %1$d día(s)</string>
+    <string name="trial_badge">Prueba: %1$dd restante(s)</string>
     <string name="trial_days_label">Período de prueba: %1$d día(s) restante(s)</string>
 
     <!-- Dashboard -->
     <string name="dashboard_title">Panel de control</string>
-    <string name="kpi_revenue_today">Ventas de hoy</string>
-    <string name="kpi_sales_count">Transacciones hoy</string>
+    <string name="kpi_revenue_today">Ingresos de Hoy</string>
+    <string name="kpi_sales_count">Ventas del día</string>
     <string name="kpi_low_stock">⚠️ Stock crítico</string>
     <string name="footer_contact">Wise Design · +240 555 445 514</string>
 
-    <!-- Módulos -->
+    <!-- Modules -->
     <string name="module_sale">🛒  Nueva Venta</string>
     <string name="module_products">📦  Productos y Stock</string>
     <string name="module_expenses">💸  Gastos</string>
@@ -48,13 +48,13 @@
     <string name="product_save_error">Error al guardar</string>
     <string name="product_no_stock">Stock insuficiente (%1$d disponible(s))</string>
     <string name="product_invalid_qty">Cantidad inválida</string>
-    <string name="product_none_available">Sin productos disponibles. Añada productos primero.</string>
+    <string name="product_none_available">No hay productos disponibles. Primero añada productos.</string>
     <string name="product_low_stock_label">Stock: %1$d</string>
     <string name="product_name_required">Nombre requerido</string>
-    <string name="product_number_error">Por favor ingrese valores numéricos válidos</string>
+    <string name="product_number_error">Por favor, introduzca valores numéricos válidos</string>
 
     <!-- Ventas -->
-    <string name="sale_add_product_btn">+ Agregar producto</string>
+    <string name="sale_add_product_btn">+ Añadir un producto</string>
     <string name="sale_payment_label">Método de pago:</string>
     <string name="sale_cash">Efectivo</string>
     <string name="sale_mobile_money">Mobile Money</string>
@@ -64,21 +64,21 @@
     <string name="sale_empty_cart">Carrito vacío</string>
     <string name="sale_success">¡Venta registrada!</string>
     <string name="sale_error">Error al registrar la venta</string>
-    <string name="sale_share_title">Compartir factura por</string>
-    <string name="sale_history_tip">Toque una venta para regenerar su factura PDF</string>
+    <string name="sale_share_title">Compartir factura a través de</string>
+    <string name="sale_history_tip">Toque una venta para volver a generar su factura en PDF</string>
     <string name="sale_choose_product">Elegir un producto</string>
     <string name="sale_qty_hint">Cantidad</string>
     <string name="sale_qty_dialog_title">Cantidad: %1$s</string>
-    <string name="sale_add">Agregar</string>
+    <string name="sale_add">Añadir</string>
 
     <!-- Gastos -->
     <string name="expense_add_btn">+ Nuevo Gasto</string>
     <string name="expense_dialog_title">Nuevo Gasto</string>
     <string name="expense_category_label">Categoría</string>
     <string name="expense_desc_hint">Descripción (opcional)</string>
-    <string name="expense_amount_hint">Monto (XAF) *</string>
-    <string name="expense_amount_required">Monto requerido</string>
-    <string name="expense_amount_invalid">Monto inválido</string>
+    <string name="expense_amount_hint">Importe (XAF) *</string>
+    <string name="expense_amount_required">Importe requerido</string>
+    <string name="expense_amount_invalid">Importe inválido</string>
     <string name="expense_saved">Gasto registrado</string>
     <string name="expense_delete_confirm">¿Eliminar este gasto?</string>
 
@@ -86,7 +86,7 @@
     <string name="report_tab_today">Hoy</string>
     <string name="report_tab_month">Este mes</string>
     <string name="report_tab_year">Este año</string>
-    <string name="report_revenue">💰 Ingresos Totales</string>
+    <string name="report_revenue">💰 Volumen de Ventas</string>
     <string name="report_gross_profit">📈 Beneficio Bruto</string>
     <string name="report_expenses">💸 Total Gastos</string>
     <string name="report_net_profit">🏆 Beneficio Neto</string>
@@ -99,7 +99,7 @@
     <string name="btn_cancel">Cancelar</string>
     <string name="btn_yes">Sí</string>
     <string name="btn_no">No</string>
-    <string name="btn_add">Agregar</string>
+    <string name="btn_add">Añadir</string>
     <string name="btn_delete">Eliminar</string>
     <string name="btn_share">Compartir</string>
 

@@ -7,23 +7,23 @@
     <string name="wise_phone">+240 555 445 514</string>
 
     <!-- Lock screen -->
-    <string name="lock_title">AfriCompta+ Trial Period Ended</string>
-    <string name="lock_expired">Your 14-day free trial has expired.</string>
-    <string name="lock_clock_fraud">⚠️ Fraud detected: system clock was rolled back.</string>
-    <string name="lock_body">Contact Wise Design to get your activation code and enjoy all features without limits.</string>
-    <string name="lock_btn_activate">📱 Request My Activation Code</string>
+    <string name="lock_title">AfriCompta+ Evaluation Period Ended</string>
+    <string name="lock_expired">Your 14-day trial period has expired.</string>
+    <string name="lock_clock_fraud">⚠️ Fraud detected: system clock modification.</string>
+    <string name="lock_body">Contact Wise Design to get your activation code and enjoy all features permanently without limits.</string>
+    <string name="lock_btn_activate">📱 Request my Activation Code</string>
     <string name="lock_whatsapp_label">WhatsApp: +240 555 445 514</string>
     <string name="lock_footer">Wise Design — AfriCompta+</string>
 
     <!-- Trial badge -->
-    <string name="trial_badge">Trial: %1$d day(s) left</string>
+    <string name="trial_badge">Trial: %1$dd remaining</string>
     <string name="trial_days_label">Trial period: %1$d day(s) remaining</string>
 
     <!-- Dashboard -->
     <string name="dashboard_title">Dashboard</string>
-    <string name="kpi_revenue_today">Today\'s Revenue</string>
-    <string name="kpi_sales_count">Today\'s Sales</string>
-    <string name="kpi_low_stock">⚠️ Low Stock</string>
+    <string name="kpi_revenue_today">Revenue Today</string>
+    <string name="kpi_sales_count">Sales today</string>
+    <string name="kpi_low_stock">⚠️ Low Stock Alert</string>
     <string name="footer_contact">Wise Design · +240 555 445 514</string>
 
     <!-- Modules -->
@@ -34,7 +34,7 @@
     <string name="module_history">🕒  Sales History</string>
 
     <!-- Products -->
-    <string name="product_search_hint">🔍 Search a product…</string>
+    <string name="product_search_hint">🔍 Search product…</string>
     <string name="product_name_hint">Product name *</string>
     <string name="product_barcode_hint">Barcode (optional)</string>
     <string name="product_buying_price_hint">Buying price (XAF) *</string>
@@ -45,7 +45,7 @@
     <string name="product_delete_confirm">Delete %1$s?</string>
     <string name="product_deleted">Product deleted</string>
     <string name="product_saved">Product saved</string>
-    <string name="product_save_error">Error saving product</string>
+    <string name="product_save_error">Error while saving</string>
     <string name="product_no_stock">Insufficient stock (%1$d available)</string>
     <string name="product_invalid_qty">Invalid quantity</string>
     <string name="product_none_available">No products available. Please add products first.</string>
@@ -61,11 +61,11 @@
     <string name="sale_credit">Credit</string>
     <string name="sale_total_label">TOTAL: %1$s XAF</string>
     <string name="sale_finalize_btn">✅ Finalize Sale &amp; Generate Invoice</string>
-    <string name="sale_empty_cart">Empty cart</string>
-    <string name="sale_success">Sale recorded!</string>
-    <string name="sale_error">Error recording the sale</string>
+    <string name="sale_empty_cart">Cart is empty</string>
+    <string name="sale_success">Sale recorded successfully!</string>
+    <string name="sale_error">Error while saving sale</string>
     <string name="sale_share_title">Share invoice via</string>
-    <string name="sale_history_tip">Tap a sale to regenerate its PDF invoice</string>
+    <string name="sale_history_tip">Tap on a sale to regenerate its PDF invoice</string>
     <string name="sale_choose_product">Choose a product</string>
     <string name="sale_qty_hint">Quantity</string>
     <string name="sale_qty_dialog_title">Quantity: %1$s</string>
@@ -79,13 +79,13 @@
     <string name="expense_amount_hint">Amount (XAF) *</string>
     <string name="expense_amount_required">Amount required</string>
     <string name="expense_amount_invalid">Invalid amount</string>
-    <string name="expense_saved">Expense saved</string>
+    <string name="expense_saved">Expense recorded</string>
     <string name="expense_delete_confirm">Delete this expense?</string>
 
     <!-- Reports -->
     <string name="report_tab_today">Today</string>
-    <string name="report_tab_month">This month</string>
-    <string name="report_tab_year">This year</string>
+    <string name="report_tab_month">This Month</string>
+    <string name="report_tab_year">This Year</string>
     <string name="report_revenue">💰 Total Revenue</string>
     <string name="report_gross_profit">📈 Gross Profit</string>
     <string name="report_expenses">💸 Total Expenses</string>
@@ -94,7 +94,7 @@
     <string name="report_period_today">Today: %1$s</string>
     <string name="report_period_range">From %1$s to %2$s</string>
 
-    <!-- Common buttons -->
+    <!-- Common Buttons -->
     <string name="btn_save">Save</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_yes">Yes</string>
