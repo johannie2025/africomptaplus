@@ -24,7 +24,7 @@
 
     <!-- Common Buttons and Actions -->
     <string name="action_save">Save</string>
-    <string name="action_cancel">Cancel</string>
+	<string name="action_cancel">Cancel</string>
     <string name="action_yes">Yes</string>
     <string name="action_no">No</string>
     <string name="action_share_invoice_via">Share invoice via</string>
