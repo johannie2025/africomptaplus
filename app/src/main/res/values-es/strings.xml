@@ -22,10 +22,18 @@
     <string name="lock_footer">Wise Design — AfriCompta+</string>
     <string name="footer_text">Wise Design — AfriCompta+</string>
 
-    <!-- Trial badge -->
-    <string name="trial_badge">Prueba: %1$dd restante(s)</string>
-    <string name="trial_days_label">Período de prueba: %1$d día(s) restante(s)</string>
+    <!-- Toasts de Notificaciones -->
+    <string name="toast_amount_required">Importe requerido</string>
+    <string name="toast_invalid_amount">Importe inválido</string>
+    <string name="toast_expense_saved">Gasto registrado</string>
+    <string name="toast_cart_empty">Carrito vacío</string>
+    <string name="toast_sale_saved">¡Venta registrada!</string>
+    <string name="toast_sale_save_error">Error al registrar la venta</string>
 
+    <!-- Badges -->
+    <string name="badge_cart_qty">Cant: %1$d</string>
+    <string name="badge_total_display">TOTAL: %1$s XAF</string>
+	
     <!-- Dashboard -->
     <string name="dashboard_title">Panel de control</string>
     <string name="kpi_revenue_today">Ingresos de Hoy</string>
@@ -131,14 +139,16 @@
     <string name="report_period_today">Hoy: %1$s</string>
     <string name="report_period_range">Del %1$s al %2$s</string>
 
-    <!-- Botones comunes -->
-    <string name="btn_save">Guardar</string>
-    <string name="btn_cancel">Cancelar</string>
-    <string name="btn_yes">Sí</string>
-    <string name="btn_no">No</string>
-    <string name="btn_add">Añadir</string>
-    <string name="btn_delete">Eliminar</string>
-    <string name="btn_share">Compartir</string>
+  <!-- Botones y Acciones Comunes -->
+    <string name="action_save">Guardar</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_yes">Sí</string>
+    <string name="action_no">No</string>
+    <string name="action_share_invoice_via">Compartir factura a través de</string>
+
+    <!-- Diálogos -->
+    <string name="dialog_new_expense">Nuevo Gasto</string>
+    <string name="dialog_delete_expense">¿Eliminar este gasto?</string>
 
     <!-- PDF / Factura -->
     <string name="invoice_header">AFRICOMPTA+</string>

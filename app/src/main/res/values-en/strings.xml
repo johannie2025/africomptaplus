@@ -22,10 +22,29 @@
     <string name="lock_footer">Wise Design — AfriCompta+</string>
     <string name="footer_text">Wise Design — AfriCompta+</string>
 
-    <!-- Trial badge -->
-    <string name="trial_badge">Trial: %1$dd remaining</string>
-    <string name="trial_days_label">Trial period: %1$d day(s) remaining</string>
+    <!-- Common Buttons and Actions -->
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_yes">Yes</string>
+    <string name="action_no">No</string>
+    <string name="action_share_invoice_via">Share invoice via</string>
 
+    <!-- Dialogs -->
+    <string name="dialog_new_expense">New Expense</string>
+    <string name="dialog_delete_expense">Delete this expense?</string>
+
+    <!-- Toast Notifications -->
+    <string name="toast_amount_required">Amount required</string>
+    <string name="toast_invalid_amount">Invalid amount</string>
+    <string name="toast_expense_saved">Expense recorded</string>
+    <string name="toast_cart_empty">Cart is empty</string>
+    <string name="toast_sale_saved">Sale recorded successfully!</string>
+    <string name="toast_sale_save_error">Error while saving sale</string>
+	
+	<!-- Badges -->
+    <string name="badge_cart_qty">Qty: %1$d</string>
+    <string name="badge_total_display">TOTAL: %1$s XAF</string>
+	
     <!-- Dashboard -->
     <string name="dashboard_title">Dashboard</string>
     <string name="kpi_revenue_today">Revenue Today</string>
@@ -130,15 +149,6 @@
     <string name="formula_net_profit">= Gross profit − Expenses</string>
     <string name="report_period_today">Today: %1$s</string>
     <string name="report_period_range">From %1$s to %2$s</string>
-
-    <!-- Common Buttons -->
-    <string name="btn_save">Save</string>
-    <string name="btn_cancel">Cancel</string>
-    <string name="btn_yes">Yes</string>
-    <string name="btn_no">No</string>
-    <string name="btn_add">Add</string>
-    <string name="btn_delete">Delete</string>
-    <string name="btn_share">Share</string>
 
     <!-- PDF / Invoice -->
     <string name="invoice_header">AFRICOMPTA+</string>
