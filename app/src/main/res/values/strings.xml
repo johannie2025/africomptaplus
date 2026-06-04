@@ -6,24 +6,32 @@
     <string name="by_wise_design">par Wise Design</string>
     <string name="wise_phone">+240 555 445 514</string>
 
-    <!-- Lock screen -->
+    <!-- Lock screen (Mappé pour activity_lock.xml) -->
+    <string name="tag_lock_icon">🔒</string>
     <string name="lock_title">Période d\'évaluation AfriCompta+ Terminée</string>
+    <string name="trial_expired_title">Période d\'évaluation AfriCompta+ Terminée</string>
     <string name="lock_expired">Votre période d\'essai de 14 jours est terminée.</string>
+    <string name="trial_expired_body">Votre période d\'essai de 14 jours est terminée. Contactez Wise Design pour obtenir votre code d\'activation et profiter de toutes les fonctionnalités en illimité.</string>
     <string name="lock_clock_fraud">⚠️ Fraude détectée : modification de l\'horloge système.</string>
     <string name="lock_body">Contactez Wise Design pour obtenir votre code d\'activation et profiter de toutes les fonctionnalités en illimité.</string>
     <string name="lock_btn_activate">📱 Demander mon Code d\'Activation</string>
+    <string name="btn_activate">📱 Demander mon Code d\'Activation</string>
     <string name="lock_whatsapp_label">WhatsApp : +240 555 445 514</string>
     <string name="lock_footer">Wise Design — AfriCompta+</string>
+    <string name="footer_text">Wise Design — AfriCompta+</string>
 
     <!-- Trial badge -->
     <string name="trial_badge">Essai : %1$dj restant(s)</string>
     <string name="trial_days_label">Période d\'essai : %1$d jour(s) restant(s)</string>
 
-    <!-- Dashboard -->
+    <!-- Dashboard (Mappé pour activity_main.xml) -->
     <string name="dashboard_title">Tableau de bord</string>
     <string name="kpi_revenue_today">CA Aujourd\'hui</string>
+    <string name="revenue_today">CA Aujourd\'hui</string>
     <string name="kpi_sales_count">Ventes du jour</string>
+    <string name="sales_today">Ventes du jour</string>
     <string name="kpi_low_stock">⚠️ Stock critique</string>
+    <string name="low_stock">⚠️ Stock critique</string>
     <string name="footer_contact">Wise Design · +240 555 445 514</string>
 
     <!-- Modules -->
@@ -33,14 +41,21 @@
     <string name="module_reports">📊  Rapports Financiers</string>
     <string name="module_history">🕒  Historique Ventes</string>
 
-    <!-- Produits -->
+    <!-- Produits (Mappé pour activity_product_form.xml & activity_product_list.xml) -->
     <string name="product_search_hint">🔍 Rechercher un produit…</string>
+    <string name="search_hint">🔍 Rechercher un produit…</string>
     <string name="product_name_hint">Nom du produit *</string>
+    <string name="hint_product_name">Nom du produit *</string>
     <string name="product_barcode_hint">Code-barres (optionnel)</string>
+    <string name="hint_barcode">Code-barres (optionnel)</string>
     <string name="product_buying_price_hint">Prix d\'achat (XAF) *</string>
+    <string name="hint_buying_price">Prix d\'achat (XAF) *</string>
     <string name="product_selling_price_hint">Prix de vente (XAF) *</string>
+    <string name="hint_selling_price">Prix de vente (XAF) *</string>
     <string name="product_stock_hint">Quantité en stock *</string>
+    <string name="hint_stock_qty">Quantité en stock *</string>
     <string name="product_min_stock_hint">Stock minimum (alerte)</string>
+    <string name="hint_min_stock">Stock minimum (alerte)</string>
     <string name="product_save_btn">💾 Enregistrer le produit</string>
     <string name="product_delete_confirm">Supprimer %1$s ?</string>
     <string name="product_deleted">Produit supprimé</string>
@@ -71,8 +86,9 @@
     <string name="sale_qty_dialog_title">Quantité : %1$s</string>
     <string name="sale_add">Ajouter</string>
 
-    <!-- Dépenses -->
+    <!-- Dépenses (Mappé pour activity_expense.xml) -->
     <string name="expense_add_btn">+ Nouvelle Dépense</string>
+    <string name="btn_add_expense">+ Nouvelle Dépense</string>
     <string name="expense_dialog_title">Nouvelle Dépense</string>
     <string name="expense_category_label">Catégorie</string>
     <string name="expense_desc_hint">Description (optionnel)</string>
@@ -82,10 +98,13 @@
     <string name="expense_saved">Dépense enregistrée</string>
     <string name="expense_delete_confirm">Supprimer cette dépense ?</string>
 
-    <!-- Rapports -->
+    <!-- Rapports (Mappé pour activity_report.xml) -->
     <string name="report_tab_today">Aujourd\'hui</string>
+    <string name="tab_today">Aujourd\'hui</string>
     <string name="report_tab_month">Ce mois</string>
+    <string name="tab_month">Ce mois</string>
     <string name="report_tab_year">Cette année</string>
+    <string name="tab_year">Cette année</string>
     <string name="report_revenue">💰 Chiffre d\'Affaires</string>
     <string name="report_gross_profit">📈 Bénéfice Brut</string>
     <string name="report_expenses">💸 Total Dépenses</string>

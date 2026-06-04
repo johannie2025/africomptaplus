@@ -7,13 +7,18 @@
     <string name="wise_phone">+240 555 445 514</string>
 
     <!-- Lock screen -->
+    <string name="tag_lock_icon">🔒</string>
     <string name="lock_title">Período de Evaluación de AfriCompta+ Finalizado</string>
+    <string name="trial_expired_title">Período de Evaluación de AfriCompta+ Finalizado</string>
     <string name="lock_expired">Su período de prueba de 14 días ha terminado.</string>
+    <string name="trial_expired_body">Su período de prueba de 14 días ha terminado. Contacte con Wise Design para obtener su código de activación y disfrutar de todas las funciones sin límites.</string>
     <string name="lock_clock_fraud">⚠️ Fraude detectado: modificación del reloj del sistema.</string>
     <string name="lock_body">Contacte con Wise Design para obtener su código de activación y disfrutar de todas las funciones sin límites.</string>
     <string name="lock_btn_activate">📱 Solicitar mi Código de Activación</string>
+    <string name="btn_activate">📱 Solicitar mi Código de Activación</string>
     <string name="lock_whatsapp_label">WhatsApp: +240 555 445 514</string>
     <string name="lock_footer">Wise Design — AfriCompta+</string>
+    <string name="footer_text">Wise Design — AfriCompta+</string>
 
     <!-- Trial badge -->
     <string name="trial_badge">Prueba: %1$dd restante(s)</string>
@@ -22,8 +27,11 @@
     <!-- Dashboard -->
     <string name="dashboard_title">Panel de control</string>
     <string name="kpi_revenue_today">Ingresos de Hoy</string>
+    <string name="revenue_today">Ingresos de Hoy</string>
     <string name="kpi_sales_count">Ventas del día</string>
+    <string name="sales_today">Ventas del día</string>
     <string name="kpi_low_stock">⚠️ Stock crítico</string>
+    <string name="low_stock">⚠️ Stock crítico</string>
     <string name="footer_contact">Wise Design · +240 555 445 514</string>
 
     <!-- Modules -->
@@ -35,12 +43,19 @@
 
     <!-- Productos -->
     <string name="product_search_hint">🔍 Buscar un producto…</string>
+    <string name="search_hint">🔍 Buscar un producto…</string>
     <string name="product_name_hint">Nombre del producto *</string>
+    <string name="hint_product_name">Nombre del producto *</string>
     <string name="product_barcode_hint">Código de barras (opcional)</string>
+    <string name="hint_barcode">Código de barras (opcional)</string>
     <string name="product_buying_price_hint">Precio de compra (XAF) *</string>
+    <string name="hint_buying_price">Precio de compra (XAF) *</string>
     <string name="product_selling_price_hint">Precio de venta (XAF) *</string>
+    <string name="hint_selling_price">Precio de venta (XAF) *</string>
     <string name="product_stock_hint">Cantidad en stock *</string>
+    <string name="hint_stock_qty">Cantidad en stock *</string>
     <string name="product_min_stock_hint">Stock mínimo (alerta)</string>
+    <string name="hint_min_stock">Stock mínimo (alerta)</string>
     <string name="product_save_btn">💾 Guardar producto</string>
     <string name="product_delete_confirm">¿Eliminar %1$s?</string>
     <string name="product_deleted">Producto eliminado</string>
@@ -58,7 +73,7 @@
     <string name="sale_payment_label">Método de pago:</string>
     <string name="sale_cash">Efectivo</string>
     <string name="sale_mobile_money">Mobile Money</string>
-    <string name="sale_credit">Crédito</string>
+    <string name="sale_credit">Crédit</string>
     <string name="sale_total_label">TOTAL: %1$s XAF</string>
     <string name="sale_finalize_btn">✅ Finalizar Venta y Generar Factura</string>
     <string name="sale_empty_cart">Carrito vacío</string>
@@ -73,6 +88,7 @@
 
     <!-- Gastos -->
     <string name="expense_add_btn">+ Nuevo Gasto</string>
+    <string name="btn_add_expense">+ Nuevo Gasto</string>
     <string name="expense_dialog_title">Nuevo Gasto</string>
     <string name="expense_category_label">Categoría</string>
     <string name="expense_desc_hint">Descripción (opcional)</string>
@@ -84,8 +100,11 @@
 
     <!-- Informes -->
     <string name="report_tab_today">Hoy</string>
+    <string name="tab_today">Hoy</string>
     <string name="report_tab_month">Este mes</string>
+    <string name="tab_month">Este mes</string>
     <string name="report_tab_year">Este año</string>
+    <string name="tab_year">Este año</string>
     <string name="report_revenue">💰 Volumen de Ventas</string>
     <string name="report_gross_profit">📈 Beneficio Bruto</string>
     <string name="report_expenses">💸 Total Gastos</string>

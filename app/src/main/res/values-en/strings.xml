@@ -7,13 +7,18 @@
     <string name="wise_phone">+240 555 445 514</string>
 
     <!-- Lock screen -->
+    <string name="tag_lock_icon">🔒</string>
     <string name="lock_title">AfriCompta+ Evaluation Period Ended</string>
+    <string name="trial_expired_title">AfriCompta+ Evaluation Period Ended</string>
     <string name="lock_expired">Your 14-day trial period has expired.</string>
+    <string name="trial_expired_body">Your 14-day trial period has expired. Contact Wise Design to get your activation code and enjoy all features permanently without limits.</string>
     <string name="lock_clock_fraud">⚠️ Fraud detected: system clock modification.</string>
     <string name="lock_body">Contact Wise Design to get your activation code and enjoy all features permanently without limits.</string>
     <string name="lock_btn_activate">📱 Request my Activation Code</string>
+    <string name="btn_activate">📱 Request my Activation Code</string>
     <string name="lock_whatsapp_label">WhatsApp: +240 555 445 514</string>
     <string name="lock_footer">Wise Design — AfriCompta+</string>
+    <string name="footer_text">Wise Design — AfriCompta+</string>
 
     <!-- Trial badge -->
     <string name="trial_badge">Trial: %1$dd remaining</string>
@@ -22,8 +27,11 @@
     <!-- Dashboard -->
     <string name="dashboard_title">Dashboard</string>
     <string name="kpi_revenue_today">Revenue Today</string>
+    <string name="revenue_today">Revenue Today</string>
     <string name="kpi_sales_count">Sales today</string>
+    <string name="sales_today">Sales today</string>
     <string name="kpi_low_stock">⚠️ Low Stock Alert</string>
+    <string name="low_stock">⚠️ Low Stock Alert</string>
     <string name="footer_contact">Wise Design · +240 555 445 514</string>
 
     <!-- Modules -->
@@ -35,12 +43,19 @@
 
     <!-- Products -->
     <string name="product_search_hint">🔍 Search product…</string>
+    <string name="search_hint">🔍 Search product…</string>
     <string name="product_name_hint">Product name *</string>
+    <string name="hint_product_name">Product name *</string>
     <string name="product_barcode_hint">Barcode (optional)</string>
+    <string name="hint_barcode">Barcode (optional)</string>
     <string name="product_buying_price_hint">Buying price (XAF) *</string>
+    <string name="hint_buying_price">Buying price (XAF) *</string>
     <string name="product_selling_price_hint">Selling price (XAF) *</string>
+    <string name="hint_selling_price">Selling price (XAF) *</string>
     <string name="product_stock_hint">Stock quantity *</string>
+    <string name="hint_stock_qty">Stock quantity *</string>
     <string name="product_min_stock_hint">Minimum stock (alert)</string>
+    <string name="hint_min_stock">Minimum stock (alert)</string>
     <string name="product_save_btn">💾 Save product</string>
     <string name="product_delete_confirm">Delete %1$s?</string>
     <string name="product_deleted">Product deleted</string>
@@ -73,6 +88,7 @@
 
     <!-- Expenses -->
     <string name="expense_add_btn">+ New Expense</string>
+    <string name="btn_add_expense">+ New Expense</string>
     <string name="expense_dialog_title">New Expense</string>
     <string name="expense_category_label">Category</string>
     <string name="expense_desc_hint">Description (optional)</string>
@@ -84,8 +100,11 @@
 
     <!-- Reports -->
     <string name="report_tab_today">Today</string>
+    <string name="tab_today">Today</string>
     <string name="report_tab_month">This Month</string>
+    <string name="tab_month">This Month</string>
     <string name="report_tab_year">This Year</string>
+    <string name="tab_year">This Year</string>
     <string name="report_revenue">💰 Total Revenue</string>
     <string name="report_gross_profit">📈 Gross Profit</string>
     <string name="report_expenses">💸 Total Expenses</string>
