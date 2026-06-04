@@ -23,7 +23,7 @@
     <string name="footer_text">Wise Design — AfriCompta+</string>
 
     <!-- Common Buttons and Actions -->
-    <string name="action_save">Save</string>
+    <string name="btn_save">Save</string>
 	<string name="action_cancel">Cancel</string>
     <string name="action_yes">Yes</string>
     <string name="action_no">No</string>

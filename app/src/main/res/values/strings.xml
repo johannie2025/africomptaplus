@@ -144,7 +144,7 @@
     <string name="report_period_range">Du %1$s au %2$s</string>
 
 <!-- Boutons et Actions Communes (Vérifiez/Ajoutez ces doublons exacts demandés par le code Java) -->
-    <string name="action_save">Enregistrer</string>
+    <string name="btn_save">Enregistrer</string>
     <string name="action_cancel">Annuler</string>
     <string name="action_yes">Oui</string>
     <string name="action_no">Non</string>

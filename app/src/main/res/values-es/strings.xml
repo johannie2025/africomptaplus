@@ -140,7 +140,7 @@
     <string name="report_period_range">Del %1$s al %2$s</string>
 
   <!-- Botones y Acciones Comunes -->
-    <string name="action_save">Guardar</string>
+    <string name="btn_save">Guardar</string>
     <string name="action_cancel">Cancelar</string>
     <string name="action_yes">Sí</string>
     <string name="action_no">No</string>
