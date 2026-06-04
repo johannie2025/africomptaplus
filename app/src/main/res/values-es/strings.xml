@@ -25,6 +25,7 @@
     <!-- Toasts de Notificaciones -->
     <string name="toast_amount_required">Importe requerido</string>
     <string name="toast_invalid_amount">Importe inválido</string>
+	<string name="toast_product_saved">Producto guardado</string>
     <string name="toast_expense_saved">Gasto registrado</string>
     <string name="toast_cart_empty">Carrito vacío</string>
     <string name="toast_sale_saved">¡Venta registrada!</string>

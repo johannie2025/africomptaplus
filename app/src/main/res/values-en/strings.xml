@@ -37,6 +37,7 @@
     <string name="toast_amount_required">Amount required</string>
     <string name="toast_invalid_amount">Invalid amount</string>
     <string name="toast_expense_saved">Expense recorded</string>
+	<string name="toast_product_saved">Product saved</string>
     <string name="toast_cart_empty">Cart is empty</string>
     <string name="toast_sale_saved">Sale recorded successfully!</string>
     <string name="toast_sale_save_error">Error while saving sale</string>

@@ -28,6 +28,7 @@
     <string name="toast_expense_saved">Dépense enregistrée</string>
     <string name="toast_cart_empty">Panier vide</string>
     <string name="toast_sale_saved">Vente enregistrée !</string>
+	<string name="toast_product_saved">Produit enregistré</string>
     <string name="toast_sale_save_error">Erreur lors de l\'enregistrement de la vente</string>
 
  <!-- Badges & Formats de texte -->
