@@ -18,18 +18,14 @@ import java.util.Locale;
 public class SaleService {
 
     private final DatabaseHelper db;
-    private final ProductService productService;
 
     public SaleService(Context context) {
-        this.db             = DatabaseHelper.getInstance(context);
-        this.productService = new ProductService(context);
+        this.db = DatabaseHelper.getInstance(context);
     }
 
     /**
      * Enregistre une vente complète (sale + items) dans une transaction atomique.
-     * Décrémente automatiquement le stock de chaque produit.
-     *
-     * @return l'ID de la vente créée, ou -1 si échec.
+     * Décrémente automatiquement le stock de chaque produit de manière sécurisée.
      */
     public long createSale(String paymentMethod, List<SaleItem> items) {
         if (items == null || items.isEmpty()) return -1;
@@ -37,11 +33,9 @@ public class SaleService {
         SQLiteDatabase sqLiteDatabase = db.getWritableDatabase();
         sqLiteDatabase.beginTransaction();
         try {
-            // Calcul du montant total
             double total = 0;
             for (SaleItem item : items) total += item.totalPrice;
 
-            // Numéro de facture unique : YYYYMMDD-HHMMSS-msms
             String invoiceNumber = "INV-" + new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(new Date());
             String createdAt     = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date());
 
@@ -55,7 +49,7 @@ public class SaleService {
 
             if (saleId == -1) return -1;
 
-            // Insertion des lignes de vente
+            // Insertion des lignes de vente et mise à jour du stock
             for (SaleItem item : items) {
                 ContentValues itemCV = new ContentValues();
                 itemCV.put(DatabaseHelper.COL_SALE_ID,     saleId);
@@ -65,8 +59,8 @@ public class SaleService {
                 itemCV.put(DatabaseHelper.COL_TOTAL_PRICE, item.totalPrice);
                 sqLiteDatabase.insert(DatabaseHelper.T_SALE_ITEMS, null, itemCV);
 
-                // Décrément du stock
-                productService.decrementStock(item.productId, item.quantity);
+                // CORRECTION CRITIQUE : Décrémentation intégrée à la transaction courante
+                decrementProductStockInTransaction(sqLiteDatabase, item.productId, item.quantity);
             }
 
             sqLiteDatabase.setTransactionSuccessful();
@@ -75,6 +69,17 @@ public class SaleService {
         } finally {
             sqLiteDatabase.endTransaction();
         }
+    }
+
+    /**
+     * Décrémente le stock directement via SQL brut dans la transaction courante.
+     * Évite les deadlocks et garantit le stock restant en temps réel.
+     */
+    private void decrementProductStockInTransaction(SQLiteDatabase dbInstance, long productId, int quantity) {
+        String query = "UPDATE " + DatabaseHelper.T_PRODUCTS 
+                     + " SET " + DatabaseHelper.COL_STOCK + " = " + DatabaseHelper.COL_STOCK + " - ?" 
+                     + " WHERE " + DatabaseHelper.COL_ID + " = ?";
+        dbInstance.execSQL(query, new Object[]{quantity, productId});
     }
 
     /** Récupère toutes les ventes (sans leurs items), ordre décroissant. */

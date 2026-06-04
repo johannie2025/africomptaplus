@@ -39,13 +39,11 @@ public class ProductListActivity extends AppCompatActivity {
 
         productService = new ProductService(this);
 
-        // RecyclerView
         RecyclerView rv = findViewById(R.id.rvProducts);
         rv.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ProductAdapter(productList);
         rv.setAdapter(adapter);
 
-        // Recherche
         EditText etSearch = findViewById(R.id.etSearch);
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -55,7 +53,6 @@ public class ProductListActivity extends AppCompatActivity {
             @Override public void afterTextChanged(Editable s) {}
         });
 
-        // FAB : nouveau produit
         FloatingActionButton fab = findViewById(R.id.fabAddProduct);
         fab.setOnClickListener(v ->
                 startActivity(new Intent(this, ProductFormActivity.class)));
@@ -77,8 +74,6 @@ public class ProductListActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
-    // ── Adapter interne ───────────────────────────────────────────────────────
-
     private class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.VH> {
 
         private final List<Product> list;
@@ -97,27 +92,25 @@ public class ProductListActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull VH h, int pos) {
             Product p = list.get(pos);
             h.tvName.setText(p.name);
-            h.tvPrice.setText(String.format(Locale.FRENCH, "%,.0f XAF", p.sellingPrice));
-            h.tvStock.setText("Stock : " + p.stock);
+            h.tvPrice.setText(String.format(Locale.getDefault(), "%,.0f XAF", p.sellingPrice));
+            h.tvStock.setText(getString(R.string.badge_stock_display, p.stock));
             h.tvStock.setTextColor(p.isLowStock() ? 0xFFE53935 : 0xFF43A047);
 
-            // Édition
             h.itemView.setOnClickListener(v -> {
                 Intent i = new Intent(ProductListActivity.this, ProductFormActivity.class);
                 i.putExtra(ProductFormActivity.EXTRA_PRODUCT_ID, p.id);
                 startActivity(i);
             });
 
-            // Suppression (long press)
             h.itemView.setOnLongClickListener(v -> {
                 new AlertDialog.Builder(ProductListActivity.this)
-                        .setTitle("Supprimer " + p.name + " ?")
-                        .setPositiveButton("Oui", (d, w) -> {
+                        .setTitle(getString(R.string.dialog_delete_product, p.name))
+                        .setPositiveButton(getString(R.string.action_yes), (d, w) -> {
                             productService.delete(p.id);
                             loadProducts("");
-                            Toast.makeText(ProductListActivity.this, "Produit supprimé", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ProductListActivity.this, getString(R.string.toast_product_deleted), Toast.LENGTH_SHORT).show();
                         })
-                        .setNegativeButton("Non", null)
+                        .setNegativeButton(getString(R.string.action_no), null)
                         .show();
                 return true;
             });

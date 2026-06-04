@@ -56,7 +56,7 @@ public class ProductFormActivity extends AppCompatActivity {
     private void saveProduct() {
         String name = etName.getText().toString().trim();
         if (name.isEmpty()) {
-            etName.setError("Nom requis");
+            etName.setError(getString(R.string.toast_product_name_required));
             return;
         }
 
@@ -68,7 +68,7 @@ public class ProductFormActivity extends AppCompatActivity {
             stock        = Integer.parseInt(etStock.getText().toString().trim());
             minStock     = Integer.parseInt(etMinStock.getText().toString().trim());
         } catch (NumberFormatException e) {
-            Toast.makeText(this, "Veuillez saisir des valeurs numériques valides", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.toast_invalid_numeric_values), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -82,10 +82,10 @@ public class ProductFormActivity extends AppCompatActivity {
 
         long id = productService.save(p);
         if (id > 0) {
-            Toast.makeText(this, "Produit enregistré", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.toast_product_saved), Toast.LENGTH_SHORT).show();
             finish();
         } else {
-            Toast.makeText(this, "Erreur lors de l'enregistrement", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.toast_save_error), Toast.LENGTH_SHORT).show();
         }
     }
 }

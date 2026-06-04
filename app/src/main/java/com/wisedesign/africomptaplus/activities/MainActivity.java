@@ -15,10 +15,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-/**
- * MainActivity — Dashboard principal.
- * Affiche les KPIs du jour et les raccourcis vers les modules.
- */
 public class MainActivity extends AppCompatActivity {
 
     private ReportService reportService;
@@ -44,20 +40,18 @@ public class MainActivity extends AppCompatActivity {
     private void refreshDashboard() {
         String today = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date());
 
-        // KPIs du jour
         double revenueToday  = reportService.revenueToday(today);
         int    salesCount    = reportService.countSalesToday(today);
         int    lowStock      = reportService.countLowStockProducts();
         int    daysRemaining = securityManager.getRemainingDays();
 
         setText(R.id.tvRevenueToday,  formatAmount(revenueToday) + " XAF");
-        setText(R.id.tvSalesCount,    salesCount + " vente(s)");
-        setText(R.id.tvLowStock,      lowStock + " produit(s)");
-        setText(R.id.tvTrialBadge,    "Essai : " + daysRemaining + "j");
+        setText(R.id.tvSalesCount,    getString(R.string.badge_sales, salesCount));
+        setText(R.id.tvLowStock,      getString(R.string.badge_products, lowStock));
+        setText(R.id.tvTrialBadge,    getString(R.string.badge_trial, daysRemaining));
     }
 
     private void setupCards() {
-        // Navigation vers les modules
         clickCard(R.id.cardSale,      SaleActivity.class);
         clickCard(R.id.cardProducts,  ProductListActivity.class);
         clickCard(R.id.cardExpenses,  ExpenseActivity.class);
@@ -79,6 +73,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String formatAmount(double amount) {
-        return String.format(Locale.FRENCH, "%,.0f", amount);
+        return String.format(Locale.getDefault(), "%,.0f", amount);
     }
 }

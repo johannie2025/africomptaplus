@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
-        android:hint="Rechercher un produit..."
+        android:hint="@string/search_hint"
         android:inputType="text"
         android:padding="12dp"
         android:background="@color/white"
@@ -36,6 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:src="@android:drawable/ic_input_add"
+        android:contentDescription="@string/module_products"
         app:backgroundTint="@color/accent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

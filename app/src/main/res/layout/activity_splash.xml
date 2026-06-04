@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="AfriCompta+"
+        android:text="@string/app_name"
         android:textColor="@color/white"
         android:textSize="42sp"
         android:textStyle="bold"/>
@@ -19,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="by Wise Design"
+        android:text="@string/splash_subtitle"
         android:textColor="#BBDEFB"
         android:textSize="16sp"/>
 
@@ -27,7 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        android:text="Gestion simplifiée pour le commerce africain"
+        android:text="@string/splash_description"
         android:textColor="#90CAF9"
         android:textSize="12sp"/>
 
@@ -42,8 +42,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text=""
-        android:textColor="#FFE082"
+        android:textColor="@color/white"
         android:textSize="13sp"/>
-
 </LinearLayout>

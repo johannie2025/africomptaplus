@@ -1,7 +1,6 @@
 package com.wisedesign.africomptaplus.activities;
 
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -41,16 +40,12 @@ public class ReportActivity extends AppCompatActivity {
             @Override public void onTabReselected(TabLayout.Tab tab) {}
         });
 
-        // Rapport du jour par défaut
         loadReport(0);
     }
 
-    /**
-     * 0 = Aujourd'hui, 1 = Ce mois, 2 = Cette année
-     */
     private void loadReport(int period) {
         SimpleDateFormat sdf    = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-        SimpleDateFormat sdfFmt = new SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH);
+        SimpleDateFormat sdfFmt = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         Calendar cal = Calendar.getInstance();
         Date today   = cal.getTime();
 
@@ -61,18 +56,19 @@ public class ReportActivity extends AppCompatActivity {
                 cal.set(Calendar.DAY_OF_MONTH, 1);
                 start = sdf.format(cal.getTime());
                 end   = sdf.format(today);
-                tvPeriod.setText("Du " + sdfFmt.format(cal.getTime()) + " au " + sdfFmt.format(today));
+                tvPeriod.setText(getString(R.string.period_range_from_to, sdfFmt.format(cal.getTime()), sdfFmt.format(today)));
                 break;
             case 2: // Cette année
                 cal.set(Calendar.DAY_OF_YEAR, 1);
                 start = sdf.format(cal.getTime());
                 end   = sdf.format(today);
-                tvPeriod.setText("Du 01/01/" + new SimpleDateFormat("yyyy", Locale.US).format(today) + " au " + sdfFmt.format(today));
+                String currentYear = new SimpleDateFormat("yyyy", Locale.US).format(today);
+                tvPeriod.setText(getString(R.string.period_range_from_to, "01/01/" + currentYear, sdfFmt.format(today)));
                 break;
             default: // Aujourd'hui
                 start = sdf.format(today);
                 end   = sdf.format(today);
-                tvPeriod.setText("Aujourd'hui : " + sdfFmt.format(today));
+                tvPeriod.setText(getString(R.string.period_today, sdfFmt.format(today)));
         }
 
         FinancialReport report = reportService.computeReport(start, end);
@@ -89,6 +85,6 @@ public class ReportActivity extends AppCompatActivity {
     }
 
     private String formatAmount(double amount) {
-        return String.format(Locale.FRENCH, "%,.0f", amount);
+        return String.format(Locale.getDefault(), "%,.0f", amount);
     }
 }

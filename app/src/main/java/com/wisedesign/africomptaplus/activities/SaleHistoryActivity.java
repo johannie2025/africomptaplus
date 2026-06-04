@@ -51,8 +51,6 @@ public class SaleHistoryActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
-    // ── Adapter ───────────────────────────────────────────────────────────────
-
     private class SaleAdapter extends RecyclerView.Adapter<SaleAdapter.VH> {
 
         private final List<Sale> list;
@@ -71,11 +69,20 @@ public class SaleHistoryActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull VH h, int pos) {
             Sale s = list.get(pos);
             h.tvInvoice.setText(s.invoiceNumber);
-            h.tvAmount.setText(String.format(Locale.FRENCH, "%,.0f XAF", s.totalAmount));
+            h.tvAmount.setText(String.format(Locale.getDefault(), "%,.0f XAF", s.totalAmount));
             h.tvDate.setText(s.createdAt);
-            h.tvPayment.setText(s.paymentMethod);
 
-            // Re-générer et partager la facture PDF
+            // Mappage de l'affichage du mode de paiement traduit
+            String readablePayment;
+            if ("mobile_money".equalsIgnoreCase(s.paymentMethod)) {
+                readablePayment = getString(R.string.pay_momo);
+            } else if ("credit".equalsIgnoreCase(s.paymentMethod)) {
+                readablePayment = getString(R.string.pay_credit);
+            } else {
+                readablePayment = getString(R.string.pay_cash);
+            }
+            h.tvPayment.setText(readablePayment);
+
             h.itemView.setOnClickListener(v -> {
                 Sale fullSale = saleService.findByIdWithItems(s.id);
                 if (fullSale != null) {
@@ -85,7 +92,7 @@ public class SaleHistoryActivity extends AppCompatActivity {
                         shareIntent.setType("application/pdf");
                         shareIntent.putExtra(Intent.EXTRA_STREAM, pdfUri);
                         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        startActivity(Intent.createChooser(shareIntent, "Partager la facture via"));
+                        startActivity(Intent.createChooser(shareIntent, getString(R.string.action_share_invoice_via)));
                     }
                 }
             });

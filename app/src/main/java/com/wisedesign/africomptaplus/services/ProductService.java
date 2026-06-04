@@ -81,13 +81,17 @@ public class ProductService {
         return list;
     }
 
-    /** Décrémente le stock d'un produit après une vente. */
+    /**
+     * CORRECTION : rawQuery() est read-only — utilisation de execSQL() pour le UPDATE.
+     * Appelé UNIQUEMENT hors transaction (ex. usage autonome).
+     * Dans SaleService, la décrémentation se fait via decrementProductStockInTransaction().
+     */
     public void decrementStock(long productId, int qty) {
-        db.rawQuery(
+        db.getWritableDatabase().execSQL(
                 "UPDATE " + DatabaseHelper.T_PRODUCTS
                 + " SET " + DatabaseHelper.COL_STOCK + " = " + DatabaseHelper.COL_STOCK + " - ?"
                 + " WHERE " + DatabaseHelper.COL_ID + " = ?",
-                new String[]{String.valueOf(qty), String.valueOf(productId)}).close();
+                new Object[]{qty, productId});
     }
 
     // ── Mapping ──────────────────────────────────────────────────────────────

@@ -5,7 +5,6 @@
     android:orientation="vertical"
     android:background="@color/surface">
 
-    <!-- Panier -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvCart"
         android:layout_width="match_parent"
@@ -14,7 +13,6 @@
         android:padding="8dp"
         android:clipToPadding="false"/>
 
-    <!-- Panneau bas -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -26,34 +24,32 @@
         <Button android:id="@+id/btnAddProduct"
             style="@style/PrimaryButton"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="+ Ajouter un produit"
+            android:text="@string/btn_add_product"
             android:layout_marginBottom="12dp"/>
 
-        <!-- Mode de paiement -->
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="Mode de paiement :" android:textSize="13sp"
+            android:text="@string/label_payment_method" android:textSize="13sp"
             android:textColor="@color/text_secondary" android:layout_marginBottom="6dp"/>
 
         <RadioGroup android:id="@+id/rgPayment"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_width="match_parent" android:layout_height=\"wrap_content\"
             android:orientation="horizontal" android:layout_marginBottom="12dp">
 
             <RadioButton android:id="@+id/rbCash"
-                android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="Espèces" android:checked="true"/>
+                android:layout_width="0dp" android:layout_height=\"wrap_content\"
+                android:layout_weight="1" android:text="@string/pay_cash" android:checked="true"/>
 
             <RadioButton android:id="@+id/rbMobileMoney"
                 android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="Mobile Money"/>
+                android:layout_weight="1" android:text="@string/pay_momo"/>
 
             <RadioButton android:id="@+id/rbCredit"
                 android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="Crédit"/>
+                android:layout_weight="1" android:text="@string/pay_credit"/>
         </RadioGroup>
 
-        <!-- Total -->
         <TextView android:id="@+id/tvTotal"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_width="match_parent" android:layout_height=\"wrap_content\"
             android:text="TOTAL : 0 XAF"
             android:textColor="@color/primary" android:textSize="22sp"
             android:textStyle="bold" android:gravity="center"
@@ -62,7 +58,6 @@
         <Button android:id="@+id/btnFinalizeSale"
             style="@style/ActivationButton"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="✅ Finaliser la Vente &amp; Générer Facture"/>
-
+            android:text="@string/btn_finalize_sale"/>
     </LinearLayout>
 </LinearLayout>

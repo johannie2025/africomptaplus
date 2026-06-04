@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App -->
+    <string name="app_name">AfriCompta+</string>
+    <string name="app_tagline">Simplified management for African commerce</string>
+    <string name="by_wise_design">by Wise Design</string>
+    <string name="wise_phone">+240 555 445 514</string>
+
+    <!-- Lock screen -->
+    <string name="lock_title">AfriCompta+ Trial Period Ended</string>
+    <string name="lock_expired">Your 14-day free trial has expired.</string>
+    <string name="lock_clock_fraud">⚠️ Fraud detected: system clock was rolled back.</string>
+    <string name="lock_body">Contact Wise Design to get your activation code and enjoy all features without limits.</string>
+    <string name="lock_btn_activate">📱 Request My Activation Code</string>
+    <string name="lock_whatsapp_label">WhatsApp: +240 555 445 514</string>
+    <string name="lock_footer">Wise Design — AfriCompta+</string>
+
+    <!-- Trial badge -->
+    <string name="trial_badge">Trial: %1$d day(s) left</string>
+    <string name="trial_days_label">Trial period: %1$d day(s) remaining</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Dashboard</string>
+    <string name="kpi_revenue_today">Today\'s Revenue</string>
+    <string name="kpi_sales_count">Today\'s Sales</string>
+    <string name="kpi_low_stock">⚠️ Low Stock</string>
+    <string name="footer_contact">Wise Design · +240 555 445 514</string>
+
+    <!-- Modules -->
+    <string name="module_sale">🛒  New Sale</string>
+    <string name="module_products">📦  Products &amp; Stock</string>
+    <string name="module_expenses">💸  Expenses</string>
+    <string name="module_reports">📊  Financial Reports</string>
+    <string name="module_history">🕒  Sales History</string>
+
+    <!-- Products -->
+    <string name="product_search_hint">🔍 Search a product…</string>
+    <string name="product_name_hint">Product name *</string>
+    <string name="product_barcode_hint">Barcode (optional)</string>
+    <string name="product_buying_price_hint">Buying price (XAF) *</string>
+    <string name="product_selling_price_hint">Selling price (XAF) *</string>
+    <string name="product_stock_hint">Stock quantity *</string>
+    <string name="product_min_stock_hint">Minimum stock (alert)</string>
+    <string name="product_save_btn">💾 Save product</string>
+    <string name="product_delete_confirm">Delete %1$s?</string>
+    <string name="product_deleted">Product deleted</string>
+    <string name="product_saved">Product saved</string>
+    <string name="product_save_error">Error saving product</string>
+    <string name="product_no_stock">Insufficient stock (%1$d available)</string>
+    <string name="product_invalid_qty">Invalid quantity</string>
+    <string name="product_none_available">No products available. Please add products first.</string>
+    <string name="product_low_stock_label">Stock: %1$d</string>
+    <string name="product_name_required">Name required</string>
+    <string name="product_number_error">Please enter valid numeric values</string>
+
+    <!-- Sales -->
+    <string name="sale_add_product_btn">+ Add product</string>
+    <string name="sale_payment_label">Payment method:</string>
+    <string name="sale_cash">Cash</string>
+    <string name="sale_mobile_money">Mobile Money</string>
+    <string name="sale_credit">Credit</string>
+    <string name="sale_total_label">TOTAL: %1$s XAF</string>
+    <string name="sale_finalize_btn">✅ Finalize Sale &amp; Generate Invoice</string>
+    <string name="sale_empty_cart">Empty cart</string>
+    <string name="sale_success">Sale recorded!</string>
+    <string name="sale_error">Error recording the sale</string>
+    <string name="sale_share_title">Share invoice via</string>
+    <string name="sale_history_tip">Tap a sale to regenerate its PDF invoice</string>
+    <string name="sale_choose_product">Choose a product</string>
+    <string name="sale_qty_hint">Quantity</string>
+    <string name="sale_qty_dialog_title">Quantity: %1$s</string>
+    <string name="sale_add">Add</string>
+
+    <!-- Expenses -->
+    <string name="expense_add_btn">+ New Expense</string>
+    <string name="expense_dialog_title">New Expense</string>
+    <string name="expense_category_label">Category</string>
+    <string name="expense_desc_hint">Description (optional)</string>
+    <string name="expense_amount_hint">Amount (XAF) *</string>
+    <string name="expense_amount_required">Amount required</string>
+    <string name="expense_amount_invalid">Invalid amount</string>
+    <string name="expense_saved">Expense saved</string>
+    <string name="expense_delete_confirm">Delete this expense?</string>
+
+    <!-- Reports -->
+    <string name="report_tab_today">Today</string>
+    <string name="report_tab_month">This month</string>
+    <string name="report_tab_year">This year</string>
+    <string name="report_revenue">💰 Total Revenue</string>
+    <string name="report_gross_profit">📈 Gross Profit</string>
+    <string name="report_expenses">💸 Total Expenses</string>
+    <string name="report_net_profit">🏆 Net Profit</string>
+    <string name="report_net_formula">= Gross profit − Expenses</string>
+    <string name="report_period_today">Today: %1$s</string>
+    <string name="report_period_range">From %1$s to %2$s</string>
+
+    <!-- Common buttons -->
+    <string name="btn_save">Save</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_yes">Yes</string>
+    <string name="btn_no">No</string>
+    <string name="btn_add">Add</string>
+    <string name="btn_delete">Delete</string>
+    <string name="btn_share">Share</string>
+
+    <!-- PDF / Invoice -->
+    <string name="invoice_header">AFRICOMPTA+</string>
+    <string name="invoice_from">Wise Design</string>
+    <string name="invoice_whatsapp">WhatsApp: +240 555 445 514</string>
+    <string name="invoice_label">Invoice</string>
+    <string name="invoice_date">Date</string>
+    <string name="invoice_payment">Payment</string>
+    <string name="invoice_col_article">Item</string>
+    <string name="invoice_col_qty">Qty</string>
+    <string name="invoice_col_total">Total</string>
+    <string name="invoice_total_label">TOTAL</string>
+    <string name="invoice_thank_you">Thank you for your purchase!</string>
+    <string name="invoice_footer">— AfriCompta+ by Wise Design —</string>
+    <string name="invoice_unit_price">%1$s / unit</string>
+    <string name="invoice_subject">Invoice %1$s</string>
+</resources>

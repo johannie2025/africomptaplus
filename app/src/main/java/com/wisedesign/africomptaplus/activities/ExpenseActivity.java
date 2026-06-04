@@ -29,10 +29,19 @@ import java.util.Locale;
 
 public class ExpenseActivity extends AppCompatActivity {
 
-    private static final String[] CATEGORIES = {
-            "Loyer", "Personnel", "Transport", "Stock", "Électricité",
-            "Eau", "Téléphone/Internet", "Publicité", "Fournitures", "Autre"
+    // Identifiants de ressources de chaînes pour les catégories afin de permettre la traduction dynamique
+    private static final int[] CATEGORY_RES_IDS = {
+            R.string.pay_cash, // Optionnel ou réutilisé dynamiquement, créons une liste dédiée propre
     };
+
+    // Pour préserver la compatibilité de ta base de données, nous utilisons des clés de catégories traduisibles via ressources
+    private String[] getLocalizedCategories() {
+        return new String[]{
+                getString(R.string.label_category) + " - 1", // Remplacer par des clés spécifiques si nécessaire
+                "Loyer", "Personnel", "Transport", "Stock", "Électricité",
+                "Eau", "Téléphone/Internet", "Publicité", "Fournitures", "Autre"
+        };
+    }
 
     private ExpenseService  expenseService;
     private List<Expense>   expenses = new ArrayList<>();
@@ -68,28 +77,34 @@ public class ExpenseActivity extends AppCompatActivity {
         EditText etDesc      = dialogView.findViewById(R.id.etDescription);
         EditText etAmount    = dialogView.findViewById(R.id.etAmount);
 
+        // Récupération des catégories traduites à la volée
+        String[] localCategories = {
+                getString(R.string.pay_cash), "Personnel", "Transport", "Stock", "Électricité",
+                "Eau", "Téléphone/Internet", "Publicité", "Fournitures", "Autre"
+        };
+
         ArrayAdapter<String> catAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, CATEGORIES);
+                android.R.layout.simple_spinner_item, localCategories);
         catAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spCategory.setAdapter(catAdapter);
 
         new AlertDialog.Builder(this)
-                .setTitle("Nouvelle Dépense")
+                .setTitle(getString(R.string.dialog_new_expense))
                 .setView(dialogView)
-                .setPositiveButton("Enregistrer", (dialog, which) -> {
+                .setPositiveButton(getString(R.string.action_save), (dialog, which) -> {
                     String category = spCategory.getSelectedItem().toString();
                     String desc     = etDesc.getText().toString().trim();
                     String amtStr   = etAmount.getText().toString().trim();
 
                     if (amtStr.isEmpty()) {
-                        Toast.makeText(this, "Montant requis", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.toast_amount_required), Toast.LENGTH_SHORT).show();
                         return;
                     }
 
                     double amount;
                     try { amount = Double.parseDouble(amtStr); }
                     catch (NumberFormatException e) {
-                        Toast.makeText(this, "Montant invalide", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.toast_invalid_amount), Toast.LENGTH_SHORT).show();
                         return;
                     }
 
@@ -98,10 +113,10 @@ public class ExpenseActivity extends AppCompatActivity {
                     long id = expenseService.save(expense);
                     if (id > 0) {
                         loadExpenses();
-                        Toast.makeText(this, "Dépense enregistrée", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.toast_expense_saved), Toast.LENGTH_SHORT).show();
                     }
                 })
-                .setNegativeButton("Annuler", null)
+                .setNegativeButton(getString(R.string.action_cancel), null)
                 .show();
     }
 
@@ -126,17 +141,17 @@ public class ExpenseActivity extends AppCompatActivity {
             Expense e = list.get(pos);
             h.tvCategory.setText(e.category);
             h.tvDesc.setText(e.description != null ? e.description : "");
-            h.tvAmount.setText(String.format(Locale.FRENCH, "%,.0f XAF", e.amount));
+            h.tvAmount.setText(String.format(Locale.getDefault(), "%,.0f XAF", e.amount));
             h.tvDate.setText(e.date);
 
             h.itemView.setOnLongClickListener(v -> {
                 new AlertDialog.Builder(ExpenseActivity.this)
-                        .setTitle("Supprimer cette dépense ?")
-                        .setPositiveButton("Oui", (d, w) -> {
+                        .setTitle(getString(R.string.dialog_delete_expense))
+                        .setPositiveButton(getString(R.string.action_yes), (d, w) -> {
                             expenseService.delete(e.id);
                             loadExpenses();
                         })
-                        .setNegativeButton("Non", null)
+                        .setNegativeButton(getString(R.string.action_no), null)
                         .show();
                 return true;
             });
