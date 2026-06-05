@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:id="@+id/tvLockReason"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/lock_bg"
@@ -39,6 +38,17 @@
         android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"
         android:background="#FFCDD2"/>
+
+    <!-- Reason text view for dynamic lock message -->
+    <TextView
+        android:id="@+id/tvLockReason"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="@string/trial_expired_body"
+        android:textColor="#FFEBEE"
+        android:textSize="14sp"/>
 
     <TextView
         android:layout_width="match_parent"
