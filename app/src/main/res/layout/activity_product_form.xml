@@ -12,38 +12,39 @@
 
         <EditText android:id="@+id/etName"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:hint="@string/hint_product_name" android:inputType="text"
+            android:hint="Nom du produit *" android:inputType="text"
             android:layout_marginBottom="12dp"/>
 
         <EditText android:id="@+id/etBarcode"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:hint="@string/hint_barcode" android:inputType="text"
+            android:hint="Code-barres (optionnel)" android:inputType="text"
             android:layout_marginBottom="12dp"/>
 
         <EditText android:id="@+id/etBuyingPrice"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:hint="@string/hint_buying_price" android:inputType="numberDecimal"
+            android:hint="Prix d'achat (XAF) *" android:inputType="numberDecimal"
             android:layout_marginBottom="12dp"/>
 
         <EditText android:id="@+id/etSellingPrice"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:hint="@string/hint_selling_price" android:inputType="numberDecimal"
+            android:hint="Prix de vente (XAF) *" android:inputType="numberDecimal"
             android:layout_marginBottom="12dp"/>
 
         <EditText android:id="@+id/etStock"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:hint="@string/hint_stock_qty" android:inputType="number"
+            android:hint="Quantité en stock *" android:inputType="number"
             android:layout_marginBottom="12dp"/>
 
         <EditText android:id="@+id/etMinStock"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:hint="@string/hint_min_stock" android:inputType="number"
+            android:hint="Stock minimum (alerte)" android:inputType="number"
             android:text="5"
             android:layout_marginBottom="24dp"/>
 
         <Button android:id="@+id/btnSave"
             style="@style/PrimaryButton"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/btn_save"/>
+            android:text="💾 Enregistrer le produit"/>
+
     </LinearLayout>
 </ScrollView>

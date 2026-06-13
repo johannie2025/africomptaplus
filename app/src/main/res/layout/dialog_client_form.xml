@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="vertical" android:padding="20dp">
+    <EditText android:id="@+id/etClientName"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:hint="Nom *" android:inputType="textCapWords" android:layout_marginBottom="10dp"/>
+    <EditText android:id="@+id/etClientPhone"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:hint="Téléphone" android:inputType="phone" android:layout_marginBottom="10dp"/>
+    <EditText android:id="@+id/etClientEmail"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:hint="Email (optionnel)" android:inputType="textEmailAddress" android:layout_marginBottom="10dp"/>
+    <EditText android:id="@+id/etClientAddress"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:hint="Adresse / Quartier" android:inputType="text"/>
+</LinearLayout>

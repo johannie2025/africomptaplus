@@ -10,14 +10,14 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/tag_lock_icon"
+        android:text="🔒"
         android:textSize="64sp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="@string/app_name"
+        android:text="AfriCompta+"
         android:textColor="@color/white"
         android:textSize="28sp"
         android:textStyle="bold"/>
@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:text="@string/trial_expired_title"
+        android:text="Période d'évaluation Terminée"
         android:textColor="#FFCDD2"
         android:textSize="18sp"
         android:textStyle="bold"/>
@@ -39,25 +39,26 @@
         android:layout_marginBottom="20dp"
         android:background="#FFCDD2"/>
 
-    <!-- Reason text view for dynamic lock message -->
     <TextView
         android:id="@+id/tvLockReason"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:padding="16dp"
-        android:text="@string/trial_expired_body"
+        android:text="Votre période d'essai de 14 jours est terminée."
         android:textColor="#FFEBEE"
         android:textSize="14sp"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="#33FFFFFF"
         android:gravity="center"
         android:padding="16dp"
-        android:text="@string/trial_expired_body"
-        android:textColor="#FFEBEE"
-        android:textSize="14sp"/>
+        android:text="Contactez Wise Design pour obtenir votre code d'activation et profiter de toutes les fonctionnalités en illimité."
+        android:textColor="@color/white"
+        android:textSize="13sp"/>
 
     <Button
         android:id="@+id/btnActivate"
@@ -66,14 +67,23 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:padding="16dp"
-        android:text="@string/btn_activate"
+        android:text="📱 Demander mon Code d'Activation"
         android:textSize="15sp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="@string/footer_text"
+        android:text="WhatsApp : +240 555 445 514"
         android:textColor="#FFCDD2"
         android:textSize="12sp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Wise Design — AfriCompta+"
+        android:textColor="#EF9A9A"
+        android:textSize="11sp"/>
+
 </LinearLayout>

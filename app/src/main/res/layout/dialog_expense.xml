@@ -6,7 +6,7 @@
     android:padding="20dp">
 
     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:text="@string/label_category" android:textSize="12sp"
+        android:text="Catégorie" android:textSize="12sp"
         android:textColor="@color/text_secondary" android:layout_marginBottom="4dp"/>
 
     <Spinner android:id="@+id/spCategory"
@@ -15,10 +15,11 @@
 
     <EditText android:id="@+id/etDescription"
         android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:hint="@string/hint_expense_description" android:inputType="text"
+        android:hint="Description (optionnel)" android:inputType="text"
         android:layout_marginBottom="12dp"/>
 
     <EditText android:id="@+id/etAmount"
         android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:hint="@string/hint_expense_amount" android:inputType="numberDecimal"/>
+        android:hint="Montant (XAF) *" android:inputType="numberDecimal"/>
+
 </LinearLayout>

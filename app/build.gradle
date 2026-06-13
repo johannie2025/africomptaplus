@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace 'com.wisedesign.africomptaplus'
-    compileSdk 34 // Assurez-vous d'avoir défini le compileSdk ici
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.wisedesign.africomptaplus"
-        minSdkVersion 26
-        targetSdkVersion 34
+        minSdk 21
+        targetSdk 34
         versionCode 1
         versionName "1.0.0"
     }

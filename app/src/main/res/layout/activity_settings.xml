@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/surface">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="16dp">
+
+        <!-- LICENCE -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="🔑 Licence" android:textSize="14sp" android:textAllCaps="true"
+            android:textColor="@color/text_secondary" android:layout_marginBottom="8dp"/>
+        <TextView android:id="@+id/tvLicenseStatus"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:padding="12dp" android:text="Vérification…"
+            android:background="@color/white" android:textSize="14sp"
+            android:layout_marginBottom="8dp"/>
+        <EditText android:id="@+id/etLicenseKey"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:hint="Clé de licence (ex: ACP-XXXX-XXXX-XXXX)"
+            android:inputType="textCapCharacters" android:layout_marginBottom="8dp"/>
+        <Button android:id="@+id/btnActivateLicense"
+            style="@style/PrimaryButton"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="✅ Activer la Licence" android:layout_marginBottom="24dp"/>
+
+        <!-- BOUTIQUE -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="🏪 Paramètres Boutique" android:textSize="14sp" android:textAllCaps="true"
+            android:textColor="@color/text_secondary" android:layout_marginBottom="8dp"/>
+        <EditText android:id="@+id/etShopName"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:hint="Nom de la boutique *" android:layout_marginBottom="10dp"/>
+        <EditText android:id="@+id/etShopPhone"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:hint="Téléphone boutique" android:inputType="phone"
+            android:layout_marginBottom="10dp"/>
+        <EditText android:id="@+id/etShopAddress"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:hint="Adresse / localisation" android:layout_marginBottom="10dp"/>
+        <EditText android:id="@+id/etInvoiceFooter"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:hint="Pied de page facture" android:layout_marginBottom="16dp"/>
+
+        <!-- LOGO -->
+        <TextView android:id="@+id/tvLogoPath"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Aucun logo sélectionné" android:textColor="@color/text_secondary"
+            android:textSize="12sp" android:padding="8dp"
+            android:background="@color/white" android:layout_marginBottom="8dp"/>
+        <Button android:id="@+id/btnPickLogo"
+            style="@style/PrimaryButton"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="🖼️ Choisir Logo Boutique" android:layout_marginBottom="24dp"/>
+
+        <!-- SAUVEGARDE CLOUD (Premium) -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="☁️ Sauvegarde Cloud (Premium)" android:textSize="14sp" android:textAllCaps="true"
+            android:textColor="@color/text_secondary" android:layout_marginBottom="8dp"/>
+        <Button android:id="@+id/btnCloudBackup"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="☁️ Sauvegarder vers le Cloud"
+            android:backgroundTint="@color/info" android:textColor="@color/white"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- ENREGISTRER -->
+        <Button android:id="@+id/btnSaveSettings"
+            style="@style/ActivationButton"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="💾 Enregistrer les Paramètres"/>
+    </LinearLayout>
+</ScrollView>

@@ -11,6 +11,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.wisedesign.africomptaplus.R;
 import com.wisedesign.africomptaplus.services.SecurityManager;
 
+/**
+ * SplashActivity — Point d'entrée de l'application.
+ * Vérifie la sécurité (time-bomb) avant de router vers MainActivity ou LockActivity.
+ */
 public class SplashActivity extends AppCompatActivity {
 
     @Override
@@ -18,6 +22,7 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+        // Vérification sécurité (time-bomb 14 jours)
         SecurityManager security = new SecurityManager(this);
         SecurityManager.LockReason reason = security.checkAndUpdate();
 
@@ -25,13 +30,15 @@ public class SplashActivity extends AppCompatActivity {
             int daysLeft = security.getRemainingDays();
             TextView tvDays = findViewById(R.id.tvTrialDays);
             if (tvDays != null && daysLeft < 14) {
-                tvDays.setText(getString(R.string.badge_trial_days_left, daysLeft));
+                tvDays.setText("Période d'essai : " + daysLeft + " jour(s) restant(s)");
             }
+            // Démarrage normal après 1.5s
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 startActivity(new Intent(this, MainActivity.class));
                 finish();
             }, 1500);
         } else {
+            // Verrouillage immédiat
             Intent lockIntent = new Intent(this, LockActivity.class);
             lockIntent.putExtra(LockActivity.EXTRA_LOCK_REASON, reason.name());
             lockIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

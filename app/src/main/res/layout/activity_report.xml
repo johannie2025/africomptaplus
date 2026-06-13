@@ -1,124 +1,175 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/surface">
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/surface">
 
-    <!-- Period display TextView -->
-    <TextView
-        android:id="@+id/tvPeriod"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:gravity="center"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="@color/primary"
-        android:background="@color/surface"/>
-
+    <!-- 5 onglets de période -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabPeriod"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:tabGravity="fill"
-        app:tabMode="fixed"
-        app:tabSelectedTextColor="@color/white"
-        app:tabTextColor="#90CAF9"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        app:tabGravity="fill" app:tabMode="scrollable"
+        app:tabSelectedTextColor="@color/white" app:tabTextColor="#90CAF9"
         android:background="@color/primary">
-
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/tab_today"/>
-
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/tab_month"/>
-
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/tab_year"/>
+        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Jour"/>
+        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Mois"/>
+        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Trimestre"/>
+        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Semestre"/>
+        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Année"/>
     </com.google.android.material.tabs.TabLayout>
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <ScrollView android:layout_width="match_parent" android:layout_height="match_parent">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="14dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            <TextView android:id="@+id/tvPeriod"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary" android:textSize="12sp"
+                android:layout_marginBottom="12dp"/>
 
-            <androidx.cardview.widget.CardView
-                style="@style/DashboardCard"
+            <!-- KPI Grid row 1 -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:weightSum="2" android:layout_marginBottom="8dp">
+
+                <androidx.cardview.widget.CardView android:layout_width="0dp"
+                    android:layout_height="wrap_content" android:layout_weight="1"
+                    android:layout_marginEnd="6dp" style="@style/DashboardCard">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="vertical" android:padding="14dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="💰 Chiffre d'Affaires" android:textColor="@color/text_secondary" android:textSize="11sp"/>
+                        <TextView android:id="@+id/tvRevenue"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="0 XAF" android:textColor="@color/primary"
+                            android:textSize="18sp" android:textStyle="bold"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView android:layout_width="0dp"
+                    android:layout_height="wrap_content" android:layout_weight="1"
+                    android:layout_marginStart="6dp" style="@style/DashboardCard">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="vertical" android:padding="14dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="📈 Bénéfice Brut" android:textColor="@color/text_secondary" android:textSize="11sp"/>
+                        <TextView android:id="@+id/tvGrossProfit"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="0 XAF" android:textColor="@color/success"
+                            android:textSize="18sp" android:textStyle="bold"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+
+            <!-- KPI Grid row 2 -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:weightSum="2" android:layout_marginBottom="8dp">
+                <androidx.cardview.widget.CardView android:layout_width="0dp"
+                    android:layout_height="wrap_content" android:layout_weight="1"
+                    android:layout_marginEnd="6dp" style="@style/DashboardCard">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="vertical" android:padding="14dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="💸 Dépenses" android:textColor="@color/text_secondary" android:textSize="11sp"/>
+                        <TextView android:id="@+id/tvExpenses"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="0 XAF" android:textColor="@color/error"
+                            android:textSize="18sp" android:textStyle="bold"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+                <androidx.cardview.widget.CardView android:layout_width="0dp"
+                    android:layout_height="wrap_content" android:layout_weight="1"
+                    android:layout_marginStart="6dp" style="@style/DashboardCard">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="vertical" android:padding="14dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="🏆 Bénéfice Net" android:textColor="@color/text_secondary" android:textSize="11sp"/>
+                        <TextView android:id="@+id/tvNetProfit"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="0 XAF" android:textColor="@color/success"
+                            android:textSize="18sp" android:textStyle="bold"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+
+            <!-- KPI Grid row 3 -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:weightSum="2" android:layout_marginBottom="16dp">
+                <androidx.cardview.widget.CardView android:layout_width="0dp"
+                    android:layout_height="wrap_content" android:layout_weight="1"
+                    android:layout_marginEnd="6dp" style="@style/DashboardCard">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="vertical" android:padding="14dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="🛒 Nb Ventes" android:textColor="@color/text_secondary" android:textSize="11sp"/>
+                        <TextView android:id="@+id/tvSalesCount"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="0" android:textColor="@color/primary"
+                            android:textSize="18sp" android:textStyle="bold"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+                <androidx.cardview.widget.CardView android:layout_width="0dp"
+                    android:layout_height="wrap_content" android:layout_weight="1"
+                    android:layout_marginStart="6dp" style="@style/DashboardCard">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="vertical" android:padding="14dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="🧺 Panier Moyen" android:textColor="@color/text_secondary" android:textSize="11sp"/>
+                        <TextView android:id="@+id/tvAvgBasket"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="0 XAF" android:textColor="@color/accent"
+                            android:textSize="18sp" android:textStyle="bold"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+
+            <!-- Dettes -->
+            <androidx.cardview.widget.CardView style="@style/DashboardCard"
                 android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp">
+                android:layout_marginBottom="16dp">
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:orientation="vertical" android:padding="20dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="@string/label_revenue" android:textColor="@color/text_secondary" android:textSize="13sp"/>
-                    <TextView android:id="@+id/tvRevenue"
-                        android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="0 XAF" android:textColor="@color/text_primary"
-                        android:textSize="26sp" android:textStyle="bold"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                style="@style/DashboardCard"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp">
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:orientation="vertical" android:padding="20dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="@string/label_gross_profit" android:textColor="@color/text_secondary" android:textSize="13sp"/>
-                    <TextView android:id="@+id/tvGrossProfit"
-                        android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="0 XAF" android:textColor="@color/text_primary"
-                        android:textSize="26sp" android:textStyle="bold"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="@string/formula_gross_profit"
-                        android:textColor="@color/text_secondary" android:textSize="11sp"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                style="@style/DashboardCard"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp">
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:orientation="vertical" android:padding="20dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="@string/label_expenses" android:textColor="@color/text_secondary" android:textSize="13sp"/>
-                    <TextView android:id="@+id/tvExpenses"
+                    android:orientation="horizontal" android:padding="14dp" android:gravity="center_vertical">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="💳 Dettes en cours (total)"
+                        android:textColor="@color/error" android:textSize="13sp"/>
+                    <TextView android:id="@+id/tvDebts"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:text="0 XAF" android:textColor="@color/error"
-                        android:textSize="26sp" android:textStyle="bold"/>
+                        android:textSize="16sp" android:textStyle="bold"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <androidx.cardview.widget.CardView
-                style="@style/DashboardCard"
+            <!-- Top Produits -->
+            <androidx.cardview.widget.CardView style="@style/DashboardCard"
                 android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp">
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:orientation="vertical" android:padding="20dp">
+                    android:orientation="vertical" android:padding="14dp">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="@string/label_net_profit" android:textColor="@color/text_secondary" android:textSize="13sp"/>
-                    <TextView android:id="@+id/tvNetProfit"
+                        android:text="🏅 Top Produits vendus" android:textColor="@color/primary"
+                        android:textSize="13sp" android:textStyle="bold" android:layout_marginBottom="8dp"/>
+                    <TextView android:id="@+id/tvTopProducts"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="0 XAF" android:textColor="@color/success"
-                        android:textSize="30sp" android:textStyle="bold"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="@string/formula_net_profit"
-                        android:textColor="@color/text_secondary" android:textSize="11sp"/>
+                        android:text="—" android:textColor="@color/text_primary"
+                        android:textSize="12sp" android:lineSpacingExtra="4dp"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+
+            <!-- Top Catégories -->
+            <androidx.cardview.widget.CardView style="@style/DashboardCard"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="vertical" android:padding="14dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="📂 Top Catégories" android:textColor="@color/primary"
+                        android:textSize="13sp" android:textStyle="bold" android:layout_marginBottom="8dp"/>
+                    <TextView android:id="@+id/tvTopCategories"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="—" android:textColor="@color/text_primary"
+                        android:textSize="12sp" android:lineSpacingExtra="4dp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

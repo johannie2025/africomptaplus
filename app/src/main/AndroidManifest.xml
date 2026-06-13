@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
 
@@ -23,46 +22,27 @@
             android:authorities="com.wisedesign.africomptaplus.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"/>
         </provider>
 
-        <!-- LOCK SCREEN (lancée en premier si trial expiré) -->
-        <activity
-            android:name=".activities.LockActivity"
-            android:exported="false"
-            android:theme="@style/Theme.AfriComptaPlus"/>
-
-        <!-- SPLASH / ENTRY POINT -->
-        <activity
-            android:name=".activities.SplashActivity"
-            android:exported="true"
+        <activity android:name=".activities.SplashActivity" android:exported="true"
             android:theme="@style/Theme.AfriComptaPlus.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-        <!-- MAIN DASHBOARD -->
-        <activity
-            android:name=".activities.MainActivity"
-            android:exported="false"/>
-
-        <!-- PRODUITS -->
+        <activity android:name=".activities.LockActivity"     android:exported="false"/>
+        <activity android:name=".activities.MainActivity"     android:exported="false"/>
         <activity android:name=".activities.ProductListActivity" android:exported="false"/>
         <activity android:name=".activities.ProductFormActivity" android:exported="false"/>
-
-        <!-- VENTES -->
-        <activity android:name=".activities.SaleActivity" android:exported="false"/>
+        <activity android:name=".activities.SaleActivity"        android:exported="false"/>
         <activity android:name=".activities.SaleHistoryActivity" android:exported="false"/>
-
-        <!-- DÉPENSES -->
-        <activity android:name=".activities.ExpenseActivity" android:exported="false"/>
-
-        <!-- RAPPORTS -->
-        <activity android:name=".activities.ReportActivity" android:exported="false"/>
-
+        <activity android:name=".activities.ExpenseActivity"     android:exported="false"/>
+        <activity android:name=".activities.ReportActivity"      android:exported="false"/>
+        <activity android:name=".activities.DebtActivity"        android:exported="false"/>
+        <activity android:name=".activities.SettingsActivity" android:exported="false"/>
+        <activity android:name=".activities.ClientListActivity" android:exported="false"/>
     </application>
 </manifest>

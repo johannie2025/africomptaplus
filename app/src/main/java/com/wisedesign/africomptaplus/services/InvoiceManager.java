@@ -1,20 +1,23 @@
 package com.wisedesign.africomptaplus.services;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.pdf.PdfDocument;
-import android.os.Environment;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.core.content.FileProvider;
 
-import android.net.Uri;
-
+import com.wisedesign.africomptaplus.db.DatabaseHelper;
 import com.wisedesign.africomptaplus.models.Sale;
 import com.wisedesign.africomptaplus.models.SaleItem;
+import com.wisedesign.africomptaplus.models.ShopConfig;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -23,214 +26,223 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * InvoiceManager — Générateur de facture PDF natif (Android graphics.pdf.PdfDocument).
- * Simule un ticket thermique 80mm.
- * Largeur cible : 80mm ≈ 227pt à 72dpi (on utilise 300px pour lisibilité).
+ * InvoiceManager V2 :
+ *  - Logo boutique personnalisé (si défini dans ShopConfig)
+ *  - Nom/contact client sur la facture
+ *  - Filigrane "Wise Design +240555445514" si pas de licence
+ *  - Config boutique dynamique (nom, adresse, pied de page)
  */
 public class InvoiceManager {
+    private static final String TAG       = "InvoiceManager";
+    private static final int    PAGE_W    = 400;
+    private static final int    MARGIN    = 18;
+    private static final float  TEXT_XS   = 9f;
+    private static final float  TEXT_SM   = 11f;
+    private static final float  TEXT_MD   = 13f;
+    private static final float  TEXT_LG   = 16f;
+    private static final float  TEXT_XL   = 22f;
 
-    private static final String TAG = "InvoiceManager";
-
-    // ── Dimensions du "ticket thermique" simulé ───────────────────────────────
-    private static final int PAGE_WIDTH  = 380;  // ~80mm en pixels (screen density)
-    private static final int MARGIN      = 16;
-    private static final int CONTENT_W   = PAGE_WIDTH - (MARGIN * 2);
-
-    // ── Police principale ─────────────────────────────────────────────────────
-    private static final float TEXT_SM   = 11f;
-    private static final float TEXT_MD   = 13f;
-    private static final float TEXT_LG   = 16f;
-    private static final float TEXT_XL   = 20f;
-
-    private final Context context;
+    private final Context        ctx;
+    private final DatabaseHelper db;
 
     public InvoiceManager(Context context) {
-        this.context = context.getApplicationContext();
+        ctx = context.getApplicationContext();
+        db  = DatabaseHelper.getInstance(ctx);
     }
 
-    /**
-     * Génère un fichier PDF de facture et retourne son URI (FileProvider).
-     *
-     * @param sale  objet Sale (avec invoiceNumber, total, paymentMethod, createdAt)
-     * @param items liste des SaleItem (avec productName, qty, unitPrice, totalPrice)
-     * @return Uri du fichier PDF, ou null si erreur
-     */
+    /** Génère le PDF et retourne l'URI FileProvider. */
     public Uri generateInvoicePDF(Sale sale, List<SaleItem> items) {
-        PdfDocument       document = new PdfDocument();
-        PdfDocument.Page  page     = null;
-        FileOutputStream  fos      = null;
+        ShopConfig cfg      = loadConfig();
+        boolean    licensed = isLicensed();
 
+        PdfDocument      doc  = new PdfDocument();
+        PdfDocument.Page page = null;
+        FileOutputStream fos  = null;
         try {
-            // ── Calcul de la hauteur dynamique du ticket ──────────────────
-            int estimatedHeight = 340 + (items.size() * 42);
-            PdfDocument.PageInfo pageInfo =
-                    new PdfDocument.PageInfo.Builder(PAGE_WIDTH, estimatedHeight, 1).create();
-            page = document.startPage(pageInfo);
-            Canvas canvas = page.getCanvas();
+            int h = computeHeight(items);
+            PdfDocument.PageInfo info = new PdfDocument.PageInfo.Builder(PAGE_W, h, 1).create();
+            page = doc.startPage(info);
+            draw(page.getCanvas(), sale, items, cfg, licensed);
+            doc.finishPage(page); page = null;
 
-            drawTicket(canvas, sale, items);
-
-            document.finishPage(page);
-            page = null;
-
-            // ── Sauvegarde dans le cache externe ──────────────────────────
-            File outDir = new File(context.getExternalCacheDir(), "invoices");
-            if (!outDir.exists()) outDir.mkdirs();
-
-            String fileName = "facture_" + sale.invoiceNumber.replace("-", "_") + ".pdf";
-            File   outFile  = new File(outDir, fileName);
-
-            fos = new FileOutputStream(outFile);
-            document.writeTo(fos);
-
-            // ── FileProvider URI pour partage natif ───────────────────────
-            return FileProvider.getUriForFile(
-                    context,
-                    context.getPackageName() + ".fileprovider",
-                    outFile);
-
+            File dir = new File(ctx.getExternalCacheDir(), "invoices");
+            if (!dir.exists()) dir.mkdirs();
+            String fname = "facture_" + sale.invoiceNumber.replace("-", "_") + ".pdf";
+            File   out   = new File(dir, fname);
+            fos = new FileOutputStream(out);
+            doc.writeTo(fos);
+            return FileProvider.getUriForFile(ctx, ctx.getPackageName() + ".fileprovider", out);
         } catch (IOException e) {
-            Log.e(TAG, "Erreur génération PDF", e);
+            Log.e(TAG, "PDF error", e);
             return null;
         } finally {
-            if (page != null) {
-                try { document.finishPage(page); } catch (Exception ignored) {}
-            }
-            document.close();
-            if (fos != null) {
-                try { fos.close(); } catch (IOException ignored) {}
-            }
+            if (page != null) { try { doc.finishPage(page); } catch (Exception ignored) {} }
+            doc.close();
+            if (fos != null) { try { fos.close(); } catch (IOException ignored) {} }
         }
     }
 
-    // ── Rendu du ticket ───────────────────────────────────────────────────────
+    // ── Rendu principal ───────────────────────────────────────────────────────
+    private void draw(Canvas cv, Sale sale, List<SaleItem> items, ShopConfig cfg, boolean licensed) {
+        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
+        // Fond blanc
+        p.setColor(Color.WHITE);
+        cv.drawRect(0, 0, PAGE_W, 9999, p);
 
-    private void drawTicket(Canvas canvas, Sale sale, List<SaleItem> items) {
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         int y = MARGIN;
 
-        // Fond blanc
-        paint.setColor(Color.WHITE);
-        canvas.drawRect(0, 0, PAGE_WIDTH, 9999, paint);
-
-        // ── En-tête ───────────────────────────────────────────────────────
-        paint.setColor(Color.BLACK);
-        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-        paint.setTextSize(TEXT_XL);
-        paint.setTextAlign(Paint.Align.CENTER);
-        canvas.drawText("AFRICOMPTA+", PAGE_WIDTH / 2f, y += 28, paint);
-
-        paint.setTypeface(Typeface.DEFAULT);
-        paint.setTextSize(TEXT_SM);
-        canvas.drawText("Wise Design", PAGE_WIDTH / 2f, y += 18, paint);
-        canvas.drawText("WhatsApp : +240 555 445 514", PAGE_WIDTH / 2f, y += 16, paint);
-
-        // Ligne séparatrice
-        y = drawDottedLine(canvas, paint, y + 10);
-
-        // ── Métadonnées de la facture ─────────────────────────────────────
-        paint.setTextAlign(Paint.Align.LEFT);
-        paint.setTextSize(TEXT_SM);
-        paint.setTypeface(Typeface.DEFAULT);
-        paint.setColor(Color.DKGRAY);
-
-        canvas.drawText("Facture : " + sale.invoiceNumber, MARGIN, y += 16, paint);
-        canvas.drawText("Date    : " + sale.createdAt,     MARGIN, y += 14, paint);
-        canvas.drawText("Paiement: " + formatPayment(sale.paymentMethod), MARGIN, y += 14, paint);
-
-        // Ligne séparatrice
-        y = drawDottedLine(canvas, paint, y + 8);
-
-        // ── En-tête colonnes ──────────────────────────────────────────────
-        paint.setColor(Color.BLACK);
-        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-        paint.setTextSize(TEXT_SM);
-
-        int colProduct = MARGIN;
-        int colQty     = PAGE_WIDTH - MARGIN - 110;
-        int colTotal   = PAGE_WIDTH - MARGIN;
-
-        paint.setTextAlign(Paint.Align.LEFT);
-        canvas.drawText("Article",   colProduct, y += 16, paint);
-        canvas.drawText("Qté",       colQty,     y,       paint);
-        paint.setTextAlign(Paint.Align.RIGHT);
-        canvas.drawText("Total",     colTotal,   y,       paint);
-
-        y = drawDottedLine(canvas, paint, y + 6);
-
-        // ── Lignes d'articles ─────────────────────────────────────────────
-        paint.setTypeface(Typeface.DEFAULT);
-        paint.setTextSize(TEXT_SM);
-        paint.setColor(Color.BLACK);
-
-        for (SaleItem item : items) {
-            // Nom du produit (tronqué si trop long)
-            String name = item.productName;
-            if (name != null && name.length() > 20) name = name.substring(0, 18) + "..";
-
-            paint.setTextAlign(Paint.Align.LEFT);
-            canvas.drawText(name != null ? name : "—", colProduct, y += 18, paint);
-            canvas.drawText("x" + item.quantity,       colQty,     y,       paint);
-            paint.setTextAlign(Paint.Align.RIGHT);
-            canvas.drawText(formatAmount(item.totalPrice), colTotal, y, paint);
-
-            // Prix unitaire (ligne secondaire)
-            paint.setColor(Color.GRAY);
-            paint.setTextSize(9f);
-            paint.setTextAlign(Paint.Align.LEFT);
-            canvas.drawText(formatAmount(item.unitPrice) + " / unité", MARGIN + 8, y += 11, paint);
-            paint.setTextSize(TEXT_SM);
-            paint.setColor(Color.BLACK);
+        // ── LOGO (si défini) ─────────────────────────────────────────────
+        if (cfg.logoPath != null && !cfg.logoPath.isEmpty()) {
+            Bitmap bmp = BitmapFactory.decodeFile(cfg.logoPath);
+            if (bmp != null) {
+                int logoW = 80, logoH = 80;
+                Bitmap scaled = Bitmap.createScaledBitmap(bmp, logoW, logoH, true);
+                cv.drawBitmap(scaled, (PAGE_W - logoW) / 2f, y, null);
+                y += logoH + 6;
+                scaled.recycle(); bmp.recycle();
+            }
         }
 
-        // Ligne séparatrice
-        y = drawDottedLine(canvas, paint, y + 8);
+        // ── EN-TÊTE BOUTIQUE ─────────────────────────────────────────────
+        p.setColor(Color.BLACK);
+        p.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        p.setTextSize(TEXT_XL);
+        p.setTextAlign(Paint.Align.CENTER);
+        cv.drawText(cfg.shopName.toUpperCase(), PAGE_W / 2f, y += 28, p);
 
-        // ── TOTAL GÉNÉRAL (en gras, grand) ────────────────────────────────
-        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-        paint.setTextSize(TEXT_LG);
-        paint.setColor(Color.BLACK);
-        paint.setTextAlign(Paint.Align.LEFT);
-        canvas.drawText("TOTAL", MARGIN, y += 22, paint);
-        paint.setTextAlign(Paint.Align.RIGHT);
-        canvas.drawText(formatAmount(sale.totalAmount) + " XAF", colTotal, y, paint);
+        p.setTypeface(Typeface.DEFAULT);
+        p.setTextSize(TEXT_SM);
+        if (!cfg.shopPhone.isEmpty()) { cv.drawText(cfg.shopPhone, PAGE_W / 2f, y += 16, p); }
+        if (!cfg.shopAddress.isEmpty()) { cv.drawText(cfg.shopAddress, PAGE_W / 2f, y += 14, p); }
 
-        // ── Pied de page ──────────────────────────────────────────────────
-        paint.setTypeface(Typeface.DEFAULT);
-        paint.setTextSize(TEXT_SM);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setColor(Color.DKGRAY);
-        canvas.drawText("Merci pour votre achat !", PAGE_WIDTH / 2f, y += 24, paint);
-        canvas.drawText("— AfriCompta+ by Wise Design —", PAGE_WIDTH / 2f, y += 14, paint);
+        y = dottedLine(cv, p, y + 8);
+
+        // ── INFO FACTURE ─────────────────────────────────────────────────
+        p.setTextAlign(Paint.Align.LEFT);
+        p.setColor(Color.DKGRAY);
+        p.setTextSize(TEXT_SM);
+        cv.drawText("Facture : " + sale.invoiceNumber, MARGIN, y += 16, p);
+        cv.drawText("Date    : " + sale.createdAt,     MARGIN, y += 14, p);
+        cv.drawText("Paiement: " + fmtPayment(sale.paymentMethod), MARGIN, y += 14, p);
+
+        // ── CLIENT ───────────────────────────────────────────────────────
+        p.setColor(Color.BLACK);
+        p.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        cv.drawText("Client  : " + sale.clientName, MARGIN, y += 14, p);
+        if (sale.clientPhone != null && !sale.clientPhone.isEmpty()) {
+            p.setTypeface(Typeface.DEFAULT);
+            cv.drawText("Tél     : " + sale.clientPhone, MARGIN, y += 12, p);
+        }
+        p.setTypeface(Typeface.DEFAULT);
+
+        y = dottedLine(cv, p, y + 8);
+
+        // ── COLONNES ─────────────────────────────────────────────────────
+        int cProd = MARGIN, cQty = PAGE_W - MARGIN - 110, cTot = PAGE_W - MARGIN;
+        p.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        p.setColor(Color.BLACK); p.setTextSize(TEXT_SM);
+        p.setTextAlign(Paint.Align.LEFT);
+        cv.drawText("Article", cProd, y += 16, p);
+        cv.drawText("Qté",     cQty,  y,       p);
+        p.setTextAlign(Paint.Align.RIGHT);
+        cv.drawText("Total",   cTot,  y,       p);
+        y = dottedLine(cv, p, y + 6);
+
+        // ── ARTICLES ─────────────────────────────────────────────────────
+        p.setTypeface(Typeface.DEFAULT); p.setColor(Color.BLACK); p.setTextSize(TEXT_SM);
+        for (SaleItem item : items) {
+            String name = item.productName;
+            if (name != null && name.length() > 22) name = name.substring(0, 20) + "..";
+            p.setTextAlign(Paint.Align.LEFT);
+            cv.drawText(name != null ? name : "—", cProd, y += 18, p);
+            cv.drawText("x" + item.quantity,        cQty,  y,       p);
+            p.setTextAlign(Paint.Align.RIGHT);
+            cv.drawText(fmtAmt(item.totalPrice),    cTot,  y,       p);
+            // sous-ligne prix unitaire
+            p.setColor(Color.GRAY); p.setTextSize(TEXT_XS); p.setTextAlign(Paint.Align.LEFT);
+            cv.drawText(fmtAmt(item.unitPrice) + " / unité", MARGIN + 8, y += 10, p);
+            p.setTextSize(TEXT_SM); p.setColor(Color.BLACK);
+        }
+
+        y = dottedLine(cv, p, y + 8);
+
+        // ── TOTAL ────────────────────────────────────────────────────────
+        p.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        p.setTextSize(TEXT_LG); p.setColor(Color.BLACK);
+        p.setTextAlign(Paint.Align.LEFT);
+        cv.drawText("TOTAL", MARGIN, y += 24, p);
+        p.setTextAlign(Paint.Align.RIGHT);
+        cv.drawText(fmtAmt(sale.totalAmount) + " " + "XAF", cTot, y, p);
+
+        // ── PIED DE PAGE ─────────────────────────────────────────────────
+        p.setTypeface(Typeface.DEFAULT); p.setTextSize(TEXT_SM);
+        p.setTextAlign(Paint.Align.CENTER); p.setColor(Color.DKGRAY);
+        String footer = cfg.invoiceFooter.isEmpty() ? "Merci pour votre achat !" : cfg.invoiceFooter;
+        cv.drawText(footer, PAGE_W / 2f, y += 24, p);
+        cv.drawText("AfriCompta+ · Wise Design", PAGE_W / 2f, y += 14, p);
+
+        // ── FILIGRANE si pas de licence ───────────────────────────────────
+        if (!licensed) {
+            drawWatermark(cv);
+        }
     }
 
-    // ── Utilitaires ───────────────────────────────────────────────────────────
+    /** Filigrane diagonal rouge semi-transparent. */
+    private void drawWatermark(Canvas cv) {
+        Paint wp = new Paint(Paint.ANTI_ALIAS_FLAG);
+        wp.setColor(Color.argb(55, 220, 0, 0));
+        wp.setTextSize(28f);
+        wp.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        wp.setTextAlign(Paint.Align.CENTER);
 
-    /** Trace une ligne en pointillés et retourne le nouveau Y. */
-    private int drawDottedLine(Canvas canvas, Paint paint, int y) {
-        paint.setColor(Color.LTGRAY);
-        paint.setTextSize(TEXT_SM);
-        paint.setTextAlign(Paint.Align.LEFT);
+        cv.save();
+        cv.rotate(-40, PAGE_W / 2f, 400);
+        cv.drawText("WISE DESIGN",         PAGE_W / 2f, 340, wp);
+        cv.drawText("+240 555 445 514",    PAGE_W / 2f, 376, wp);
+        cv.drawText("VERSION DÉMO",        PAGE_W / 2f, 412, wp);
+        cv.restore();
 
-        StringBuilder dots = new StringBuilder();
-        int approxChars = CONTENT_W / 6;
-        for (int i = 0; i < approxChars; i++) dots.append("-");
-        canvas.drawText(dots.toString(), MARGIN, y + 10, paint);
+        // Deuxième filigrane décalé
+        cv.save();
+        cv.rotate(-40, PAGE_W / 2f, 700);
+        cv.drawText("WISE DESIGN",         PAGE_W / 2f, 640, wp);
+        cv.drawText("+240 555 445 514",    PAGE_W / 2f, 676, wp);
+        cv.restore();
+    }
 
-        paint.setColor(Color.BLACK);
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    private int computeHeight(List<SaleItem> items) { return 420 + items.size() * 44; }
+
+    private int dottedLine(Canvas cv, Paint p, int y) {
+        p.setColor(Color.LTGRAY); p.setTextSize(TEXT_SM); p.setTextAlign(Paint.Align.LEFT);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < (PAGE_W - MARGIN * 2) / 6; i++) sb.append("-");
+        cv.drawText(sb.toString(), MARGIN, y + 10, p);
+        p.setColor(Color.BLACK);
         return y + 12;
     }
 
-    private String formatAmount(double amount) {
-        return String.format(Locale.FRENCH, "%,.0f", amount);
+    private String fmtAmt(double v) { return String.format(Locale.FRENCH, "%,.0f", v); }
+
+    private String fmtPayment(String m) {
+        if (m == null) return "Espèces";
+        switch (m) { case "mobile_money": return "Mobile Money"; case "credit": return "Crédit"; default: return "Espèces"; }
     }
 
-    private String formatPayment(String method) {
-        if (method == null) return "Espèces";
-        switch (method) {
-            case "mobile_money": return "Mobile Money";
-            case "credit":       return "Crédit";
-            default:             return "Espèces";
-        }
+    private ShopConfig loadConfig() {
+        ShopConfig c = new ShopConfig();
+        c.shopName      = db.getConfig("shop_name");
+        c.shopPhone     = db.getConfig("shop_phone");
+        c.shopAddress   = db.getConfig("shop_address");
+        c.logoPath      = db.getConfig("shop_logo_path");
+        c.invoiceFooter = db.getConfig("invoice_footer");
+        if (c.shopName.isEmpty()) c.shopName = "Ma Boutique";
+        return c;
+    }
+
+    private boolean isLicensed() {
+        android.database.Cursor cur = db.rawQuery(
+                "SELECT " + DatabaseHelper.COL_IS_ACTIVATED + " FROM " + DatabaseHelper.T_APP_SECURITY + " LIMIT 1", null);
+        try { return cur.moveToFirst() && cur.getInt(0) == 1; } finally { cur.close(); }
     }
 }

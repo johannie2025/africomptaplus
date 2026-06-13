@@ -1,52 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- App & Splash -->
+    <!-- App -->
     <string name="app_name">AfriCompta+</string>
     <string name="app_tagline">Gestion simplifiée pour le commerce africain</string>
-    <string name="splash_subtitle">Gestion simplifiée pour le commerce africain</string>
-    <string name="splash_description">Comptabilité et suivi de stock mobiles</string>
     <string name="by_wise_design">par Wise Design</string>
     <string name="wise_phone">+240 555 445 514</string>
 
     <!-- Lock screen -->
-    <string name="tag_lock_icon">🔒</string>
     <string name="lock_title">Période d\'évaluation AfriCompta+ Terminée</string>
-    <string name="trial_expired_title">Période d\'évaluation AfriCompta+ Terminée</string>
     <string name="lock_expired">Votre période d\'essai de 14 jours est terminée.</string>
-    <string name="trial_expired_body">Votre période d\'essai de 14 jours est terminée. Contactez Wise Design pour obtenir votre code d\'activation et profiter de toutes les fonctionnalités en illimité.</string>
     <string name="lock_clock_fraud">⚠️ Fraude détectée : modification de l\'horloge système.</string>
     <string name="lock_body">Contactez Wise Design pour obtenir votre code d\'activation et profiter de toutes les fonctionnalités en illimité.</string>
     <string name="lock_btn_activate">📱 Demander mon Code d\'Activation</string>
-    <string name="btn_activate">📱 Demander mon Code d\'Activation</string>
     <string name="lock_whatsapp_label">WhatsApp : +240 555 445 514</string>
     <string name="lock_footer">Wise Design — AfriCompta+</string>
-    <string name="footer_text">Wise Design — AfriCompta+</string>
-	
-	<!-- Toasts de Notifications -->
-    <string name="toast_amount_required">Montant requis</string>
-    <string name="toast_invalid_amount">Montant invalide</string>
-    <string name="toast_expense_saved">Dépense enregistrée</string>
-    <string name="toast_cart_empty">Panier vide</string>
-    <string name="toast_sale_saved">Vente enregistrée !</string>
-	<string name="toast_product_saved">Produit enregistré</string>
-    <string name="toast_sale_save_error">Erreur lors de l\'enregistrement de la vente</string>
 
- <!-- Badges & Formats de texte -->
-    <string name="badge_cart_qty">Qté : %1$d</string>
-    <string name="badge_total_display">TOTAL : %1$s XAF</string>
-	
-<!-- Dialogues -->
-    <string name="dialog_new_expense">Nouvelle Dépense</string>
-    <string name="dialog_delete_expense">Supprimer cette dépense ?</string>
-	
+    <!-- Trial badge -->
+    <string name="trial_badge">Essai : %1$dj restant(s)</string>
+    <string name="trial_days_label">Période d\'essai : %1$d jour(s) restant(s)</string>
+
     <!-- Dashboard -->
     <string name="dashboard_title">Tableau de bord</string>
     <string name="kpi_revenue_today">CA Aujourd\'hui</string>
-    <string name="revenue_today">CA Aujourd\'hui</string>
     <string name="kpi_sales_count">Ventes du jour</string>
-    <string name="sales_today">Ventes du jour</string>
     <string name="kpi_low_stock">⚠️ Stock critique</string>
-    <string name="low_stock">⚠️ Stock critique</string>
     <string name="footer_contact">Wise Design · +240 555 445 514</string>
 
     <!-- Modules -->
@@ -58,19 +35,12 @@
 
     <!-- Produits -->
     <string name="product_search_hint">🔍 Rechercher un produit…</string>
-    <string name="search_hint">🔍 Rechercher un produit…</string>
     <string name="product_name_hint">Nom du produit *</string>
-    <string name="hint_product_name">Nom du produit *</string>
     <string name="product_barcode_hint">Code-barres (optionnel)</string>
-    <string name="hint_barcode">Code-barres (optionnel)</string>
     <string name="product_buying_price_hint">Prix d\'achat (XAF) *</string>
-    <string name="hint_buying_price">Prix d\'achat (XAF) *</string>
     <string name="product_selling_price_hint">Prix de vente (XAF) *</string>
-    <string name="hint_selling_price">Prix de vente (XAF) *</string>
     <string name="product_stock_hint">Quantité en stock *</string>
-    <string name="hint_stock_qty">Quantité en stock *</string>
     <string name="product_min_stock_hint">Stock minimum (alerte)</string>
-    <string name="hint_min_stock">Stock minimum (alerte)</string>
     <string name="product_save_btn">💾 Enregistrer le produit</string>
     <string name="product_delete_confirm">Supprimer %1$s ?</string>
     <string name="product_deleted">Produit supprimé</string>
@@ -85,24 +55,17 @@
 
     <!-- Ventes -->
     <string name="sale_add_product_btn">+ Ajouter un produit</string>
-    <string name="btn_add_product">+ Ajouter un produit</string>
     <string name="sale_payment_label">Mode de paiement :</string>
-    <string name="label_payment_method">Mode de paiement :</string>
     <string name="sale_cash">Espèces</string>
-    <string name="pay_cash">Espèces</string>
     <string name="sale_mobile_money">Mobile Money</string>
-    <string name="pay_momo">Mobile Money</string>
     <string name="sale_credit">Crédit</string>
-    <string name="pay_credit">Crédit</string>
     <string name="sale_total_label">TOTAL : %1$s XAF</string>
     <string name="sale_finalize_btn">✅ Finaliser la Vente &amp; Générer Facture</string>
-    <string name="btn_finalize_sale">✅ Finaliser la Vente &amp; Générer Facture</string>
     <string name="sale_empty_cart">Panier vide</string>
     <string name="sale_success">Vente enregistrée !</string>
     <string name="sale_error">Erreur lors de l\'enregistrement de la vente</string>
     <string name="sale_share_title">Partager la facture via</string>
     <string name="sale_history_tip">Appuyez sur une vente pour re-générer sa facture PDF</string>
-    <string name="history_hint">Appuyez sur une vente pour re-générer sa facture PDF</string>
     <string name="sale_choose_product">Choisir un produit</string>
     <string name="sale_qty_hint">Quantité</string>
     <string name="sale_qty_dialog_title">Quantité : %1$s</string>
@@ -110,14 +73,10 @@
 
     <!-- Dépenses -->
     <string name="expense_add_btn">+ Nouvelle Dépense</string>
-    <string name="btn_add_expense">+ Nouvelle Dépense</string>
     <string name="expense_dialog_title">Nouvelle Dépense</string>
     <string name="expense_category_label">Catégorie</string>
-    <string name="label_category">Catégorie</string>
     <string name="expense_desc_hint">Description (optionnel)</string>
-    <string name="hint_expense_description">Description (optionnel)</string>
     <string name="expense_amount_hint">Montant (XAF) *</string>
-    <string name="hint_expense_amount">Montant (XAF) *</string>
     <string name="expense_amount_required">Montant requis</string>
     <string name="expense_amount_invalid">Montant invalide</string>
     <string name="expense_saved">Dépense enregistrée</string>
@@ -125,31 +84,24 @@
 
     <!-- Rapports -->
     <string name="report_tab_today">Aujourd\'hui</string>
-    <string name="tab_today">Aujourd\'hui</string>
     <string name="report_tab_month">Ce mois</string>
-    <string name="tab_month">Ce mois</string>
     <string name="report_tab_year">Cette année</string>
-    <string name="tab_year">Cette année</string>
     <string name="report_revenue">💰 Chiffre d\'Affaires</string>
-    <string name="label_revenue">💰 Chiffre d\'Affaires</string>
     <string name="report_gross_profit">📈 Bénéfice Brut</string>
-    <string name="label_gross_profit">📈 Bénéfice Brut</string>
-    <string name="formula_gross_profit">Valeur des ventes − Coût d\'achat</string>
     <string name="report_expenses">💸 Total Dépenses</string>
-    <string name="label_expenses">💸 Total Dépenses</string>
     <string name="report_net_profit">🏆 Bénéfice Net</string>
-    <string name="label_net_profit">🏆 Bénéfice Net</string>
     <string name="report_net_formula">= Bénéfice brut − Dépenses</string>
-    <string name="formula_net_profit">= Bénéfice brut − Dépenses</string>
     <string name="report_period_today">Aujourd\'hui : %1$s</string>
     <string name="report_period_range">Du %1$s au %2$s</string>
 
-<!-- Boutons et Actions Communes (Vérifiez/Ajoutez ces doublons exacts demandés par le code Java) -->
+    <!-- Boutons communs -->
     <string name="btn_save">Enregistrer</string>
-    <string name="action_cancel">Annuler</string>
-    <string name="action_yes">Oui</string>
-    <string name="action_no">Non</string>
-    <string name="action_share_invoice_via">Partager la facture via</string>
+    <string name="btn_cancel">Annuler</string>
+    <string name="btn_yes">Oui</string>
+    <string name="btn_no">Non</string>
+    <string name="btn_add">Ajouter</string>
+    <string name="btn_delete">Supprimer</string>
+    <string name="btn_share">Partager</string>
 
     <!-- PDF / Facture -->
     <string name="invoice_header">AFRICOMPTA+</string>
@@ -166,29 +118,4 @@
     <string name="invoice_footer">— AfriCompta+ by Wise Design —</string>
     <string name="invoice_unit_price">%1$s / unité</string>
     <string name="invoice_subject">Facture %1$s</string>
-
-    <!-- Missing strings from errors -->
-    <string name="action_save">Enregistrer</string>
-    <string name="toast_product_name_required">Nom du produit requis</string>
-    <string name="toast_invalid_numeric_values">Veuillez saisir des valeurs numériques valides</string>
-    <string name="toast_save_error">Erreur lors de l\'enregistrement</string>
-    <string name="badge_stock_display">Stock : %1$d</string>
-    <string name="dialog_delete_product">Supprimer %1$s ?</string>
-    <string name="toast_product_deleted">Produit supprimé</string>
-    <string name="badge_trial_days_left">%1$d jours restants</string>
-    <string name="badge_sales">%1$d</string>
-    <string name="badge_products">%1$d</string>
-    <string name="badge_trial">Essai : %1$d j</string>
-    <string name="period_range_from_to">Du %1$s au %2$s</string>
-    <string name="period_today">Aujourd\'hui : %1$s</string>
-    <string name="lock_fraud">⚠️ Fraude détectée : modification de l\'horloge système.</string>
-    <string name="lock_default">Période d\'évaluation terminée. Contactez Wise Design.</string>
-    <string name="toast_no_products">Aucun produit disponible. Ajoutez d\'abord des produits.</string>
-    <string name="dialog_choose_product">Choisir un produit</string>
-    <string name="hint_quantity">Quantité</string>
-    <string name="dialog_quantity_title">Quantité pour %1$s</string>
-    <string name="action_add">Ajouter</string>
-    <string name="toast_invalid_qty">Quantité invalide</string>
-    <string name="toast_insufficient_stock">Stock insuffisant (%1$d disponible)</string>
-
 </resources>
