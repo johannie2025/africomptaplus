@@ -27,7 +27,7 @@ public class SecurityManager {
 
     private static final String TAG              = "SecurityManager";
     private static final long   TRIAL_MS         = 14L * 24 * 60 * 60 * 1000;
-    private static final String API_BASE         = "https://wise.alwaysdata.net/africomptaplus/api/index.php";
+    private static final String API_BASE         = "https://wise.alwaysdata.net/africompta+/api/index.php";
 
     public enum LockReason { NONE, CLOCK_FRAUD, TRIAL_EXPIRED, ALREADY_LOCKED }
 
