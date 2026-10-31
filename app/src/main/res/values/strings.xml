@@ -240,7 +240,6 @@
     <string name="invoice_discount">Remise</string>
     <string name="invoice_vat">TVA (%1$s%%)</string>
     <string name="report_pdf_heading">RAPPORT FINANCIER</string>
-    <string name="report_pdf_revenue">Chiffre d'affaires</string>
     <string name="report_pdf_sales_count">Nombre de ventes</string>
     <string name="report_pdf_average_basket">Panier moyen</string>
     <string name="report_pdf_top_products">MEILLEURES VENTES</string>
