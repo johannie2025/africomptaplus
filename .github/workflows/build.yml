@@ -1,4 +1,16 @@
-steps:
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
       # ── 1. Checkout ──────────────────────────────────────────────────────────
       - name: Checkout code
         uses: actions/checkout@v4
@@ -20,6 +32,7 @@ steps:
       # ── 4. Gradle permissions ────────────────────────────────────────────────
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+
       # ── 5. Cache Gradle ──────────────────────────────────────────────────────
       - name: Cache Gradle packages
         uses: actions/cache@v4
@@ -31,11 +44,11 @@ steps:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # ── 6. Build APK debug (toujours) ────────────────────────────────────────
+      # ── 6. Build APK debug ───────────────────────────────────────────────────
       - name: Build Debug APK
         run: ./gradlew assembleDebug --stacktrace
 
-      # ── 7. Build APK release (signé avec debug keystore) ─────────────────────
+      # ── 7. Build APK release ─────────────────────────────────────────────────
       - name: Build Release APK
         run: ./gradlew assembleRelease --stacktrace
 
