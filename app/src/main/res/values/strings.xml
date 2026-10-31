@@ -150,7 +150,7 @@
     <string name="sale_discount_invalid">La remise dépasse le montant autorisé</string>
     <string name="sale_vat_discount_invalid">Vérifiez la remise et le taux de TVA</string>
     <string name="sale_credit_client_required">Sélectionnez un client pour une vente à crédit</string>
-    <string name="sale_no_products">Aucun produit. Ajoutez d'abord des produits.</string>
+    <string name="sale_no_products">Aucun produit. Ajoutez d\'abord des produits.</string>
     <string name="sale_stock_available">Stock insuffisant (%1$d dispo)</string>
     <string name="settings_vat_enabled">Activer la TVA sur les ventes</string>
     <string name="settings_vat_rate_hint">Taux TVA (%)</string>
@@ -249,7 +249,7 @@
     <string name="report_pdf_share_name">Rapport financier</string>
     <string name="shop_default_name">Ma Boutique</string>
     <string name="invoice_demo_watermark">VERSION DÉMO</string>
-    <string name="report_pdf_revenue">Chiffre d'affaires</string>
+    <string name="report_pdf_revenue">Chiffre d\'affaires</string>
     <string name="report_pdf_gross_profit">Bénéfice brut</string>
     <string name="report_pdf_expenses">Dépenses</string>
     <string name="report_pdf_net_profit">Bénéfice net</string>
