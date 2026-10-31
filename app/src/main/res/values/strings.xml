@@ -90,7 +90,7 @@
     <string name="report_net_formula">= Bénéfice brut − Dépenses</string>
     <string name="report_period_today">Aujourd\'hui : %1$s</string>
     <string name="report_period_range">Du %1$s au %2$s</string>
-    <string name="report_pdf_period">Période : %s au %s</string>
+<string name="report_pdf_period" formatted="false">Période : %s au %s</string>
 
     <!-- Boutons communs -->
     <string name="btn_save">Enregistrer</string>
