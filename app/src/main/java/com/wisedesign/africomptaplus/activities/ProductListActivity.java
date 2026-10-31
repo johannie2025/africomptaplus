@@ -97,8 +97,8 @@ public class ProductListActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull VH h, int pos) {
             Product p = list.get(pos);
             h.tvName.setText(p.name);
-            h.tvPrice.setText(String.format(Locale.FRENCH, "%,.0f XAF", p.sellingPrice));
-            h.tvStock.setText("Stock : " + p.stock);
+            h.tvPrice.setText(String.format(Locale.getDefault(), "%,.0f XAF", p.sellingPrice));
+            h.tvStock.setText(getString(R.string.product_low_stock_label, p.stock));
             h.tvStock.setTextColor(p.isLowStock() ? 0xFFE53935 : 0xFF43A047);
 
             // Édition
@@ -111,13 +111,13 @@ public class ProductListActivity extends AppCompatActivity {
             // Suppression (long press)
             h.itemView.setOnLongClickListener(v -> {
                 new AlertDialog.Builder(ProductListActivity.this)
-                        .setTitle("Supprimer " + p.name + " ?")
-                        .setPositiveButton("Oui", (d, w) -> {
+                        .setTitle(getString(R.string.product_delete_confirm, p.name))
+                        .setPositiveButton(R.string.btn_yes, (d, w) -> {
                             productService.delete(p.id);
                             loadProducts("");
-                            Toast.makeText(ProductListActivity.this, "Produit supprimé", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ProductListActivity.this, R.string.product_deleted, Toast.LENGTH_SHORT).show();
                         })
-                        .setNegativeButton("Non", null)
+                        .setNegativeButton(R.string.btn_no, null)
                         .show();
                 return true;
             });

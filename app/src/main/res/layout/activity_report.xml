@@ -11,14 +11,21 @@
         app:tabGravity="fill" app:tabMode="scrollable"
         app:tabSelectedTextColor="@color/white" app:tabTextColor="#90CAF9"
         android:background="@color/primary">
-        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Jour"/>
-        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Mois"/>
-        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Trimestre"/>
-        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Semestre"/>
-        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Année"/>
+        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/report_day"/>
+        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/report_month"/>
+        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/report_quarter"/>
+        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/report_semester"/>
+        <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/report_year"/>
     </com.google.android.material.tabs.TabLayout>
 
-    <ScrollView android:layout_width="match_parent" android:layout_height="match_parent">
+    <Button android:id="@+id/btnExportReport"
+        style="@style/PrimaryButton"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginHorizontal="14dp" android:layout_marginTop="8dp"
+        android:text="@string/report_export_pdf"/>
+
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1">
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="vertical" android:padding="14dp">
 
@@ -37,7 +44,7 @@
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:orientation="vertical" android:padding="14dp">
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="💰 Chiffre d'Affaires" android:textColor="@color/text_secondary" android:textSize="11sp"/>
+                            android:text="@string/report_revenue" android:textColor="@color/text_secondary" android:textSize="11sp"/>
                         <TextView android:id="@+id/tvRevenue"
                             android:layout_width="wrap_content" android:layout_height="wrap_content"
                             android:text="0 XAF" android:textColor="@color/primary"
@@ -51,7 +58,7 @@
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:orientation="vertical" android:padding="14dp">
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="📈 Bénéfice Brut" android:textColor="@color/text_secondary" android:textSize="11sp"/>
+                            android:text="@string/report_gross_profit" android:textColor="@color/text_secondary" android:textSize="11sp"/>
                         <TextView android:id="@+id/tvGrossProfit"
                             android:layout_width="wrap_content" android:layout_height="wrap_content"
                             android:text="0 XAF" android:textColor="@color/success"
@@ -69,7 +76,7 @@
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:orientation="vertical" android:padding="14dp">
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="💸 Dépenses" android:textColor="@color/text_secondary" android:textSize="11sp"/>
+                            android:text="@string/report_expenses" android:textColor="@color/text_secondary" android:textSize="11sp"/>
                         <TextView android:id="@+id/tvExpenses"
                             android:layout_width="wrap_content" android:layout_height="wrap_content"
                             android:text="0 XAF" android:textColor="@color/error"
@@ -82,7 +89,7 @@
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:orientation="vertical" android:padding="14dp">
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="🏆 Bénéfice Net" android:textColor="@color/text_secondary" android:textSize="11sp"/>
+                            android:text="@string/report_net_profit" android:textColor="@color/text_secondary" android:textSize="11sp"/>
                         <TextView android:id="@+id/tvNetProfit"
                             android:layout_width="wrap_content" android:layout_height="wrap_content"
                             android:text="0 XAF" android:textColor="@color/success"
@@ -100,7 +107,7 @@
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:orientation="vertical" android:padding="14dp">
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="🛒 Nb Ventes" android:textColor="@color/text_secondary" android:textSize="11sp"/>
+                            android:text="@string/report_sales_count" android:textColor="@color/text_secondary" android:textSize="11sp"/>
                         <TextView android:id="@+id/tvSalesCount"
                             android:layout_width="wrap_content" android:layout_height="wrap_content"
                             android:text="0" android:textColor="@color/primary"
@@ -113,7 +120,7 @@
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:orientation="vertical" android:padding="14dp">
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="🧺 Panier Moyen" android:textColor="@color/text_secondary" android:textSize="11sp"/>
+                            android:text="@string/report_average_basket" android:textColor="@color/text_secondary" android:textSize="11sp"/>
                         <TextView android:id="@+id/tvAvgBasket"
                             android:layout_width="wrap_content" android:layout_height="wrap_content"
                             android:text="0 XAF" android:textColor="@color/accent"
@@ -129,7 +136,7 @@
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:orientation="horizontal" android:padding="14dp" android:gravity="center_vertical">
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:text="💳 Dettes en cours (total)"
+                        android:layout_weight="1" android:text="@string/report_debts"
                         android:textColor="@color/error" android:textSize="13sp"/>
                     <TextView android:id="@+id/tvDebts"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -145,7 +152,7 @@
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:orientation="vertical" android:padding="14dp">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="🏅 Top Produits vendus" android:textColor="@color/primary"
+                        android:text="@string/report_top_products" android:textColor="@color/primary"
                         android:textSize="13sp" android:textStyle="bold" android:layout_marginBottom="8dp"/>
                     <TextView android:id="@+id/tvTopProducts"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -161,7 +168,7 @@
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:orientation="vertical" android:padding="14dp">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="📂 Top Catégories" android:textColor="@color/primary"
+                        android:text="@string/report_top_categories" android:textColor="@color/primary"
                         android:textSize="13sp" android:textStyle="bold" android:layout_marginBottom="8dp"/>
                     <TextView android:id="@+id/tvTopCategories"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"

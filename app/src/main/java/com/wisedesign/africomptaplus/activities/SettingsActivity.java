@@ -20,6 +20,8 @@ public class SettingsActivity extends AppCompatActivity {
     private static final int PICK_LOGO = 101;
     private DatabaseHelper db;
     private EditText etShopName, etShopPhone, etShopAddress, etFooter, etLicenseKey;
+    private EditText etVatRate;
+    private Switch swVatEnabled;
     private TextView tvLogoPath, tvLicenseStatus;
     private String   selectedLogoPath = "";
 
@@ -34,6 +36,8 @@ public class SettingsActivity extends AppCompatActivity {
         etShopAddress = findViewById(R.id.etShopAddress);
         etFooter      = findViewById(R.id.etInvoiceFooter);
         etLicenseKey  = findViewById(R.id.etLicenseKey);
+        etVatRate     = findViewById(R.id.etVatRate);
+        swVatEnabled  = findViewById(R.id.swVatEnabled);
         tvLogoPath    = findViewById(R.id.tvLogoPath);
         tvLicenseStatus = findViewById(R.id.tvLicenseStatus);
 
@@ -48,7 +52,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         findViewById(R.id.btnActivateLicense).setOnClickListener(v -> {
             String key = etLicenseKey.getText().toString().trim();
-            if (key.isEmpty()) { Toast.makeText(this, "Saisissez votre clé", Toast.LENGTH_SHORT).show(); return; }
+            if (key.isEmpty()) { Toast.makeText(this, R.string.settings_license_key_required, Toast.LENGTH_SHORT).show(); return; }
             activateLicense(key);
         });
 
@@ -57,9 +61,9 @@ public class SettingsActivity extends AppCompatActivity {
             com.wisedesign.africomptaplus.services.SecurityManager sm =
                     new com.wisedesign.africomptaplus.services.SecurityManager(this);
             if (!sm.isActivated()) {
-                Toast.makeText(this, "Fonctionnalité Premium — Activez votre licence", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.settings_premium_required, Toast.LENGTH_LONG).show();
             } else {
-                Toast.makeText(this, "Sauvegarde cloud en cours de développement…", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.settings_cloud_coming_soon, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -69,28 +73,45 @@ public class SettingsActivity extends AppCompatActivity {
         etShopPhone.setText(db.getConfig("shop_phone"));
         etShopAddress.setText(db.getConfig("shop_address"));
         etFooter.setText(db.getConfig("invoice_footer"));
+        swVatEnabled.setChecked("1".equals(db.getConfig("vat_enabled")));
+        String vatRate = db.getConfig("vat_rate");
+        etVatRate.setText(vatRate.isEmpty() ? "0" : vatRate);
         selectedLogoPath = db.getConfig("shop_logo_path");
-        tvLogoPath.setText(selectedLogoPath.isEmpty() ? "Aucun logo sélectionné" : selectedLogoPath);
+        tvLogoPath.setText(selectedLogoPath.isEmpty() ? getString(R.string.settings_logo_none) : selectedLogoPath);
 
         com.wisedesign.africomptaplus.services.SecurityManager sm =
                 new com.wisedesign.africomptaplus.services.SecurityManager(this);
         if (sm.isActivated()) {
-            tvLicenseStatus.setText("✅ Licence active");
+            tvLicenseStatus.setText(R.string.settings_license_active);
             tvLicenseStatus.setTextColor(0xFF43A047);
         } else {
             int days = sm.getRemainingDays();
-            tvLicenseStatus.setText("⏳ Essai : " + days + " jour(s) restant(s)");
+            tvLicenseStatus.setText(getString(R.string.settings_trial_days, days));
             tvLicenseStatus.setTextColor(0xFFE65100);
         }
     }
 
     private void saveConfig() {
+        double vatRate;
+        try {
+            String value = etVatRate.getText().toString().trim().replace(',', '.');
+            vatRate = value.isEmpty() ? 0 : Double.parseDouble(value);
+        } catch (NumberFormatException e) {
+            etVatRate.setError(getString(R.string.settings_vat_rate_invalid));
+            return;
+        }
+        if (vatRate < 0 || vatRate > 100) {
+            etVatRate.setError(getString(R.string.settings_vat_rate_range));
+            return;
+        }
         db.setConfig("shop_name",      etShopName.getText().toString().trim());
         db.setConfig("shop_phone",     etShopPhone.getText().toString().trim());
         db.setConfig("shop_address",   etShopAddress.getText().toString().trim());
         db.setConfig("invoice_footer", etFooter.getText().toString().trim());
         db.setConfig("shop_logo_path", selectedLogoPath);
-        Toast.makeText(this, "Paramètres enregistrés", Toast.LENGTH_SHORT).show();
+        db.setConfig("vat_enabled", swVatEnabled.isChecked() ? "1" : "0");
+        db.setConfig("vat_rate", String.valueOf(vatRate));
+        Toast.makeText(this, R.string.settings_saved, Toast.LENGTH_SHORT).show();
     }
 
     private void activateLicense(String key) {
@@ -99,7 +120,7 @@ public class SettingsActivity extends AppCompatActivity {
         String deviceId = android.provider.Settings.Secure.getString(
                 getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 
-        Toast.makeText(this, "Vérification en cours…", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.settings_license_verifying, Toast.LENGTH_SHORT).show();
         sm.verifyLicense(key, deviceId, (valid, message) -> {
             Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             if (valid) loadConfig();
@@ -122,7 +143,7 @@ public class SettingsActivity extends AppCompatActivity {
                 selectedLogoPath = logoFile.getAbsolutePath();
                 tvLogoPath.setText(selectedLogoPath);
             } catch (Exception e) {
-                Toast.makeText(this, "Erreur chargement logo", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.settings_logo_error, Toast.LENGTH_SHORT).show();
             }
         }
     }

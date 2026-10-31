@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:text="Période d'évaluation Terminée"
+        android:text="@string/lock_title"
         android:textColor="#FFCDD2"
         android:textSize="18sp"
         android:textStyle="bold"/>
@@ -45,7 +45,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:padding="16dp"
-        android:text="Votre période d'essai de 14 jours est terminée."
+        android:text="@string/lock_expired"
         android:textColor="#FFEBEE"
         android:textSize="14sp"/>
 
@@ -56,7 +56,7 @@
         android:background="#33FFFFFF"
         android:gravity="center"
         android:padding="16dp"
-        android:text="Contactez Wise Design pour obtenir votre code d'activation et profiter de toutes les fonctionnalités en illimité."
+        android:text="@string/lock_body"
         android:textColor="@color/white"
         android:textSize="13sp"/>
 
@@ -67,14 +67,14 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:padding="16dp"
-        android:text="📱 Demander mon Code d'Activation"
+        android:text="@string/lock_btn_activate"
         android:textSize="15sp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="WhatsApp : +240 555 445 514"
+        android:text="@string/lock_whatsapp_label"
         android:textColor="#FFCDD2"
         android:textSize="12sp"/>
 

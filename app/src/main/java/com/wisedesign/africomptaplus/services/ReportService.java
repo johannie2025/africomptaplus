@@ -66,7 +66,8 @@ public class ReportService {
     // ── Requêtes ─────────────────────────────────────────────────────────────
 
     private double queryRevenue(String s, String e) {
-        Cursor c = db.rawQuery("SELECT COALESCE(SUM(" + DatabaseHelper.COL_TOTAL_AMOUNT + "),0)"
+        Cursor c = db.rawQuery("SELECT COALESCE(SUM(" + DatabaseHelper.COL_TOTAL_AMOUNT
+            + " - " + DatabaseHelper.COL_VAT_AMOUNT + "),0)"
                 + " FROM " + DatabaseHelper.T_SALES
                 + " WHERE date(" + DatabaseHelper.COL_CREATED_AT + ") BETWEEN date(?) AND date(?)", new String[]{s, e});
         try { return c.moveToFirst() ? c.getDouble(0) : 0; } finally { c.close(); }
@@ -75,10 +76,13 @@ public class ReportService {
     private double queryGrossProfit(String s, String e) {
         Cursor c = db.rawQuery(
                 "SELECT COALESCE(SUM((si." + DatabaseHelper.COL_UNIT_PRICE + " - p." + DatabaseHelper.COL_BUYING_PRICE + ") * si." + DatabaseHelper.COL_QUANTITY + "),0)"
+                + " - (SELECT COALESCE(SUM(" + DatabaseHelper.COL_DISCOUNT_AMOUNT + "),0) FROM " + DatabaseHelper.T_SALES
+                + " WHERE date(" + DatabaseHelper.COL_CREATED_AT + ") BETWEEN date(?) AND date(?))"
                 + " FROM " + DatabaseHelper.T_SALE_ITEMS + " si"
                 + " INNER JOIN " + DatabaseHelper.T_SALES + " sa ON sa." + DatabaseHelper.COL_ID + "=si." + DatabaseHelper.COL_SALE_ID
                 + " INNER JOIN " + DatabaseHelper.T_PRODUCTS + " p ON p." + DatabaseHelper.COL_ID + "=si." + DatabaseHelper.COL_PRODUCT_ID
-                + " WHERE date(sa." + DatabaseHelper.COL_CREATED_AT + ") BETWEEN date(?) AND date(?)", new String[]{s, e});
+                + " WHERE date(sa." + DatabaseHelper.COL_CREATED_AT + ") BETWEEN date(?) AND date(?)",
+                new String[]{s, e, s, e});
         try { return c.moveToFirst() ? c.getDouble(0) : 0; } finally { c.close(); }
     }
 
@@ -135,7 +139,7 @@ public class ReportService {
         List<String[]> list = new ArrayList<>();
         Cursor c = db.rawQuery(
                 "SELECT date(" + DatabaseHelper.COL_CREATED_AT + ") AS day"
-                + ", SUM(" + DatabaseHelper.COL_TOTAL_AMOUNT + ") AS rev"
+                + ", SUM(" + DatabaseHelper.COL_TOTAL_AMOUNT + " - " + DatabaseHelper.COL_VAT_AMOUNT + ") AS rev"
                 + " FROM " + DatabaseHelper.T_SALES
                 + " WHERE date(" + DatabaseHelper.COL_CREATED_AT + ") BETWEEN date(?) AND date(?)"
                 + " GROUP BY day ORDER BY day ASC", new String[]{s, e});

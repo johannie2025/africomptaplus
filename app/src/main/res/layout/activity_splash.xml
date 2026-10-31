@@ -19,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="by Wise Design"
+        android:text="@string/by_wise_design"
         android:textColor="#BBDEFB"
         android:textSize="16sp"/>
 
@@ -27,7 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        android:text="Gestion simplifiée pour le commerce africain"
+        android:text="@string/app_tagline"
         android:textColor="#90CAF9"
         android:textSize="12sp"/>
 

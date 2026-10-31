@@ -14,6 +14,7 @@ import android.util.Log;
 
 import androidx.core.content.FileProvider;
 
+import com.wisedesign.africomptaplus.R;
 import com.wisedesign.africomptaplus.db.DatabaseHelper;
 import com.wisedesign.africomptaplus.models.Sale;
 import com.wisedesign.africomptaplus.models.SaleItem;
@@ -121,17 +122,17 @@ public class InvoiceManager {
         p.setTextAlign(Paint.Align.LEFT);
         p.setColor(Color.DKGRAY);
         p.setTextSize(TEXT_SM);
-        cv.drawText("Facture : " + sale.invoiceNumber, MARGIN, y += 16, p);
-        cv.drawText("Date    : " + sale.createdAt,     MARGIN, y += 14, p);
-        cv.drawText("Paiement: " + fmtPayment(sale.paymentMethod), MARGIN, y += 14, p);
+        cv.drawText(ctx.getString(R.string.invoice_label) + " : " + sale.invoiceNumber, MARGIN, y += 16, p);
+        cv.drawText(ctx.getString(R.string.invoice_date) + " : " + sale.createdAt, MARGIN, y += 14, p);
+        cv.drawText(ctx.getString(R.string.invoice_payment) + ": " + fmtPayment(sale.paymentMethod), MARGIN, y += 14, p);
 
         // ── CLIENT ───────────────────────────────────────────────────────
         p.setColor(Color.BLACK);
         p.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-        cv.drawText("Client  : " + sale.clientName, MARGIN, y += 14, p);
+        cv.drawText(ctx.getString(R.string.invoice_customer_label) + " : " + sale.clientName, MARGIN, y += 14, p);
         if (sale.clientPhone != null && !sale.clientPhone.isEmpty()) {
             p.setTypeface(Typeface.DEFAULT);
-            cv.drawText("Tél     : " + sale.clientPhone, MARGIN, y += 12, p);
+            cv.drawText(ctx.getString(R.string.invoice_phone_label) + " : " + sale.clientPhone, MARGIN, y += 12, p);
         }
         p.setTypeface(Typeface.DEFAULT);
 
@@ -142,10 +143,10 @@ public class InvoiceManager {
         p.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
         p.setColor(Color.BLACK); p.setTextSize(TEXT_SM);
         p.setTextAlign(Paint.Align.LEFT);
-        cv.drawText("Article", cProd, y += 16, p);
-        cv.drawText("Qté",     cQty,  y,       p);
+        cv.drawText(ctx.getString(R.string.invoice_col_article), cProd, y += 16, p);
+        cv.drawText(ctx.getString(R.string.invoice_col_qty), cQty, y, p);
         p.setTextAlign(Paint.Align.RIGHT);
-        cv.drawText("Total",   cTot,  y,       p);
+        cv.drawText(ctx.getString(R.string.invoice_col_total), cTot, y, p);
         y = dottedLine(cv, p, y + 6);
 
         // ── ARTICLES ─────────────────────────────────────────────────────
@@ -166,20 +167,35 @@ public class InvoiceManager {
 
         y = dottedLine(cv, p, y + 8);
 
+        y = drawSummaryRow(cv, p, ctx.getString(R.string.invoice_subtotal), sale.subtotalAmount, y + 18);
+        if (sale.discountAmount > 0) {
+            String discountLabel = "percent".equals(sale.discountType)
+                    ? String.format(Locale.getDefault(), "%s (%.2f%%)",
+                        ctx.getString(R.string.invoice_discount), sale.discountValue)
+                    : ctx.getString(R.string.invoice_discount);
+            y = drawSummaryRow(cv, p, discountLabel, -sale.discountAmount, y);
+        }
+        if (sale.vatRate > 0) {
+                y = drawSummaryRow(cv, p, String.format(ctx.getString(R.string.invoice_vat),
+                    String.format(Locale.getDefault(), "%.2f", sale.vatRate)),
+                sale.vatAmount, y);
+        }
+        y = dottedLine(cv, p, y + 2);
+
         // ── TOTAL ────────────────────────────────────────────────────────
         p.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
         p.setTextSize(TEXT_LG); p.setColor(Color.BLACK);
         p.setTextAlign(Paint.Align.LEFT);
-        cv.drawText("TOTAL", MARGIN, y += 24, p);
+        cv.drawText(ctx.getString(R.string.invoice_total_label), MARGIN, y += 24, p);
         p.setTextAlign(Paint.Align.RIGHT);
         cv.drawText(fmtAmt(sale.totalAmount) + " " + "XAF", cTot, y, p);
 
         // ── PIED DE PAGE ─────────────────────────────────────────────────
         p.setTypeface(Typeface.DEFAULT); p.setTextSize(TEXT_SM);
         p.setTextAlign(Paint.Align.CENTER); p.setColor(Color.DKGRAY);
-        String footer = cfg.invoiceFooter.isEmpty() ? "Merci pour votre achat !" : cfg.invoiceFooter;
+        String footer = cfg.invoiceFooter.isEmpty() ? ctx.getString(R.string.invoice_thank_you) : cfg.invoiceFooter;
         cv.drawText(footer, PAGE_W / 2f, y += 24, p);
-        cv.drawText("AfriCompta+ · Wise Design", PAGE_W / 2f, y += 14, p);
+        cv.drawText(ctx.getString(R.string.invoice_footer), PAGE_W / 2f, y += 14, p);
 
         // ── FILIGRANE si pas de licence ───────────────────────────────────
         if (!licensed) {
@@ -199,7 +215,7 @@ public class InvoiceManager {
         cv.rotate(-40, PAGE_W / 2f, 400);
         cv.drawText("WISE DESIGN",         PAGE_W / 2f, 340, wp);
         cv.drawText("+240 555 445 514",    PAGE_W / 2f, 376, wp);
-        cv.drawText("VERSION DÉMO",        PAGE_W / 2f, 412, wp);
+        cv.drawText(ctx.getString(R.string.invoice_demo_watermark), PAGE_W / 2f, 412, wp);
         cv.restore();
 
         // Deuxième filigrane décalé
@@ -211,7 +227,19 @@ public class InvoiceManager {
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
-    private int computeHeight(List<SaleItem> items) { return 420 + items.size() * 44; }
+    private int computeHeight(List<SaleItem> items) { return 500 + items.size() * 44; }
+
+    private int drawSummaryRow(Canvas cv, Paint p, String label, double amount, int y) {
+        p.setTypeface(Typeface.DEFAULT);
+        p.setTextSize(TEXT_SM);
+        p.setColor(Color.DKGRAY);
+        p.setTextAlign(Paint.Align.LEFT);
+        cv.drawText(label, MARGIN, y, p);
+        p.setTextAlign(Paint.Align.RIGHT);
+        cv.drawText((amount < 0 ? "-" : "") + fmtAmt(Math.abs(amount)), PAGE_W - MARGIN, y, p);
+        p.setTextAlign(Paint.Align.LEFT);
+        return y + 16;
+    }
 
     private int dottedLine(Canvas cv, Paint p, int y) {
         p.setColor(Color.LTGRAY); p.setTextSize(TEXT_SM); p.setTextAlign(Paint.Align.LEFT);
@@ -222,11 +250,12 @@ public class InvoiceManager {
         return y + 12;
     }
 
-    private String fmtAmt(double v) { return String.format(Locale.FRENCH, "%,.0f", v); }
+    private String fmtAmt(double v) { return String.format(Locale.getDefault(), "%,.0f", v); }
 
     private String fmtPayment(String m) {
-        if (m == null) return "Espèces";
-        switch (m) { case "mobile_money": return "Mobile Money"; case "credit": return "Crédit"; default: return "Espèces"; }
+        if ("mobile_money".equals(m)) return ctx.getString(R.string.sale_mobile_money);
+        if ("credit".equals(m)) return ctx.getString(R.string.sale_credit);
+        return ctx.getString(R.string.sale_cash);
     }
 
     private ShopConfig loadConfig() {
@@ -236,7 +265,7 @@ public class InvoiceManager {
         c.shopAddress   = db.getConfig("shop_address");
         c.logoPath      = db.getConfig("shop_logo_path");
         c.invoiceFooter = db.getConfig("invoice_footer");
-        if (c.shopName.isEmpty()) c.shopName = "Ma Boutique";
+        if (c.shopName.isEmpty()) c.shopName = ctx.getString(R.string.shop_default_name);
         return c;
     }
 

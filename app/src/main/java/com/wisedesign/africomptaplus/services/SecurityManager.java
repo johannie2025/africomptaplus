@@ -8,6 +8,7 @@ import android.os.Looper;
 import android.util.Log;
 
 import com.wisedesign.africomptaplus.db.DatabaseHelper;
+import com.wisedesign.africomptaplus.R;
 
 import org.json.JSONObject;
 import java.io.BufferedReader;
@@ -27,14 +28,18 @@ public class SecurityManager {
 
     private static final String TAG              = "SecurityManager";
     private static final long   TRIAL_MS         = 14L * 24 * 60 * 60 * 1000;
-    private static final String API_BASE         = "https://wise.alwaysdata.net/africompta+/api/index.php";
+    private static final String API_BASE         = "https://wise.alwaysdata.net/africomptaplus/api/index.php";
 
     public enum LockReason { NONE, CLOCK_FRAUD, TRIAL_EXPIRED, ALREADY_LOCKED }
 
     public interface LicenseCallback { void onResult(boolean valid, String message); }
 
     private final DatabaseHelper db;
-    public SecurityManager(Context ctx) { db = DatabaseHelper.getInstance(ctx); }
+    private final Context context;
+    public SecurityManager(Context ctx) {
+        context = ctx.getApplicationContext();
+        db = DatabaseHelper.getInstance(ctx);
+    }
 
     // ── Vérification locale (time-bomb) ──────────────────────────────────────
 
@@ -115,7 +120,7 @@ public class SecurityManager {
 
                 JSONObject resp = new JSONObject(sb.toString());
                 boolean valid   = resp.optBoolean("valid", false);
-                String  msg     = resp.optString("message", "Erreur inconnue");
+                String  msg     = resp.optString("message", context.getString(R.string.error_unknown));
 
                 if (valid) {
                     // Activer localement
@@ -125,7 +130,7 @@ public class SecurityManager {
 
             } catch (Exception ex) {
                 Log.e(TAG, "verifyLicense error", ex);
-                main.post(() -> callback.onResult(false, "Connexion impossible. Vérifiez votre réseau."));
+                main.post(() -> callback.onResult(false, context.getString(R.string.error_connection)));
             }
         }).start();
     }

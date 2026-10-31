@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME    = "africompta.db";
-    private static final int    DB_VERSION = 2; // bumped for new tables
+        private static final int    DB_VERSION = 4;
 
     // ── Tables ──────────────────────────────────────────────────────────────
     public static final String T_PRODUCTS     = "products";
@@ -20,6 +20,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String T_CLIENTS      = "clients";
     public static final String T_DEBTS        = "debts";
     public static final String T_SHOP_CONFIG  = "shop_config";
+        public static final String T_PENDING_SALES = "pending_sales";
 
     // ── Colonnes communes ────────────────────────────────────────────────────
     public static final String COL_ID            = "id";
@@ -31,6 +32,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_MIN_STOCK     = "min_stock";
     public static final String COL_INVOICE_NUMBER  = "invoice_number";
     public static final String COL_TOTAL_AMOUNT    = "total_amount";
+        public static final String COL_SUBTOTAL_AMOUNT = "subtotal_amount";
+        public static final String COL_DISCOUNT_TYPE   = "discount_type";
+        public static final String COL_DISCOUNT_VALUE  = "discount_value";
+        public static final String COL_DISCOUNT_AMOUNT = "discount_amount";
+        public static final String COL_VAT_RATE        = "vat_rate";
+        public static final String COL_VAT_AMOUNT      = "vat_amount";
     public static final String COL_PAYMENT_METHOD  = "payment_method";
     public static final String COL_CREATED_AT      = "created_at";
     public static final String COL_SALE_ID     = "sale_id";
@@ -108,6 +115,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COL_CLIENT_ID + " INTEGER DEFAULT 0,"
                 + COL_CLIENT_NAME + " TEXT DEFAULT 'Client Passager',"
                 + COL_CLIENT_PHONE + " TEXT DEFAULT '',"
+                + COL_SUBTOTAL_AMOUNT + " REAL NOT NULL DEFAULT 0,"
+                + COL_DISCOUNT_TYPE + " TEXT NOT NULL DEFAULT 'percent',"
+                + COL_DISCOUNT_VALUE + " REAL NOT NULL DEFAULT 0,"
+                + COL_DISCOUNT_AMOUNT + " REAL NOT NULL DEFAULT 0,"
+                + COL_VAT_RATE + " REAL NOT NULL DEFAULT 0,"
+                + COL_VAT_AMOUNT + " REAL NOT NULL DEFAULT 0,"
                 + COL_TOTAL_AMOUNT + " REAL NOT NULL DEFAULT 0,"
                 + COL_PAYMENT_METHOD + " TEXT NOT NULL DEFAULT 'cash',"
                 + COL_CREATED_AT + " TEXT NOT NULL"
@@ -158,6 +171,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COL_KEY + " TEXT PRIMARY KEY,"
                 + COL_VALUE + " TEXT NOT NULL DEFAULT ''"
                 + ");");
+        createPendingSalesTable(db);
 
         // Valeurs par défaut config boutique
         insertConfig(db, "shop_name",    "Ma Boutique");
@@ -166,6 +180,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         insertConfig(db, "shop_logo_path", "");
         insertConfig(db, "shop_currency", "XAF");
         insertConfig(db, "invoice_footer", "Merci pour votre achat !");
+        insertConfig(db, "vat_enabled", "0");
+        insertConfig(db, "vat_rate", "0");
         insertConfig(db, "cloud_backup_enabled", "0");
         insertConfig(db, "cloud_backup_token", "");
 
@@ -212,6 +228,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             insertConfig(db, "cloud_backup_enabled", "0");
             insertConfig(db, "cloud_backup_token", "");
         }
+        if (oldVersion < 3) createPendingSalesTable(db);
+        if (oldVersion < 4) {
+            try { db.execSQL("ALTER TABLE " + T_SALES + " ADD COLUMN " + COL_SUBTOTAL_AMOUNT + " REAL NOT NULL DEFAULT 0"); } catch (Exception ignored) {}
+            try { db.execSQL("ALTER TABLE " + T_SALES + " ADD COLUMN " + COL_DISCOUNT_TYPE + " TEXT NOT NULL DEFAULT 'percent'"); } catch (Exception ignored) {}
+            try { db.execSQL("ALTER TABLE " + T_SALES + " ADD COLUMN " + COL_DISCOUNT_VALUE + " REAL NOT NULL DEFAULT 0"); } catch (Exception ignored) {}
+            try { db.execSQL("ALTER TABLE " + T_SALES + " ADD COLUMN " + COL_DISCOUNT_AMOUNT + " REAL NOT NULL DEFAULT 0"); } catch (Exception ignored) {}
+            try { db.execSQL("ALTER TABLE " + T_SALES + " ADD COLUMN " + COL_VAT_RATE + " REAL NOT NULL DEFAULT 0"); } catch (Exception ignored) {}
+            try { db.execSQL("ALTER TABLE " + T_SALES + " ADD COLUMN " + COL_VAT_AMOUNT + " REAL NOT NULL DEFAULT 0"); } catch (Exception ignored) {}
+            db.execSQL("UPDATE " + T_SALES + " SET " + COL_SUBTOTAL_AMOUNT + "=" + COL_TOTAL_AMOUNT
+                    + " WHERE " + COL_SUBTOTAL_AMOUNT + "=0");
+            try { db.execSQL("ALTER TABLE " + T_PENDING_SALES + " ADD COLUMN " + COL_DISCOUNT_TYPE + " TEXT NOT NULL DEFAULT 'percent'"); } catch (Exception ignored) {}
+            try { db.execSQL("ALTER TABLE " + T_PENDING_SALES + " ADD COLUMN " + COL_DISCOUNT_VALUE + " REAL NOT NULL DEFAULT 0"); } catch (Exception ignored) {}
+            try { db.execSQL("ALTER TABLE " + T_PENDING_SALES + " ADD COLUMN " + COL_VAT_RATE + " REAL NOT NULL DEFAULT 0"); } catch (Exception ignored) {}
+            try { db.execSQL("ALTER TABLE " + T_PENDING_SALES + " ADD COLUMN vat_enabled INTEGER NOT NULL DEFAULT 0"); } catch (Exception ignored) {}
+            insertConfig(db, "vat_enabled", "0");
+            insertConfig(db, "vat_rate", "0");
+        }
     }
 
     @Override
@@ -224,6 +257,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private void insertConfig(SQLiteDatabase db, String key, String value) {
         db.execSQL("INSERT OR IGNORE INTO " + T_SHOP_CONFIG + " VALUES (?,?)", new Object[]{key, value});
     }
+
+        private void createPendingSalesTable(SQLiteDatabase db) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS " + T_PENDING_SALES + " ("
+                                + COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                                + COL_CLIENT_ID + " INTEGER NOT NULL DEFAULT 0,"
+                                + COL_CLIENT_NAME + " TEXT NOT NULL DEFAULT 'Client Passager',"
+                                + COL_CLIENT_PHONE + " TEXT NOT NULL DEFAULT '',"
+                                + COL_PAYMENT_METHOD + " TEXT NOT NULL DEFAULT 'cash',"
+                                + COL_DUE_DATE + " TEXT,"
+                                + COL_DISCOUNT_TYPE + " TEXT NOT NULL DEFAULT 'percent',"
+                                + COL_DISCOUNT_VALUE + " REAL NOT NULL DEFAULT 0,"
+                                + COL_VAT_RATE + " REAL NOT NULL DEFAULT 0,"
+                                + "vat_enabled INTEGER NOT NULL DEFAULT 0,"
+                                + "items_json TEXT NOT NULL,"
+                                + COL_CREATED_AT + " TEXT NOT NULL"
+                                + ");");
+        }
 
     public String getConfig(String key) {
         Cursor c = getReadableDatabase().rawQuery(

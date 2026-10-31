@@ -55,11 +55,12 @@ public class ClientListActivity extends AppCompatActivity {
             etAddress.setText(existing.address);
         }
         new AlertDialog.Builder(this)
-                .setTitle(existing == null ? "Nouveau client" : "Modifier " + existing.name)
+                .setTitle(existing == null ? getString(R.string.client_new_title)
+                    : getString(R.string.client_edit_title, existing.name))
                 .setView(v)
-                .setPositiveButton("Enregistrer", (d, w) -> {
+                .setPositiveButton(R.string.btn_save, (d, w) -> {
                     String name = etName.getText().toString().trim();
-                    if (name.isEmpty()) { Toast.makeText(this, "Nom requis", Toast.LENGTH_SHORT).show(); return; }
+                    if (name.isEmpty()) { Toast.makeText(this, R.string.client_name_required, Toast.LENGTH_SHORT).show(); return; }
                     Client c = existing != null ? existing : new Client();
                     c.name    = name;
                     c.phone   = etPhone.getText().toString().trim();
@@ -67,9 +68,9 @@ public class ClientListActivity extends AppCompatActivity {
                     c.address = etAddress.getText().toString().trim();
                     clientService.save(c);
                     loadClients();
-                    Toast.makeText(this, "Client enregistré", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.client_saved, Toast.LENGTH_SHORT).show();
                 })
-                .setNegativeButton("Annuler", null).show();
+                .setNegativeButton(R.string.btn_cancel, null).show();
     }
 
     private class ClientAdapter extends RecyclerView.Adapter<ClientAdapter.VH> {
@@ -88,14 +89,16 @@ public class ClientListActivity extends AppCompatActivity {
             double total = 0;
             for (com.wisedesign.africomptaplus.models.Debt d : debtService.findByClient(c.id))
                 total += d.remainingAmount();
-            h.tvDebt.setText(total > 0 ? String.format(java.util.Locale.FRENCH, "Doit : %,.0f XAF", total) : "Aucune dette");
+                h.tvDebt.setText(total > 0
+                    ? getString(R.string.client_debt_amount, String.format(java.util.Locale.getDefault(), "%,.0f", total))
+                    : getString(R.string.client_no_debt));
             h.tvDebt.setTextColor(total > 0 ? 0xFFE53935 : 0xFF43A047);
             h.itemView.setOnClickListener(v -> showClientForm(c));
             h.itemView.setOnLongClickListener(v -> {
                 new AlertDialog.Builder(ClientListActivity.this)
-                        .setTitle("Supprimer " + c.name + " ?")
-                        .setPositiveButton("Oui", (d, w) -> { clientService.delete(c.id); loadClients(); })
-                        .setNegativeButton("Non", null).show();
+                        .setTitle(getString(R.string.client_delete_title, c.name))
+                        .setPositiveButton(R.string.btn_yes, (d, w) -> { clientService.delete(c.id); loadClients(); })
+                        .setNegativeButton(R.string.btn_no, null).show();
                 return true;
             });
         }

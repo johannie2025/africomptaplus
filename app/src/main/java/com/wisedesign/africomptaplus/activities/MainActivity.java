@@ -49,16 +49,16 @@ public class MainActivity extends AppCompatActivity {
         int    daysLeft  = securityManager.getRemainingDays();
         String shopName  = db.getConfig("shop_name");
 
-        setText(R.id.tvShopName,    shopName.isEmpty() ? "AfriCompta+" : shopName);
+        setText(R.id.tvShopName,    shopName.isEmpty() ? getString(R.string.app_name) : shopName);
         setText(R.id.tvRevenueToday, fmt(revenue) + " XAF");
         setText(R.id.tvSalesCount,   String.valueOf(sales));
         setText(R.id.tvLowStock,     String.valueOf(lowStock));
         setText(R.id.tvDebts,        fmt(debts) + " XAF");
 
         if (!securityManager.isActivated()) {
-            setText(R.id.tvTrialBadge, "⏳ Essai : " + daysLeft + "j restant(s)");
+            setText(R.id.tvTrialBadge, getString(R.string.trial_badge, daysLeft));
         } else {
-            setText(R.id.tvTrialBadge, "✅ Licence active");
+            setText(R.id.tvTrialBadge, getString(R.string.settings_license_active));
         }
     }
 
@@ -82,5 +82,5 @@ public class MainActivity extends AppCompatActivity {
         if (tv != null) tv.setText(text);
     }
 
-    private String fmt(double v) { return String.format(Locale.FRENCH, "%,.0f", v); }
+    private String fmt(double v) { return String.format(Locale.getDefault(), "%,.0f", v); }
 }

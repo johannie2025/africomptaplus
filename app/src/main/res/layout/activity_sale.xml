@@ -10,11 +10,11 @@
         android:elevation="4dp">
         <TextView android:id="@+id/tvClientSelected"
             android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:text="Client : Client Passager"
+            android:layout_weight="1" android:text="@string/sale_client_label"
             android:textSize="13sp" android:textColor="@color/text_primary"/>
         <Button android:id="@+id/btnSelectClient"
             android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="Changer" android:textSize="12sp"
+            android:text="@string/sale_change_client" android:textSize="12sp"
             android:backgroundTint="@color/primary_light" android:textColor="@color/white"
             android:paddingHorizontal="12dp" android:paddingVertical="6dp"/>
     </LinearLayout>
@@ -30,46 +30,98 @@
         android:background="@color/white" android:elevation="8dp"
         android:orientation="vertical" android:padding="14dp">
 
-        <Button android:id="@+id/btnAddProduct"
-            style="@style/PrimaryButton"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="+ Ajouter un produit" android:layout_marginBottom="10dp"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:layout_marginBottom="10dp">
+            <Button android:id="@+id/btnScanBarcode"
+                style="@style/PrimaryButton"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="@string/sale_scan" android:layout_marginEnd="4dp"/>
+            <Button android:id="@+id/btnAddProduct"
+                style="@style/PrimaryButton"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="@string/sale_add" android:layout_marginStart="4dp"/>
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:layout_marginBottom="10dp">
+            <Button android:id="@+id/btnHoldSale"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="@string/sale_hold"
+                android:layout_marginEnd="4dp"/>
+            <Button android:id="@+id/btnResumeSale"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="@string/sale_resume"
+                android:layout_marginStart="4dp"/>
+        </LinearLayout>
 
         <!-- Mode paiement -->
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="Mode de paiement :" android:textSize="12sp"
+            android:text="@string/sale_payment_label" android:textSize="12sp"
             android:textColor="@color/text_secondary" android:layout_marginBottom="4dp"/>
         <RadioGroup android:id="@+id/rgPayment"
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:layout_marginBottom="8dp">
             <RadioButton android:id="@+id/rbCash"
                 android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="Espèces" android:checked="true" android:textSize="12sp"/>
+                android:layout_weight="1" android:text="@string/sale_cash" android:checked="true" android:textSize="12sp"/>
             <RadioButton android:id="@+id/rbMobileMoney"
                 android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="Mobile Money" android:textSize="12sp"/>
+                android:layout_weight="1" android:text="@string/sale_mobile_money" android:textSize="12sp"/>
             <RadioButton android:id="@+id/rbCredit"
                 android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="Crédit" android:textSize="12sp"/>
+                android:layout_weight="1" android:text="@string/sale_credit" android:textSize="12sp"/>
         </RadioGroup>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="@string/sale_discount_label" android:textSize="13sp"
+                android:textColor="@color/text_secondary"/>
+            <RadioGroup android:id="@+id/rgDiscountType"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <RadioButton android:id="@+id/rbDiscountPercent"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="%" android:checked="true"/>
+                <RadioButton android:id="@+id/rbDiscountAmount"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="XAF"/>
+            </RadioGroup>
+        </LinearLayout>
+        <EditText android:id="@+id/etDiscountValue"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:hint="@string/sale_discount_value_hint" android:inputType="numberDecimal"
+            android:layout_marginBottom="6dp"/>
 
         <!-- Date échéance (visible uniquement si Crédit) -->
         <EditText android:id="@+id/etDueDate"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:hint="Date échéance crédit (YYYY-MM-DD)"
+            android:hint="@string/sale_due_date_hint"
             android:inputType="date" android:visibility="gone"
             android:layout_marginBottom="8dp"/>
+
+        <TextView android:id="@+id/tvSubtotal"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="@string/sale_subtotal" android:textSize="12sp"
+            android:textColor="@color/text_secondary"/>
+        <TextView android:id="@+id/tvDiscountAmount"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="@string/sale_discount_summary" android:textSize="12sp"
+            android:textColor="@color/text_secondary"/>
+        <TextView android:id="@+id/tvVatAmount"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="@string/sale_vat_disabled" android:textSize="12sp"
+            android:textColor="@color/text_secondary" android:layout_marginBottom="4dp"/>
 
         <!-- Total -->
         <TextView android:id="@+id/tvTotal"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="TOTAL : 0 XAF" android:textColor="@color/primary"
+            android:text="@string/sale_total_label" android:textColor="@color/primary"
             android:textSize="20sp" android:textStyle="bold"
             android:gravity="center" android:layout_marginBottom="10dp"/>
 
         <Button android:id="@+id/btnFinalizeSale"
             style="@style/ActivationButton"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="✅ Finaliser la Vente &amp; Générer Facture"/>
+            android:text="@string/sale_finalize_btn"/>
     </LinearLayout>
 </LinearLayout>

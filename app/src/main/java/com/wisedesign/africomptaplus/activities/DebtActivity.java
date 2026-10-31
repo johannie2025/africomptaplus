@@ -39,25 +39,27 @@ public class DebtActivity extends AppCompatActivity {
         debts.addAll(debtService.findAllOpen());
         adapter.notifyDataSetChanged();
         double total = debtService.totalOutstanding();
-        tvTotalDebts.setText(String.format(java.util.Locale.FRENCH, "Total dû : %,.0f XAF", total));
+        tvTotalDebts.setText(getString(R.string.debt_total_due,
+            String.format(java.util.Locale.getDefault(), "%,.0f", total)));
     }
 
     private void showPaymentDialog(Debt debt) {
         EditText et = new EditText(this);
         et.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        et.setHint("Montant payé");
+        et.setHint(R.string.debt_amount_hint);
         new AlertDialog.Builder(this)
-                .setTitle("Paiement — " + debt.clientName)
-                .setMessage("Restant : " + String.format(java.util.Locale.FRENCH, "%,.0f XAF", debt.remainingAmount()))
+                .setTitle(getString(R.string.debt_payment_title, debt.clientName))
+                .setMessage(getString(R.string.debt_remaining,
+                    String.format(java.util.Locale.getDefault(), "%,.0f", debt.remainingAmount())))
                 .setView(et)
-                .setPositiveButton("Enregistrer", (d, w) -> {
+                .setPositiveButton(R.string.btn_save, (d, w) -> {
                     String v = et.getText().toString().trim();
                     if (v.isEmpty()) return;
                     debtService.recordPayment(debt.id, Double.parseDouble(v));
                     loadDebts();
-                    Toast.makeText(this, "Paiement enregistré", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.debt_payment_saved, Toast.LENGTH_SHORT).show();
                 })
-                .setNegativeButton("Annuler", null).show();
+                .setNegativeButton(R.string.btn_cancel, null).show();
     }
 
     // ── Adapter ───────────────────────────────────────────────────────────────
@@ -74,8 +76,9 @@ public class DebtActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull VH h, int pos) {
             Debt d = list.get(pos);
             h.tvClient.setText(d.clientName != null ? d.clientName : "—");
-            h.tvAmount.setText(String.format(java.util.Locale.FRENCH, "%,.0f XAF", d.amount));
-            h.tvRemaining.setText(String.format(java.util.Locale.FRENCH, "Restant : %,.0f XAF", d.remainingAmount()));
+                h.tvAmount.setText(String.format(java.util.Locale.getDefault(), "%,.0f XAF", d.amount));
+                h.tvRemaining.setText(getString(R.string.debt_remaining,
+                    String.format(java.util.Locale.getDefault(), "%,.0f", d.remainingAmount())));
             h.tvStatus.setText(statusLabel(d.status));
             h.tvStatus.setTextColor(d.status.equals("open") ? 0xFFE53935 : 0xFFFF6F00);
             h.tvDue.setText(d.dueDate != null && !d.dueDate.isEmpty() ? "Échéance : " + d.dueDate : "");

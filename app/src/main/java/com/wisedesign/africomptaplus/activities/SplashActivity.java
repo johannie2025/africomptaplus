@@ -30,7 +30,7 @@ public class SplashActivity extends AppCompatActivity {
             int daysLeft = security.getRemainingDays();
             TextView tvDays = findViewById(R.id.tvTrialDays);
             if (tvDays != null && daysLeft < 14) {
-                tvDays.setText("Période d'essai : " + daysLeft + " jour(s) restant(s)");
+                tvDays.setText(getString(R.string.trial_days_label, daysLeft));
             }
             // Démarrage normal après 1.5s
             new Handler(Looper.getMainLooper()).postDelayed(() -> {

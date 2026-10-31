@@ -21,12 +21,39 @@ public class SaleService {
     public long createSale(String paymentMethod, List<SaleItem> items,
                            long clientId, String clientName, String clientPhone,
                            String dueDate) {
+        return createSale(paymentMethod, items, clientId, clientName, clientPhone, dueDate,
+            "percent", 0, false, 0);
+        }
+
+        public long createSale(String paymentMethod, List<SaleItem> items,
+                   long clientId, String clientName, String clientPhone, String dueDate,
+                   String discountType, double discountValue, boolean vatEnabled, double vatRate) {
         if (items == null || items.isEmpty()) return -1;
+        if (discountValue < 0 || vatRate < 0 || (vatEnabled && vatRate > 100)) return -3;
         SQLiteDatabase sqdb = db.getWritableDatabase();
         sqdb.beginTransaction();
         try {
-            double total = 0;
-            for (SaleItem item : items) total += item.totalPrice;
+            for (SaleItem item : items) {
+                Cursor stockCursor = sqdb.rawQuery("SELECT " + DatabaseHelper.COL_STOCK
+                        + " FROM " + DatabaseHelper.T_PRODUCTS + " WHERE " + DatabaseHelper.COL_ID + "=?",
+                        new String[]{String.valueOf(item.productId)});
+                try {
+                    if (!stockCursor.moveToFirst() || stockCursor.getInt(0) < item.quantity) return -2;
+                } finally {
+                    stockCursor.close();
+                }
+            }
+
+                double subtotal = 0;
+                for (SaleItem item : items) subtotal += item.totalPrice;
+                boolean percentDiscount = "percent".equals(discountType);
+                if (!percentDiscount && !"amount".equals(discountType)) return -3;
+                if ((percentDiscount && discountValue > 100) || (!percentDiscount && discountValue > subtotal)) return -3;
+                double discountAmount = Math.round(percentDiscount
+                    ? subtotal * discountValue / 100d : discountValue);
+                double appliedVatRate = vatEnabled ? vatRate : 0;
+                double vatAmount = Math.round((subtotal - discountAmount) * appliedVatRate / 100d);
+                double total = subtotal - discountAmount + vatAmount;
 
             String inv = "INV-" + new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(new Date());
             String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date());
@@ -36,6 +63,12 @@ public class SaleService {
             cv.put(DatabaseHelper.COL_CLIENT_ID,      clientId);
             cv.put(DatabaseHelper.COL_CLIENT_NAME,    clientName  != null ? clientName  : "Client Passager");
             cv.put(DatabaseHelper.COL_CLIENT_PHONE,   clientPhone != null ? clientPhone : "");
+            cv.put(DatabaseHelper.COL_SUBTOTAL_AMOUNT, subtotal);
+            cv.put(DatabaseHelper.COL_DISCOUNT_TYPE,   discountType);
+            cv.put(DatabaseHelper.COL_DISCOUNT_VALUE,  discountValue);
+            cv.put(DatabaseHelper.COL_DISCOUNT_AMOUNT, discountAmount);
+            cv.put(DatabaseHelper.COL_VAT_RATE,        appliedVatRate);
+            cv.put(DatabaseHelper.COL_VAT_AMOUNT,      vatAmount);
             cv.put(DatabaseHelper.COL_TOTAL_AMOUNT,   total);
             cv.put(DatabaseHelper.COL_PAYMENT_METHOD, paymentMethod);
             cv.put(DatabaseHelper.COL_CREATED_AT,     now);
@@ -138,6 +171,12 @@ public class SaleService {
         if (cnIdx >= 0) s.clientName = c.getString(cnIdx);
         int cpIdx = c.getColumnIndex(DatabaseHelper.COL_CLIENT_PHONE);
         if (cpIdx >= 0) s.clientPhone = c.getString(cpIdx);
+        s.subtotalAmount = c.getDouble(c.getColumnIndexOrThrow(DatabaseHelper.COL_SUBTOTAL_AMOUNT));
+        s.discountType = c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COL_DISCOUNT_TYPE));
+        s.discountValue = c.getDouble(c.getColumnIndexOrThrow(DatabaseHelper.COL_DISCOUNT_VALUE));
+        s.discountAmount = c.getDouble(c.getColumnIndexOrThrow(DatabaseHelper.COL_DISCOUNT_AMOUNT));
+        s.vatRate = c.getDouble(c.getColumnIndexOrThrow(DatabaseHelper.COL_VAT_RATE));
+        s.vatAmount = c.getDouble(c.getColumnIndexOrThrow(DatabaseHelper.COL_VAT_AMOUNT));
         return s;
     }
 }

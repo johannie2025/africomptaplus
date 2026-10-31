@@ -71,9 +71,11 @@ public class SaleHistoryActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull VH h, int pos) {
             Sale s = list.get(pos);
             h.tvInvoice.setText(s.invoiceNumber);
-            h.tvAmount.setText(String.format(Locale.FRENCH, "%,.0f XAF", s.totalAmount));
+            h.tvAmount.setText(String.format(Locale.getDefault(), "%,.0f XAF", s.totalAmount));
             h.tvDate.setText(s.createdAt);
-            h.tvPayment.setText(s.paymentMethod);
+                h.tvPayment.setText("mobile_money".equals(s.paymentMethod) ? getString(R.string.sale_mobile_money)
+                    : "credit".equals(s.paymentMethod) ? getString(R.string.sale_credit)
+                    : getString(R.string.sale_cash));
 
             // Re-générer et partager la facture PDF
             h.itemView.setOnClickListener(v -> {
@@ -85,7 +87,7 @@ public class SaleHistoryActivity extends AppCompatActivity {
                         shareIntent.setType("application/pdf");
                         shareIntent.putExtra(Intent.EXTRA_STREAM, pdfUri);
                         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        startActivity(Intent.createChooser(shareIntent, "Partager la facture via"));
+                        startActivity(Intent.createChooser(shareIntent, getString(R.string.sale_share_title)));
                     }
                 }
             });

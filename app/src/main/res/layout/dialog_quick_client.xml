@@ -4,9 +4,9 @@
     android:orientation="vertical" android:padding="20dp">
     <EditText android:id="@+id/etClientName"
         android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:hint="Nom du client *" android:inputType="textCapWords"
+        android:hint="@string/client_name_hint" android:inputType="textCapWords"
         android:layout_marginBottom="12dp"/>
     <EditText android:id="@+id/etClientPhone"
         android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:hint="Téléphone (optionnel)" android:inputType="phone"/>
+        android:hint="@string/client_phone_hint" android:inputType="phone"/>
 </LinearLayout>

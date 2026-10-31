@@ -4,11 +4,11 @@
     android:orientation="vertical" android:background="@color/surface">
     <TextView android:id="@+id/tvTotalDebts"
         android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:padding="16dp" android:text="Total dû : 0 XAF"
+        android:padding="16dp" android:text="@string/debt_total_due"
         android:textSize="18sp" android:textStyle="bold"
         android:textColor="@color/error" android:background="@color/white"/>
     <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:padding="8dp" android:text="Appuyez sur une dette pour enregistrer un paiement"
+        android:padding="8dp" android:text="@string/debt_payment_tip"
         android:textColor="@color/text_secondary" android:textSize="12sp"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvDebts"

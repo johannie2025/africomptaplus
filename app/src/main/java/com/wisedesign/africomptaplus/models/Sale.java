@@ -7,6 +7,12 @@ public class Sale {
     public long   clientId    = 0;
     public String clientName  = "Client Passager";
     public String clientPhone = "";
+    public double subtotalAmount;
+    public String discountType = "percent";
+    public double discountValue;
+    public double discountAmount;
+    public double vatRate;
+    public double vatAmount;
     public double totalAmount;
     public String paymentMethod;
     public String createdAt;
