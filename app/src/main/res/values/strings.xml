@@ -133,7 +133,6 @@
     <string name="sale_due_date_hint">Date échéance crédit (AAAA-MM-JJ)</string>
     <string name="sale_scan_prompt">Placez le code-barres ou QR dans le cadre</string>
     <string name="sale_scan_cancelled">Scan annulé</string>
-    <string name="sale_no_products">Aucun produit disponible</string>
     <string name="sale_out_of_stock">Produit en rupture de stock</string>
     <string name="sale_product_added">%1$s ajouté</string>
     <string name="sale_pending_empty">Aucune facture en attente</string>
