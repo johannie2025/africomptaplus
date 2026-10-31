@@ -1,18 +1,4 @@
-name: Build AfriCompta+ APK
-
-on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-  workflow_dispatch:
-
-jobs:
-  build:
-    name: Build Release APK
-    runs-on: ubuntu-latest
-
-    steps:
+steps:
       # ── 1. Checkout ──────────────────────────────────────────────────────────
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,17 +11,15 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-     # ── 3. Android SDK ───────────────────────────────────────────────────────
-    - name: Set up Android SDK
-      uses: android-actions/setup-android@v3
-      with:
-        cmdline-tools-version: "11076708" # Utilise une version stable connue des commandline-tools
-
+      # ── 3. Android SDK ───────────────────────────────────────────────────────
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: "11076708"
 
       # ── 4. Gradle permissions ────────────────────────────────────────────────
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-
       # ── 5. Cache Gradle ──────────────────────────────────────────────────────
       - name: Cache Gradle packages
         uses: actions/cache@v4
