@@ -65,12 +65,12 @@ jobs:
           path: artifacts/AfriComptaPlus-debug-${{ github.run_number }}.apk
           retention-days: 30
 
-      - name: Upload Release APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: AfriComptaPlus-release-${{ github.run_number }}
-          path: artifacts/AfriComptaPlus-release-${{ github.run_number }}.apk
-          retention-days: 30
+      #- name: Upload Release APK
+       # uses: actions/upload-artifact@v4
+       # with:
+       #   name: AfriComptaPlus-release-${{ github.run_number }}
+        #  path: artifacts/AfriComptaPlus-release-${{ github.run_number }}.apk
+        #  retention-days: 30
 
       # ── 9. Résumé ───────────────────────────────────────────────────────────
       - name: Build Summary
