@@ -43,19 +43,19 @@ jobs:
         run: ./gradlew assembleDebug --stacktrace
 
       # ── 6. Build APK release ─────────────────────────────────────────────────
-      - name: Build Release APK
-        run: ./gradlew assembleRelease --stacktrace
+      #- name: Build Release APK
+        #run: ./gradlew assembleRelease --stacktrace
 
       # ── 7. Rename APK ────────────────────────────────────────────────────────
-      #- name: Rename APK files
-        #run: |
-        #  mkdir -p artifacts
-         # cp app/build/outputs/apk/debug/app-debug.apk \
-         #    artifacts/AfriComptaPlus-debug-${{ github.run_number }}.apk
-        #  cp app/build/outputs/apk/release/app-release.apk \
-        #     artifacts/AfriComptaPlus-release-${{ github.run_number }}.apk || \
-        #  cp app/build/outputs/apk/release/app-release-unsigned.apk \
-        #     artifacts/AfriComptaPlus-release-${{ github.run_number }}.apk
+      - name: Rename APK files
+        run: |
+          mkdir -p artifacts
+          cp app/build/outputs/apk/debug/app-debug.apk \
+              artifacts/AfriComptaPlus-debug-${{ github.run_number }}.apk
+          cp app/build/outputs/apk/release/app-release.apk \
+             artifacts/AfriComptaPlus-release-${{ github.run_number }}.apk || \
+          cp app/build/outputs/apk/release/app-release-unsigned.apk \
+             artifacts/AfriComptaPlus-release-${{ github.run_number }}.apk
 
       # ── 8. Upload APK artifact ───────────────────────────────────────────────
       - name: Upload Debug APK
