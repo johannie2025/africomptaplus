@@ -25,9 +25,12 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      # ── 3. Android SDK ───────────────────────────────────────────────────────
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+     # ── 3. Android SDK ───────────────────────────────────────────────────────
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v3
+      with:
+        cmdline-tools-version: "11076708" # Utilise une version stable connue des commandline-tools
+
 
       # ── 4. Gradle permissions ────────────────────────────────────────────────
       - name: Grant execute permission for gradlew
