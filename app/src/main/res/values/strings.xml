@@ -255,7 +255,7 @@
     <string name="report_pdf_net_profit">Bénéfice net</string>
     <string name="report_pdf_debts">Dettes en cours</string>
     <string name="lock_app_locked">Cette application est verrouillée.</string>
-    <string name="lock_whatsapp_message">Bonjour Wise Design, je souhaite obtenir mon code d'activation pour AfriCompta+. Merci de me contacter pour activer l'application.</string>
+    <string name="lock_whatsapp_message">Bonjour Wise Design, je souhaite obtenir mon code d\'activation pour AfriCompta+. Merci de me contacter pour activer l\'application.</string>
     <string name="error_unknown">Erreur inconnue</string>
     <string name="error_connection">Connexion impossible. Vérifiez votre réseau.</string>
     <string name="sale_product_option">%1$s — %2$s XAF (Stock : %3$d)</string>
