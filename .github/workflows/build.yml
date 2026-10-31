@@ -23,18 +23,11 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      # ── 3. Android SDK ───────────────────────────────────────────────────────
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          cmdline-tools-version: "11076708"
-          packages: platform-tools platforms-34 build-tools;34.0.0
-
-      # ── 4. Gradle permissions ────────────────────────────────────────────────
+      # ── 3. Gradle permissions ────────────────────────────────────────────────
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # ── 5. Cache Gradle ──────────────────────────────────────────────────────
+      # ── 4. Cache Gradle ──────────────────────────────────────────────────────
       - name: Cache Gradle packages
         uses: actions/cache@v4
         with:
@@ -45,15 +38,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # ── 6. Build APK debug ───────────────────────────────────────────────────
+      # ── 5. Build APK debug ───────────────────────────────────────────────────
       - name: Build Debug APK
         run: ./gradlew assembleDebug --stacktrace
 
-      # ── 7. Build APK release ─────────────────────────────────────────────────
+      # ── 6. Build APK release ─────────────────────────────────────────────────
       - name: Build Release APK
         run: ./gradlew assembleRelease --stacktrace
 
-      # ── 8. Rename APK ────────────────────────────────────────────────────────
+      # ── 7. Rename APK ────────────────────────────────────────────────────────
       - name: Rename APK files
         run: |
           mkdir -p artifacts
@@ -64,7 +57,7 @@ jobs:
           cp app/build/outputs/apk/release/app-release-unsigned.apk \
              artifacts/AfriComptaPlus-release-${{ github.run_number }}.apk
 
-      # ── 9. Upload APK artifact ───────────────────────────────────────────────
+      # ── 8. Upload APK artifact ───────────────────────────────────────────────
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
@@ -79,7 +72,7 @@ jobs:
           path: artifacts/AfriComptaPlus-release-${{ github.run_number }}.apk
           retention-days: 30
 
-      # ── 10. Résumé ───────────────────────────────────────────────────────────
+      # ── 9. Résumé ───────────────────────────────────────────────────────────
       - name: Build Summary
         run: |
           echo "## ✅ AfriCompta+ Build #${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
