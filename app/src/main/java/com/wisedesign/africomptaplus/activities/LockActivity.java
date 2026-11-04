@@ -17,7 +17,7 @@ import com.wisedesign.africomptaplus.services.SecurityManager;
 public class LockActivity extends AppCompatActivity {
 
     public static final String EXTRA_LOCK_REASON = "lock_reason";
-    private static final String WHATSAPP_PHONE = "+240555445514";
+    private static final String WHATSAPP_PHONE = "+240222886007";
     private static final String WHATSAPP_MESSAGE =
             "Bonjour Wise Design, je souhaite obtenir ma clé de licence pour AfriCompta+. "
             + "Merci de me contacter pour procéder à l'activation.";

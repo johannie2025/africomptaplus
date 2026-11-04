@@ -168,7 +168,7 @@ public class InvoiceManager {
         cv.rotate(-35, W / 2f, height / 2f);
         cv.drawText("VERSION DÉMO", W / 2f, height / 2f - 20, wp);
         cv.drawText("WISE DESIGN", W / 2f, height / 2f + 12, wp);
-        cv.drawText("+240 555 445 514", W / 2f, height / 2f + 44, wp);
+        cv.drawText("+240 222 886 007", W / 2f, height / 2f + 44, wp);
         cv.restore();
     }
 
