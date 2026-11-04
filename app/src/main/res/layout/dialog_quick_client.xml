@@ -2,11 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="wrap_content"
     android:orientation="vertical" android:padding="20dp">
-    <EditText android:id="@+id/etClientName"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:hint="@string/client_name_hint" android:inputType="textCapWords"
-        android:layout_marginBottom="12dp"/>
-    <EditText android:id="@+id/etClientPhone"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:hint="@string/client_phone_hint" android:inputType="phone"/>
+    <TextView style="@style/FormLabel" android:text="Nom du client *"/>
+    <EditText android:id="@+id/etClientName" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:inputType="textCapWords" android:layout_marginBottom="12dp"/>
+    <TextView style="@style/FormLabel" android:text="Téléphone"/>
+    <EditText android:id="@+id/etClientPhone" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:inputType="phone"/>
 </LinearLayout>

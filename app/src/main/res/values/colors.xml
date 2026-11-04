@@ -1,31 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Brand -->
+    <!-- Brand (design guide AfriCompta+ Pro) -->
     <color name="primary">#1E40AF</color>
-    <color name="primary_dark">#0F172A</color>
+    <color name="primary_dark">#1E3A8A</color>
     <color name="primary_light">#3B82F6</color>
-    <color name="accent">#F97316</color>
-    <color name="accent_soft">#FFF7ED</color>
+    <color name="accent">#F97316</color>          <!-- CTA uniquement -->
+    <color name="accent_light">#FB923C</color>
 
     <!-- Semantic -->
     <color name="success">#10B981</color>
     <color name="error">#EF4444</color>
     <color name="warning">#F59E0B</color>
     <color name="info">#0EA5E9</color>
+    <color name="violet">#7C3AED</color>
+
+    <!-- Pastilles (15 % d'opacité sur blanc) -->
+    <color name="primary_soft">#E8ECF8</color>
+    <color name="accent_soft">#FEEFE3</color>
+    <color name="success_soft">#DCF7EE</color>
+    <color name="danger_soft">#FDE7E7</color>
+    <color name="warning_soft">#FEF3DB</color>
+    <color name="violet_soft">#EEE8FD</color>
+    <color name="slate100">#F1F5F9</color>
 
     <!-- Neutrals -->
     <color name="white">#FFFFFF</color>
     <color name="surface">#F8FAFC</color>
-    <color name="bg_app">#F8FAFC</color>
     <color name="card_bg">#FFFFFF</color>
-    <color name="card_border">#E2E8F0</color>
     <color name="text_primary">#0F172A</color>
     <color name="text_secondary">#64748B</color>
-    <color name="text_muted">#94A3B8</color>
+    <color name="text_hint">#94A3B8</color>
+    <color name="border">#E2E8F0</color>
     <color name="divider">#E2E8F0</color>
 
     <!-- Lock screen -->
-    <color name="lock_bg">#B91C1C</color>
+    <color name="lock_bg">#0F172A</color>
     <color name="lock_text">#FFFFFF</color>
     <color name="lock_btn">#F97316</color>
 </resources>

@@ -1,89 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/lock_bg"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="32dp">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/lock_bg" android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:gravity="center_horizontal" android:orientation="vertical" android:padding="28dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="🔒"
-        android:textSize="64sp"/>
+        <ImageView android:layout_width="84dp" android:layout_height="84dp"
+            android:layout_marginTop="32dp" android:background="@drawable/bg_glass"
+            android:padding="22dp" android:src="@drawable/ic_lock" android:tint="@color/accent"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="AfriCompta+"
-        android:textColor="@color/white"
-        android:textSize="28sp"
-        android:textStyle="bold"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" android:text="AfriCompta+"
+            android:textColor="@color/white" android:textSize="28sp" android:textStyle="bold"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:gravity="center"
-        android:text="@string/lock_title"
-        android:textColor="#FFCDD2"
-        android:textSize="18sp"
-        android:textStyle="bold"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="6dp" android:gravity="center"
+            android:text="Activation requise" android:textColor="#CBD5E1"
+            android:textSize="16sp" android:textStyle="bold"/>
 
-    <View
-        android:layout_width="60dp"
-        android:layout_height="2dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        android:background="#FFCDD2"/>
+        <TextView android:id="@+id/tvLockReason"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="14dp" android:gravity="center"
+            android:text="Votre période d'essai de 14 jours est terminée."
+            android:textColor="#94A3B8" android:textSize="14sp"/>
 
-    <TextView
-        android:id="@+id/tvLockReason"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="16dp"
-        android:text="@string/lock_expired"
-        android:textColor="#FFEBEE"
-        android:textSize="14sp"/>
+        <!-- Saisie clé -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="28dp" android:orientation="vertical"
+            android:padding="18dp" android:background="@drawable/bg_card">
+            <TextView style="@style/FormLabel" android:text="Clé de licence"/>
+            <EditText android:id="@+id/etLockKey"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="ACP-XXXX-XXXX-XXXX" android:inputType="textCapCharacters|textNoSuggestions"
+                android:maxLength="20"/>
+            <TextView android:id="@+id/tvLockStatus"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" android:textColor="@color/error"
+                android:textSize="12sp" android:visibility="gone"/>
+            <Button android:id="@+id/btnLockActivate" style="@style/ActivationButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="14dp" android:text="Activer"/>
+        </LinearLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="#33FFFFFF"
-        android:gravity="center"
-        android:padding="16dp"
-        android:text="@string/lock_body"
-        android:textColor="@color/white"
-        android:textSize="13sp"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="22dp" android:text="Pas encore de clé ?"
+            android:textColor="#94A3B8" android:textSize="13sp"/>
 
-    <Button
-        android:id="@+id/btnActivate"
-        style="@style/ActivationButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:padding="16dp"
-        android:text="@string/lock_btn_activate"
-        android:textSize="15sp"/>
+        <Button android:id="@+id/btnActivate" style="@style/OutlineButton"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" android:text="Demander ma clé sur WhatsApp"
+            android:textColor="@color/white" app:strokeColor="#475569"
+            xmlns:app="http://schemas.android.com/apk/res-auto"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/lock_whatsapp_label"
-        android:textColor="#FFCDD2"
-        android:textSize="12sp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="Wise Design — AfriCompta+"
-        android:textColor="#EF9A9A"
-        android:textSize="11sp"/>
-
-</LinearLayout>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" android:layout_marginBottom="8dp"
+            android:text="Wise Design · +240 555 445 514"
+            android:textColor="#64748B" android:textSize="11sp"/>
+    </LinearLayout>
+</ScrollView>

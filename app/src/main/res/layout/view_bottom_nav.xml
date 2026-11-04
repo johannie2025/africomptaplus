@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bottom navigation commune : Vente · Produits · [+] · Clients · Dettes · Rapports -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bottomNav"
+    android:layout_width="match_parent" android:layout_height="86dp">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="66dp"
+        android:layout_gravity="bottom" android:orientation="horizontal"
+        android:background="@drawable/bg_sticky_bottom" android:elevation="12dp"
+        android:paddingStart="4dp" android:paddingEnd="4dp">
+        <LinearLayout android:id="@+id/navSale" android:layout_width="0dp" android:layout_height="match_parent"
+            android:layout_weight="1" android:layout_margin="6dp" android:gravity="center" android:orientation="vertical"
+            android:background="?attr/selectableItemBackgroundBorderless" android:clickable="true" android:focusable="true">
+            <ImageView android:id="@+id/navSaleIcon" android:layout_width="22dp" android:layout_height="22dp"
+                android:src="@drawable/ic_cart" android:tint="@color/nav_item"/>
+            <TextView android:id="@+id/navSaleLabel" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="3dp" android:text="Vente" android:textSize="10sp" android:textStyle="bold"
+                android:textColor="@color/nav_item"/>
+        </LinearLayout>
+        <LinearLayout android:id="@+id/navProducts" android:layout_width="0dp" android:layout_height="match_parent"
+            android:layout_weight="1" android:layout_margin="6dp" android:gravity="center" android:orientation="vertical"
+            android:background="?attr/selectableItemBackgroundBorderless" android:clickable="true" android:focusable="true">
+            <ImageView android:id="@+id/navProductsIcon" android:layout_width="22dp" android:layout_height="22dp"
+                android:src="@drawable/ic_box" android:tint="@color/nav_item"/>
+            <TextView android:id="@+id/navProductsLabel" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="3dp" android:text="Produits" android:textSize="10sp" android:textStyle="bold"
+                android:textColor="@color/nav_item"/>
+        </LinearLayout>
+        <View android:layout_width="64dp" android:layout_height="match_parent"/>
+        <LinearLayout android:id="@+id/navClients" android:layout_width="0dp" android:layout_height="match_parent"
+            android:layout_weight="1" android:layout_margin="6dp" android:gravity="center" android:orientation="vertical"
+            android:background="?attr/selectableItemBackgroundBorderless" android:clickable="true" android:focusable="true">
+            <ImageView android:id="@+id/navClientsIcon" android:layout_width="22dp" android:layout_height="22dp"
+                android:src="@drawable/ic_users" android:tint="@color/nav_item"/>
+            <TextView android:id="@+id/navClientsLabel" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="3dp" android:text="Clients" android:textSize="10sp" android:textStyle="bold"
+                android:textColor="@color/nav_item"/>
+        </LinearLayout>
+        <LinearLayout android:id="@+id/navDebts" android:layout_width="0dp" android:layout_height="match_parent"
+            android:layout_weight="1" android:layout_margin="6dp" android:gravity="center" android:orientation="vertical"
+            android:background="?attr/selectableItemBackgroundBorderless" android:clickable="true" android:focusable="true">
+            <ImageView android:id="@+id/navDebtsIcon" android:layout_width="22dp" android:layout_height="22dp"
+                android:src="@drawable/ic_wallet" android:tint="@color/nav_item"/>
+            <TextView android:id="@+id/navDebtsLabel" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="3dp" android:text="Dettes" android:textSize="10sp" android:textStyle="bold"
+                android:textColor="@color/nav_item"/>
+        </LinearLayout>
+        <LinearLayout android:id="@+id/navReports" android:layout_width="0dp" android:layout_height="match_parent"
+            android:layout_weight="1" android:layout_margin="6dp" android:gravity="center" android:orientation="vertical"
+            android:background="?attr/selectableItemBackgroundBorderless" android:clickable="true" android:focusable="true">
+            <ImageView android:id="@+id/navReportsIcon" android:layout_width="22dp" android:layout_height="22dp"
+                android:src="@drawable/ic_chart" android:tint="@color/nav_item"/>
+            <TextView android:id="@+id/navReportsLabel" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="3dp" android:text="Rapports" android:textSize="10sp" android:textStyle="bold"
+                android:textColor="@color/nav_item"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <ImageButton android:id="@+id/navFab" android:layout_width="56dp" android:layout_height="56dp"
+        android:layout_gravity="top|center_horizontal" android:elevation="16dp"
+        android:background="@drawable/bg_fab" android:src="@drawable/ic_plus" android:tint="@color/white"
+        android:contentDescription="Actions rapides" android:padding="14dp" android:scaleType="fitCenter"/>
+</FrameLayout>

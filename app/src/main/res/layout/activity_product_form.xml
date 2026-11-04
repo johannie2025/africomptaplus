@@ -1,50 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/surface">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/surface">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+    <include layout="@layout/view_topbar"/>
 
-        <EditText android:id="@+id/etName"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:hint="@string/product_name_hint" android:inputType="text"
-            android:layout_marginBottom="12dp"/>
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1" android:overScrollMode="never">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="16dp">
 
-        <EditText android:id="@+id/etBarcode"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:hint="@string/product_barcode_hint" android:inputType="text"
-            android:layout_marginBottom="12dp"/>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="16dp" android:background="@drawable/bg_card">
 
-        <EditText android:id="@+id/etBuyingPrice"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:hint="@string/product_buying_price_hint" android:inputType="numberDecimal"
-            android:layout_marginBottom="12dp"/>
+                <TextView style="@style/FormLabel" android:text="Nom du produit *"/>
+                <EditText android:id="@+id/etName" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:hint="Ex : Riz parfumé 25 kg" android:inputType="textCapSentences"
+                    android:layout_marginBottom="14dp"/>
 
-        <EditText android:id="@+id/etSellingPrice"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:hint="@string/product_selling_price_hint" android:inputType="numberDecimal"
-            android:layout_marginBottom="12dp"/>
+                <TextView style="@style/FormLabel" android:text="Code-barres / SKU (optionnel)"/>
+                <EditText android:id="@+id/etBarcode" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:hint="Ex : RZ-2500" android:inputType="text" android:layout_marginBottom="14dp"/>
 
-        <EditText android:id="@+id/etStock"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:hint="@string/product_stock_hint" android:inputType="number"
-            android:layout_marginBottom="12dp"/>
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:layout_marginBottom="14dp">
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical" android:layout_marginEnd="6dp">
+                        <TextView style="@style/FormLabel" android:text="Prix d'achat (XAF) *"/>
+                        <EditText android:id="@+id/etBuyingPrice" android:layout_width="match_parent"
+                            android:layout_height="wrap_content" android:hint="0" android:inputType="numberDecimal"/>
+                    </LinearLayout>
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical" android:layout_marginStart="6dp">
+                        <TextView style="@style/FormLabel" android:text="Prix de vente (XAF) *"/>
+                        <EditText android:id="@+id/etSellingPrice" android:layout_width="match_parent"
+                            android:layout_height="wrap_content" android:hint="0" android:inputType="numberDecimal"/>
+                    </LinearLayout>
+                </LinearLayout>
 
-        <EditText android:id="@+id/etMinStock"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:hint="@string/product_min_stock_hint" android:inputType="number"
-            android:text="5"
-            android:layout_marginBottom="24dp"/>
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical" android:layout_marginEnd="6dp">
+                        <TextView style="@style/FormLabel" android:text="Quantité en stock *"/>
+                        <EditText android:id="@+id/etStock" android:layout_width="match_parent"
+                            android:layout_height="wrap_content" android:hint="0" android:inputType="number"/>
+                    </LinearLayout>
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical" android:layout_marginStart="6dp">
+                        <TextView style="@style/FormLabel" android:text="Seuil d'alerte"/>
+                        <EditText android:id="@+id/etMinStock" android:layout_width="match_parent"
+                            android:layout_height="wrap_content" android:text="5" android:inputType="number"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
 
-        <Button android:id="@+id/btnSave"
-            style="@style/PrimaryButton"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/product_save_btn"/>
-
-    </LinearLayout>
-</ScrollView>
+            <Button android:id="@+id/btnSave" style="@style/PrimaryButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="20dp" android:text="Enregistrer le produit"/>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

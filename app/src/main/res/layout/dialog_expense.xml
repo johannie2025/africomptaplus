@@ -1,25 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="20dp">
-
-    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:text="@string/expense_category" android:textSize="12sp"
-        android:textColor="@color/text_secondary" android:layout_marginBottom="4dp"/>
-
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="vertical" android:padding="20dp">
+    <TextView style="@style/FormLabel" android:text="Catégorie"/>
     <Spinner android:id="@+id/spCategory"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"/>
-
+        android:layout_width="match_parent" android:layout_height="52dp"
+        android:background="@drawable/bg_input" android:layout_marginBottom="14dp"/>
+    <TextView style="@style/FormLabel" android:text="Description"/>
     <EditText android:id="@+id/etDescription"
         android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:hint="@string/expense_description_hint" android:inputType="text"
-        android:layout_marginBottom="12dp"/>
-
+        android:hint="Optionnel" android:inputType="textCapSentences" android:layout_marginBottom="14dp"/>
+    <TextView style="@style/FormLabel" android:text="Montant (XAF) *"/>
     <EditText android:id="@+id/etAmount"
         android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:hint="@string/expense_amount_hint" android:inputType="numberDecimal"/>
-
+        android:hint="0" android:inputType="numberDecimal"/>
 </LinearLayout>

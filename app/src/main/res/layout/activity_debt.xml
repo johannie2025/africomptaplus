@@ -2,16 +2,48 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
     android:orientation="vertical" android:background="@color/surface">
-    <TextView android:id="@+id/tvTotalDebts"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:padding="16dp" android:text="@string/debt_total_due"
-        android:textSize="18sp" android:textStyle="bold"
-        android:textColor="@color/error" android:background="@color/white"/>
-    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:padding="8dp" android:text="@string/debt_payment_tip"
+
+    <include layout="@layout/view_topbar"/>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginStart="16dp" android:layout_marginEnd="16dp"
+        android:layout_marginBottom="12dp" android:orientation="horizontal"
+        android:gravity="center_vertical" android:padding="18dp"
+        android:background="@drawable/bg_card">
+        <ImageView android:layout_width="48dp" android:layout_height="48dp"
+            android:background="@drawable/bg_icon_red" android:padding="12dp"
+            android:src="@drawable/ic_wallet" android:tint="@color/error"/>
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:layout_marginStart="14dp" android:orientation="vertical">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Total dû" android:textColor="@color/text_secondary" android:textSize="13sp"/>
+            <TextView android:id="@+id/tvTotalDebts"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="0 XAF" android:textColor="@color/error"
+                android:textSize="24sp" android:textStyle="bold"/>
+        </LinearLayout>
+        <TextView android:id="@+id/tvDebtCount"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:background="@drawable/bg_pill_danger" android:textColor="@color/error"
+            android:textSize="12sp" android:textStyle="bold"/>
+    </LinearLayout>
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginStart="20dp" android:layout_marginBottom="8dp"
+        android:text="Appuyez sur une dette pour enregistrer un paiement"
         android:textColor="@color/text_secondary" android:textSize="12sp"/>
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvDebts"
-        android:layout_width="match_parent" android:layout_height="match_parent"
-        android:padding="8dp" android:clipToPadding="false"/>
+
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvDebts"
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:clipToPadding="false" android:paddingStart="16dp" android:paddingEnd="16dp"
+            android:paddingBottom="12dp" android:overScrollMode="never"/>
+        <TextView android:id="@+id/tvEmpty"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_gravity="center" android:gravity="center"
+            android:text="Aucune dette en cours 🎉"
+            android:textColor="@color/text_secondary" android:textSize="14sp" android:visibility="gone"/>
+    </FrameLayout>
+
+    <include layout="@layout/view_bottom_nav"/>
 </LinearLayout>

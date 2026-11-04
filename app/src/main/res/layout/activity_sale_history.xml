@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/surface">
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/surface">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="@string/history_tip"
-        android:textColor="@color/text_secondary"
-        android:textSize="12sp"
-        android:background="@color/white"/>
+    <include layout="@layout/view_topbar"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvSaleHistory"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="8dp"
-        android:clipToPadding="false"/>
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginStart="20dp" android:layout_marginBottom="8dp"
+        android:text="Appuyez sur une vente pour partager sa facture PDF"
+        android:textColor="@color/text_secondary" android:textSize="12sp"/>
 
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvSaleHistory"
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:clipToPadding="false" android:paddingStart="16dp" android:paddingEnd="16dp"
+            android:paddingBottom="12dp" android:overScrollMode="never"/>
+        <TextView android:id="@+id/tvEmpty"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_gravity="center" android:text="Aucune vente pour le moment."
+            android:textColor="@color/text_secondary" android:textSize="14sp" android:visibility="gone"/>
+    </FrameLayout>
+
+    <include layout="@layout/view_bottom_nav"/>
 </LinearLayout>

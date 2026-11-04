@@ -3,125 +3,133 @@
     android:layout_width="match_parent" android:layout_height="match_parent"
     android:orientation="vertical" android:background="@color/surface">
 
-    <!-- Client selector bar -->
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:background="@color/white" android:padding="10dp"
-        android:orientation="horizontal" android:gravity="center_vertical"
-        android:elevation="4dp">
-        <TextView android:id="@+id/tvClientSelected"
-            android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:text="@string/sale_client_label"
-            android:textSize="13sp" android:textColor="@color/text_primary"/>
-        <Button android:id="@+id/btnSelectClient"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="@string/sale_change_client" android:textSize="12sp"
-            android:backgroundTint="@color/primary_light" android:textColor="@color/white"
-            android:paddingHorizontal="12dp" android:paddingVertical="6dp"/>
-    </LinearLayout>
+    <include layout="@layout/view_topbar"/>
 
-    <!-- Panier -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvCart"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent" android:layout_height="0dp"
-        android:layout_weight="1" android:padding="8dp" android:clipToPadding="false"/>
+        android:layout_weight="1" android:overScrollMode="never">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:paddingStart="16dp" android:paddingEnd="16dp"
+            android:paddingBottom="12dp">
 
-    <!-- Panel bas -->
+            <!-- Client -->
+            <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp">
+                <TextView style="@style/SectionTitle" android:text="Client"/>
+                <TextView android:id="@+id/btnNewClient"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true" android:text="+ Nouveau"
+                    android:textColor="@color/accent" android:textSize="14sp" android:textStyle="bold"
+                    android:padding="4dp"/>
+            </RelativeLayout>
+
+            <LinearLayout android:id="@+id/btnSelectClient"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical"
+                android:padding="14dp" android:background="@drawable/bg_card"
+                android:clickable="true" android:focusable="true">
+                <TextView android:id="@+id/tvClientAvatar"
+                    android:layout_width="48dp" android:layout_height="48dp"
+                    android:background="@drawable/bg_avatar" android:gravity="center"
+                    android:text="CP" android:textColor="@color/primary"
+                    android:textSize="16sp" android:textStyle="bold"/>
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:layout_marginStart="14dp" android:orientation="vertical">
+                    <TextView android:id="@+id/tvClientSelected"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Client Passager" android:textColor="@color/text_primary"
+                        android:textSize="16sp" android:textStyle="bold" android:singleLine="true"/>
+                    <TextView android:id="@+id/tvClientPhone"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Vente comptoir" android:textColor="@color/text_secondary"
+                        android:textSize="13sp"/>
+                </LinearLayout>
+                <ImageView android:layout_width="20dp" android:layout_height="20dp"
+                    android:src="@drawable/ic_chevron" android:tint="@color/text_hint"/>
+            </LinearLayout>
+
+            <!-- Articles -->
+            <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="20dp" android:layout_marginBottom="8dp">
+                <TextView android:id="@+id/tvArticlesTitle" style="@style/SectionTitle" android:text="Articles (0)"/>
+                <TextView android:id="@+id/btnAddProduct"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true" android:text="+ Ajouter"
+                    android:textColor="@color/primary" android:textSize="14sp" android:textStyle="bold"
+                    android:padding="4dp"/>
+            </RelativeLayout>
+
+            <TextView android:id="@+id/tvEmptyCart"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:background="@drawable/bg_dashed_box" android:gravity="center"
+                android:padding="26dp" android:text="Panier vide\nAppuyez sur « Ajouter » pour choisir un produit"
+                android:textColor="@color/text_secondary" android:textSize="13sp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvCart"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false" android:overScrollMode="never"/>
+
+            <!-- Mode de paiement -->
+            <TextView style="@style/SectionTitle" android:text="Mode de paiement"
+                android:layout_marginTop="20dp" android:layout_marginBottom="10dp"/>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <LinearLayout android:id="@+id/payCash" style="@style/PayCard" android:layout_marginEnd="5dp">
+                    <ImageView android:layout_width="28dp" android:layout_height="28dp"
+                        android:src="@drawable/ic_cash" android:tint="@color/accent"/>
+                    <TextView style="@style/PayLabel" android:text="Espèces"/>
+                </LinearLayout>
+                <LinearLayout android:id="@+id/payMobile" style="@style/PayCard" android:layout_marginStart="5dp" android:layout_marginEnd="5dp">
+                    <ImageView android:layout_width="28dp" android:layout_height="28dp"
+                        android:src="@drawable/ic_phone" android:tint="@color/primary"/>
+                    <TextView style="@style/PayLabel" android:text="Mobile Money"/>
+                </LinearLayout>
+                <LinearLayout android:id="@+id/payCredit" style="@style/PayCard" android:layout_marginStart="5dp">
+                    <ImageView android:layout_width="28dp" android:layout_height="28dp"
+                        android:src="@drawable/ic_card" android:tint="@color/violet"/>
+                    <TextView style="@style/PayLabel" android:text="Crédit"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <EditText android:id="@+id/etDueDate"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" android:hint="Échéance du crédit (AAAA-MM-JJ)"
+                android:inputType="date" android:visibility="gone"/>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Total sticky -->
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:background="@color/white" android:elevation="8dp"
-        android:orientation="vertical" android:padding="14dp">
-
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:layout_marginBottom="10dp">
-            <Button android:id="@+id/btnScanBarcode"
-                style="@style/PrimaryButton"
-                android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="@string/sale_scan" android:layout_marginEnd="4dp"/>
-            <Button android:id="@+id/btnAddProduct"
-                style="@style/PrimaryButton"
-                android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="@string/sale_add" android:layout_marginStart="4dp"/>
-        </LinearLayout>
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:layout_marginBottom="10dp">
-            <Button android:id="@+id/btnHoldSale"
-                android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="@string/sale_hold"
-                android:layout_marginEnd="4dp"/>
-            <Button android:id="@+id/btnResumeSale"
-                android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="@string/sale_resume"
-                android:layout_marginStart="4dp"/>
-        </LinearLayout>
-
-        <!-- Mode paiement -->
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="@string/sale_payment_label" android:textSize="12sp"
-            android:textColor="@color/text_secondary" android:layout_marginBottom="4dp"/>
-        <RadioGroup android:id="@+id/rgPayment"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:layout_marginBottom="8dp">
-            <RadioButton android:id="@+id/rbCash"
-                android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="@string/sale_cash" android:checked="true" android:textSize="12sp"/>
-            <RadioButton android:id="@+id/rbMobileMoney"
-                android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="@string/sale_mobile_money" android:textSize="12sp"/>
-            <RadioButton android:id="@+id/rbCredit"
-                android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="@string/sale_credit" android:textSize="12sp"/>
-        </RadioGroup>
+        android:orientation="vertical" android:background="@drawable/bg_sticky_bottom"
+        android:elevation="10dp" android:paddingStart="20dp" android:paddingEnd="20dp"
+        android:paddingTop="16dp" android:paddingBottom="12dp">
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:gravity="center_vertical">
             <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="@string/sale_discount_label" android:textSize="13sp"
-                android:textColor="@color/text_secondary"/>
-            <RadioGroup android:id="@+id/rgDiscountType"
+                android:layout_weight="1" android:text="Total à payer"
+                android:textColor="@color/text_primary" android:textSize="15sp" android:textStyle="bold"/>
+            <TextView android:id="@+id/tvTotal"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <RadioButton android:id="@+id/rbDiscountPercent"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="%" android:checked="true"/>
-                <RadioButton android:id="@+id/rbDiscountAmount"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="XAF"/>
-            </RadioGroup>
+                android:text="0 XAF" android:textColor="@color/text_primary"
+                android:textSize="24sp" android:textStyle="bold"/>
         </LinearLayout>
-        <EditText android:id="@+id/etDiscountValue"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:hint="@string/sale_discount_value_hint" android:inputType="numberDecimal"
-            android:layout_marginBottom="6dp"/>
 
-        <!-- Date échéance (visible uniquement si Crédit) -->
-        <EditText android:id="@+id/etDueDate"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:hint="@string/sale_due_date_hint"
-            android:inputType="date" android:visibility="gone"
-            android:layout_marginBottom="8dp"/>
-
-        <TextView android:id="@+id/tvSubtotal"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/sale_subtotal" android:textSize="12sp"
-            android:textColor="@color/text_secondary"/>
-        <TextView android:id="@+id/tvDiscountAmount"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/sale_discount_summary" android:textSize="12sp"
-            android:textColor="@color/text_secondary"/>
-        <TextView android:id="@+id/tvVatAmount"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/sale_vat_disabled" android:textSize="12sp"
-            android:textColor="@color/text_secondary" android:layout_marginBottom="4dp"/>
-
-        <!-- Total -->
-        <TextView android:id="@+id/tvTotal"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/sale_total_label" android:textColor="@color/primary"
-            android:textSize="20sp" android:textStyle="bold"
-            android:gravity="center" android:layout_marginBottom="10dp"/>
-
-        <Button android:id="@+id/btnFinalizeSale"
-            style="@style/ActivationButton"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="@string/sale_finalize_btn"/>
+        <LinearLayout android:id="@+id/btnFinalizeSale"
+            android:layout_width="match_parent" android:layout_height="56dp"
+            android:layout_marginTop="12dp" android:orientation="horizontal"
+            android:gravity="center" android:background="@drawable/bg_btn_cta"
+            android:elevation="6dp" android:clickable="true" android:focusable="true">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Encaisser" android:textColor="@color/white"
+                android:textSize="17sp" android:textStyle="bold"/>
+            <ImageView android:layout_width="20dp" android:layout_height="20dp"
+                android:layout_marginStart="10dp" android:src="@drawable/ic_arrow_right"
+                android:tint="@color/white"/>
+        </LinearLayout>
     </LinearLayout>
+
+    <include layout="@layout/view_bottom_nav"/>
 </LinearLayout>
