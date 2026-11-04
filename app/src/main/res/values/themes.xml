@@ -252,8 +252,8 @@
     </style>
 
     <style name="Theme.AfriComptaPlus.Splash" parent="Theme.AfriComptaPlus">
-        <item name="android:statusBarColor">@color/primary_dark</item>
-        <item name="android:navigationBarColor">@color/primary</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:navigationBarColor">@color/white</item>
         
     </style>
     <style name="Theme.AfriComptaPlus.Main" parent="Theme.AfriComptaPlus">

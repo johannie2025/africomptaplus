@@ -19,8 +19,16 @@
                     android:layout_marginBottom="14dp"/>
 
                 <TextView style="@style/FormLabel" android:text="Code-barres / SKU (optionnel)"/>
-                <EditText android:id="@+id/etBarcode" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:hint="Ex : RZ-2500" android:inputType="text" android:layout_marginBottom="14dp"/>
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="14dp">
+                    <EditText android:id="@+id/etBarcode" android:layout_width="0dp" android:layout_weight="1"
+                        android:layout_height="wrap_content" android:hint="Scanner ou saisir" android:inputType="text"/>
+                    <ImageView android:id="@+id/btnScanBarcode"
+                        android:layout_width="52dp" android:layout_height="52dp" android:layout_marginStart="10dp"
+                        android:background="@drawable/bg_btn_primary" android:padding="14dp"
+                        android:src="@drawable/ic_scan" android:tint="@color/white"
+                        android:contentDescription="Scanner" android:clickable="true" android:focusable="true"/>
+                </LinearLayout>
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:orientation="horizontal" android:layout_marginBottom="14dp">

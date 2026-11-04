@@ -1,30 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="@drawable/bg_splash" android:gravity="center"
+    android:background="@color/white" android:gravity="center"
     android:orientation="vertical" android:padding="32dp">
 
-    <ImageView android:layout_width="88dp" android:layout_height="88dp"
-        android:background="@drawable/bg_logo_round" android:padding="22dp"
-        android:src="@drawable/ic_chart" android:tint="@color/primary"/>
+    <ImageView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:adjustViewBounds="true" android:src="@drawable/logo_africompta"
+        android:contentDescription="AfriCompta+"/>
 
     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:layout_marginTop="20dp" android:text="AfriCompta+"
-        android:textColor="@color/white" android:textSize="34sp" android:textStyle="bold"/>
+        android:layout_marginTop="8dp" android:text="Gestion simplifiée pour le commerce africain"
+        android:textColor="@color/text_secondary" android:textSize="13sp"/>
 
-    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:layout_marginTop="4dp" android:text="Gestion simplifiée pour le commerce africain"
-        android:textColor="#B9C7F0" android:textSize="13sp"/>
-
-    <ProgressBar android:layout_width="36dp" android:layout_height="36dp"
-        android:layout_marginTop="44dp" android:indeterminateTint="@color/white"/>
+    <ProgressBar android:layout_width="34dp" android:layout_height="34dp"
+        android:layout_marginTop="36dp" android:indeterminateTint="@color/primary"/>
 
     <TextView android:id="@+id/tvTrialDays"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:layout_marginTop="16dp" android:text=""
-        android:textColor="#FDE68A" android:textSize="13sp"/>
+        android:textColor="@color/accent" android:textSize="13sp" android:textStyle="bold"/>
 
     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:layout_marginTop="28dp" android:text="by Wise Design"
-        android:textColor="#93A4D8" android:textSize="12sp"/>
+        android:textColor="@color/text_hint" android:textSize="12sp"/>
 </LinearLayout>
