@@ -92,3 +92,12 @@ app/
 ---
 
 *AfriCompta+ — Wise Design © 2024*
+
+
+---
+
+## v2.0 — Refonte design + identité boutique + licences en ligne
+
+- **Design system** (Qonto/Pennylane) : tokens dans `res/values/colors.xml` et `themes.xml`; barre de navigation commune `ui/BottomNav` (Vente · Produits · [+] · Clients · Dettes · Rapports).
+- **Identité boutique** : *Ma boutique* (Paramètres) → logo, nom, activité, adresse, tél, email, N° fiscal, pied de page → imprimés sur factures PDF et rapports PDF. Bouton « Aperçu de la facture ».
+- **Licences** : API `https://wiseos.alwaysdata.net/africompta/api/` (voir `africompta_server/`). Activation depuis Paramètres ou directement sur l'écran de verrouillage; re-validation silencieuse toutes les 24 h.
