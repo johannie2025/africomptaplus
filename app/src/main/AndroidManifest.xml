@@ -43,6 +43,9 @@
         <activity android:name=".activities.ReportActivity"      android:exported="false"/>
         <activity android:name=".activities.DebtActivity"        android:exported="false"/>
         <activity android:name=".activities.SettingsActivity" android:exported="false"/>
+        <activity android:name=".activities.PortraitCaptureActivity" android:exported="false"
+            android:screenOrientation="portrait" android:stateNotNeeded="true"
+            android:theme="@style/Theme.AfriComptaPlus.Lock"/>
         <activity android:name=".activities.ClientListActivity" android:exported="false"/>
     </application>
 </manifest>
