@@ -62,6 +62,67 @@ public class ProductFormActivity extends AppCompatActivity {
         if (preset != null) etBarcode.setText(preset);
 
         long productId = getIntent().getLongExtra(EXTRA_PRODUCT_ID, 0);
-        // ... le reste de votre logique onCreate
+        if (productId > 0) {
+            currentProduct = productService.findById(productId);
+            if (currentProduct != null) populateForm(currentProduct);
+        }
+
+        Button btnSave = findViewById(R.id.btnSave);
+        btnSave.setOnClickListener(v -> saveProduct());
+        UiKit.pressScale(btnSave);
+    }
+
+    private void populateForm(Product p) {
+        etName.setText(p.name);
+        etBarcode.setText(p.barcode != null ? p.barcode : "");
+        etBuyingPrice.setText(String.valueOf(p.buyingPrice));
+        etSellingPrice.setText(String.valueOf(p.sellingPrice));
+        etStock.setText(String.valueOf(p.stock));
+        etMinStock.setText(String.valueOf(p.minStock));
+    }
+
+    private void saveProduct() {
+        String name = etName.getText().toString().trim();
+        if (name.isEmpty()) {
+            etName.setError("Nom requis");
+            return;
+        }
+
+        String code = etBarcode.getText().toString().trim();
+        if (!code.isEmpty()) {
+            Product other = productService.findByBarcode(code);
+            if (other != null && (currentProduct == null || other.id != currentProduct.id)) {
+                etBarcode.setError("Déjà utilisé par : " + other.name);
+                return;
+            }
+        }
+
+        double buyingPrice, sellingPrice;
+        int stock, minStock;
+        try {
+            buyingPrice  = Double.parseDouble(etBuyingPrice.getText().toString().trim());
+            sellingPrice = Double.parseDouble(etSellingPrice.getText().toString().trim());
+            stock        = Integer.parseInt(etStock.getText().toString().trim());
+            minStock     = Integer.parseInt(etMinStock.getText().toString().trim());
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Veuillez saisir des valeurs numériques valides", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Product p = currentProduct != null ? currentProduct : new Product();
+        p.name         = name;
+        p.barcode      = etBarcode.getText().toString().trim();
+        p.buyingPrice  = buyingPrice;
+        p.sellingPrice = sellingPrice;
+        p.stock        = stock;
+        p.minStock     = minStock;
+
+        long id = productService.save(p);
+        if (id > 0) {
+            Toast.makeText(this, "Produit enregistré", Toast.LENGTH_SHORT).show();
+            finish();
+        } else {
+            Toast.makeText(this, "Erreur lors de l'enregistrement", Toast.LENGTH_SHORT).show();
+        }
     }
 }
