@@ -54,7 +54,7 @@
 
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:layout_marginTop="20dp" android:layout_marginBottom="8dp"
-            android:text="Wise Design · +240 555 445 514"
+            android:text="Wise Design · +240 222 886 007"
             android:textColor="#64748B" android:textSize="11sp"/>
     </LinearLayout>
 </ScrollView>

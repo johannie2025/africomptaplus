@@ -4,7 +4,7 @@
     <string name="app_name">AfriCompta+</string>
     <string name="app_tagline">Gestion simplifiée pour le commerce africain</string>
     <string name="by_wise_design">par Wise Design</string>
-    <string name="wise_phone">+240 555 445 514</string>
+    <string name="wise_phone">+240 222 886 007</string>
 
     <!-- Lock screen -->
     <string name="lock_title">Période d\'évaluation AfriCompta+ Terminée</string>
@@ -12,7 +12,7 @@
     <string name="lock_clock_fraud">⚠️ Fraude détectée : modification de l\'horloge système.</string>
     <string name="lock_body">Contactez Wise Design pour obtenir votre code d\'activation et profiter de toutes les fonctionnalités en illimité.</string>
     <string name="lock_btn_activate">📱 Demander mon Code d\'Activation</string>
-    <string name="lock_whatsapp_label">WhatsApp : +240 555 445 514</string>
+    <string name="lock_whatsapp_label">WhatsApp : +240 222 886 007</string>
     <string name="lock_footer">Wise Design — AfriCompta+</string>
 
     <!-- Trial badge -->
@@ -24,7 +24,7 @@
     <string name="kpi_revenue_today">CA Aujourd\'hui</string>
     <string name="kpi_sales_count">Ventes du jour</string>
     <string name="kpi_low_stock">⚠️ Stock critique</string>
-    <string name="footer_contact">Wise Design · +240 555 445 514</string>
+    <string name="footer_contact">Wise Design · +240 222 886 007</string>
 
     <!-- Modules -->
     <string name="module_sale">🛒  Nouvelle Vente</string>
@@ -106,7 +106,7 @@
     <!-- PDF / Facture -->
     <string name="invoice_header">AFRICOMPTA+</string>
     <string name="invoice_from">Wise Design</string>
-    <string name="invoice_whatsapp">WhatsApp : +240 555 445 514</string>
+    <string name="invoice_whatsapp">WhatsApp : +240 222 886 007</string>
     <string name="invoice_label">Facture</string>
     <string name="invoice_date">Date</string>
     <string name="invoice_payment">Paiement</string>
