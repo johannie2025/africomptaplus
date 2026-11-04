@@ -132,6 +132,18 @@ public class InvoiceManager {
         p.setColor(PdfStyle.BORDER); cv.drawRect(M, y, W - M, y + 1, p);
         y += 16;
 
+        // Sous-total / TVA (si activée sur cette vente)
+        if (sale.taxRate > 0) {
+            p.setTypeface(Typeface.DEFAULT); p.setTextSize(10.5f); p.setColor(PdfStyle.MUTED);
+            p.setTextAlign(Paint.Align.LEFT);
+            cv.drawText("Sous-total HT", W - M - 200, y + 4, p);
+            cv.drawText("TVA (" + (sale.taxRate == Math.floor(sale.taxRate) ? String.valueOf((long) sale.taxRate) : String.valueOf(sale.taxRate)) + " %)", W - M - 200, y + 20, p);
+            p.setTextAlign(Paint.Align.RIGHT); p.setColor(PdfStyle.TEXT);
+            cv.drawText(UiKit.fmt(sale.subtotal), W - M, y + 4, p);
+            cv.drawText(UiKit.fmt(sale.taxAmount), W - M, y + 20, p);
+            y += 34;
+        }
+
         // Total
         p.setColor(PdfStyle.PRIMARY);
         cv.drawRoundRect(new RectF(W - M - 200, y, W - M, y + 40), 12, 12, p);

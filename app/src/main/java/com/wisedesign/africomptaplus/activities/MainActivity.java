@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         // Logo boutique dans l'en-tête
         ImageView iv = findViewById(R.id.ivShopLogo);
         Bitmap logo = UiKit.loadLogo(this, 160);
-        if (logo != null) { iv.setImageTintList(null); iv.setImageBitmap(logo); }
+        if (logo != null) { iv.setBackgroundResource(R.drawable.bg_logo_round); iv.setPadding(8, 8, 8, 8); iv.setImageBitmap(logo); }
     }
 
     private void setupCards() {

@@ -25,8 +25,11 @@ public class SaleService {
         SQLiteDatabase sqdb = db.getWritableDatabase();
         sqdb.beginTransaction();
         try {
-            double total = 0;
-            for (SaleItem item : items) total += item.totalPrice;
+            double subtotal = 0;
+            for (SaleItem item : items) subtotal += item.totalPrice;
+            double taxRate   = taxRate();
+            double taxAmount = Math.round(subtotal * taxRate / 100.0);
+            double total     = subtotal + taxAmount;
 
             String inv = "INV-" + new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(new Date());
             String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date());
@@ -37,6 +40,9 @@ public class SaleService {
             cv.put(DatabaseHelper.COL_CLIENT_NAME,    clientName  != null ? clientName  : "Client Passager");
             cv.put(DatabaseHelper.COL_CLIENT_PHONE,   clientPhone != null ? clientPhone : "");
             cv.put(DatabaseHelper.COL_TOTAL_AMOUNT,   total);
+            cv.put(DatabaseHelper.COL_SUBTOTAL,       subtotal);
+            cv.put(DatabaseHelper.COL_TAX_RATE,       taxRate);
+            cv.put(DatabaseHelper.COL_TAX_AMOUNT,     taxAmount);
             cv.put(DatabaseHelper.COL_PAYMENT_METHOD, paymentMethod);
             cv.put(DatabaseHelper.COL_CREATED_AT,     now);
             long saleId = sqdb.insert(DatabaseHelper.T_SALES, null, cv);
@@ -75,6 +81,15 @@ public class SaleService {
             sqdb.setTransactionSuccessful();
             return saleId;
         } finally { sqdb.endTransaction(); }
+    }
+
+    /** Taux de TVA actif (0 si désactivée). */
+    public double taxRate() {
+        if (!"1".equals(db.getConfig("tva_enabled"))) return 0;
+        try {
+            double r = Double.parseDouble(db.getConfig("tva_rate").replace(',', '.'));
+            return (r > 0 && r <= 100) ? r : 0;
+        } catch (Exception e) { return 0; }
     }
 
     // compat ancienne signature
@@ -138,6 +153,13 @@ public class SaleService {
         if (cnIdx >= 0) s.clientName = c.getString(cnIdx);
         int cpIdx = c.getColumnIndex(DatabaseHelper.COL_CLIENT_PHONE);
         if (cpIdx >= 0) s.clientPhone = c.getString(cpIdx);
+        int stIdx = c.getColumnIndex(DatabaseHelper.COL_SUBTOTAL);
+        if (stIdx >= 0) s.subtotal = c.getDouble(stIdx);
+        int trIdx = c.getColumnIndex(DatabaseHelper.COL_TAX_RATE);
+        if (trIdx >= 0) s.taxRate = c.getDouble(trIdx);
+        int taIdx = c.getColumnIndex(DatabaseHelper.COL_TAX_AMOUNT);
+        if (taIdx >= 0) s.taxAmount = c.getDouble(taIdx);
+        if (s.subtotal <= 0) s.subtotal = s.totalAmount - s.taxAmount;
         return s;
     }
 }

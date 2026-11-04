@@ -3,6 +3,10 @@ package com.wisedesign.africomptaplus.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import androidx.activity.result.ActivityResultLauncher;
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
+import com.wisedesign.africomptaplus.ui.Scanner;
 import android.view.*;
 import android.widget.*;
 import androidx.annotation.NonNull;
@@ -30,6 +34,11 @@ public class SaleActivity extends AppCompatActivity {
     private EditText       etDueDate;
     private View           payCash, payMobile, payCredit;
     private String         paymentMethod = "cash";
+
+    private final ActivityResultLauncher<ScanOptions> scanLauncher =
+            registerForActivityResult(new ScanContract(), result -> {
+                if (result.getContents() != null) onBarcodeScanned(result.getContents().trim());
+            });
 
     private long   selectedClientId    = 0;
     private String selectedClientName  = "Client Passager";
@@ -65,6 +74,9 @@ public class SaleActivity extends AppCompatActivity {
         findViewById(R.id.btnSelectClient).setOnClickListener(v -> showClientPicker());
         findViewById(R.id.btnNewClient).setOnClickListener(v -> showQuickClientDialog());
         findViewById(R.id.btnAddProduct).setOnClickListener(v -> showProductPicker());
+        findViewById(R.id.btnScan).setOnClickListener(v ->
+                scanLauncher.launch(Scanner.options("Scannez le code-barres du produit")));
+        UiKit.pressScale(findViewById(R.id.btnScan));
         findViewById(R.id.btnFinalizeSale).setOnClickListener(v -> finalizeSale());
         UiKit.pressScale(findViewById(R.id.btnFinalizeSale), payCash, payMobile, payCredit);
 
@@ -77,6 +89,12 @@ public class SaleActivity extends AppCompatActivity {
         refreshCart();
         BottomNav.attach(this, BottomNav.SALE);
     }
+
+    private static String trimRate(double r) {
+        return r == Math.floor(r) ? String.valueOf((long) r) : String.valueOf(r);
+    }
+
+    @Override protected void onResume() { super.onResume(); refreshCart(); }
 
     private void selectPayment(String m) {
         paymentMethod = m;
@@ -175,6 +193,29 @@ public class SaleActivity extends AppCompatActivity {
                 .setNegativeButton("Annuler", null).show();
     }
 
+    /** Scan → ajoute 1 unité au panier ; propose la création si le code est inconnu. */
+    private void onBarcodeScanned(String code) {
+        Product p = productService.findByBarcode(code);
+        if (p == null) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Produit introuvable")
+                    .setMessage("Aucun produit avec le code " + code + ".\nLe créer maintenant ?")
+                    .setPositiveButton("Créer", (d, w) -> {
+                        Intent i = new Intent(this, ProductFormActivity.class);
+                        i.putExtra(ProductFormActivity.EXTRA_BARCODE, code);
+                        startActivity(i);
+                    })
+                    .setNegativeButton("Annuler", null).show();
+            return;
+        }
+        if (qtyInCart(p.id) + 1 > p.stock) {
+            Toast.makeText(this, "Stock insuffisant : " + p.name + " (" + p.stock + " dispo)", Toast.LENGTH_LONG).show();
+            return;
+        }
+        addToCart(p, 1);
+        Toast.makeText(this, "Ajouté : " + p.name, Toast.LENGTH_SHORT).show();
+    }
+
     private int qtyInCart(long productId) {
         for (SaleItem i : cart) if (i.productId == productId) return i.quantity;
         return 0;
@@ -197,7 +238,16 @@ public class SaleActivity extends AppCompatActivity {
         cartAdapter.notifyDataSetChanged();
         double total = 0;
         for (SaleItem item : cart) total += item.totalPrice;
-        tvTotal.setText(UiKit.xaf(total));
+        double rate = saleService.taxRate();
+        double tax = Math.round(total * rate / 100.0);
+        View taxes = findViewById(R.id.rowTaxes);
+        if (rate > 0) {
+            taxes.setVisibility(View.VISIBLE);
+            ((TextView) findViewById(R.id.tvSubtotal)).setText(UiKit.xaf(total));
+            ((TextView) findViewById(R.id.tvTaxLabel)).setText("TVA (" + trimRate(rate) + " %)");
+            ((TextView) findViewById(R.id.tvTaxAmount)).setText(UiKit.xaf(tax));
+        } else taxes.setVisibility(View.GONE);
+        tvTotal.setText(UiKit.xaf(total + tax));
         tvArticlesTitle.setText("Articles (" + cart.size() + ")");
         tvEmptyCart.setVisibility(cart.isEmpty() ? View.VISIBLE : View.GONE);
     }

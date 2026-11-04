@@ -29,6 +29,8 @@ public class SettingsActivity extends AppCompatActivity {
     private EditText etShopName, etTagline, etShopPhone, etEmail, etShopAddress, etTaxId, etFooter, etLicenseKey;
     private TextView tvLogoPath, tvLicenseStatus, tvLicenseInfo, tvDeviceId, btnRemoveLogo;
     private ImageView ivLogo;
+    private com.google.android.material.switchmaterial.SwitchMaterial swTva;
+    private EditText etTvaRate;
     private String selectedLogoPath = "";
 
     @Override
@@ -54,6 +56,12 @@ public class SettingsActivity extends AppCompatActivity {
         btnRemoveLogo = findViewById(R.id.btnRemoveLogo);
         ivLogo        = findViewById(R.id.ivLogoPreview);
 
+        swTva     = findViewById(R.id.swTva);
+        etTvaRate = findViewById(R.id.etTvaRate);
+        swTva.setOnCheckedChangeListener((b, on) ->
+                findViewById(R.id.boxTvaRate).setVisibility(on ? View.VISIBLE : View.GONE));
+        findViewById(R.id.btnSaveTva).setOnClickListener(v -> saveTva());
+
         loadConfig();
 
         findViewById(R.id.btnPickLogo).setOnClickListener(v -> {
@@ -76,11 +84,130 @@ public class SettingsActivity extends AppCompatActivity {
             });
         });
 
-        findViewById(R.id.btnCloudBackup).setOnClickListener(v -> {
-            if (!sm.isActivated()) Toast.makeText(this, "Fonctionnalité Premium — activez votre licence", Toast.LENGTH_LONG).show();
-            else Toast.makeText(this, "Sauvegarde cloud : bientôt disponible", Toast.LENGTH_SHORT).show();
+        setupBackup();
+    }
+
+    // ── Sauvegarde / restauration ───────────────────────────────────────────
+    private com.wisedesign.africomptaplus.services.BackupManager backup;
+    private Runnable pendingDriveAction;
+    private final androidx.activity.result.ActivityResultLauncher<androidx.activity.result.IntentSenderRequest> authLauncher =
+        registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.StartIntentSenderForResult(), res -> {
+            try {
+                com.google.android.gms.auth.api.identity.AuthorizationResult r =
+                    com.google.android.gms.auth.api.identity.Identity.getAuthorizationClient(this)
+                        .getAuthorizationResultFromIntent(res.getData());
+                if (r.getAccessToken() != null && pendingDriveAction != null) runDrive(r.getAccessToken());
+            } catch (Exception e) { gmsError(); }
         });
-        UiKit.pressScale(findViewById(R.id.btnCloudBackup));
+    private final androidx.activity.result.ActivityResultLauncher<String[]> importLauncher =
+        registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.OpenDocument(), uri -> {
+            if (uri == null) return;
+            try (InputStream in = getContentResolver().openInputStream(uri)) {
+                ByteArrayOutputStream bo = new ByteArrayOutputStream();
+                byte[] buf = new byte[8192]; int n;
+                while ((n = in.read(buf)) > 0) bo.write(buf, 0, n);
+                confirmRestore(bo.toByteArray());
+            } catch (Exception e) { toast("Fichier illisible"); }
+        });
+    private boolean driveRestoreMode;
+
+    private void setupBackup() {
+        backup = new com.wisedesign.africomptaplus.services.BackupManager(this);
+        showLastBackup();
+        int[] ids = {R.id.btnDriveBackup, R.id.btnDriveRestore, R.id.btnFileExport, R.id.btnFileImport};
+        for (int id : ids) UiKit.pressScale(findViewById(id));
+
+        findViewById(R.id.btnFileExport).setOnClickListener(v -> {
+            if (!premium()) return;
+            try {
+                Uri u = backup.writeBackupFile();
+                Intent i = new Intent(Intent.ACTION_SEND).setType("application/octet-stream")
+                        .putExtra(Intent.EXTRA_STREAM, u).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivity(Intent.createChooser(i, "Enregistrer la sauvegarde"));
+                markBackup();
+            } catch (Exception e) { toast("Échec : " + e.getMessage()); }
+        });
+        findViewById(R.id.btnFileImport).setOnClickListener(v -> {
+            if (premium()) importLauncher.launch(new String[]{"*/*"});
+        });
+        findViewById(R.id.btnDriveBackup).setOnClickListener(v -> { if (premium()) startDrive(false); });
+        findViewById(R.id.btnDriveRestore).setOnClickListener(v -> { if (premium()) startDrive(true); });
+    }
+
+    private boolean premium() {
+        if (sm.isActivated()) return true;
+        toast("Fonctionnalité Premium — activez votre licence");
+        return false;
+    }
+
+    private void toast(String m) { Toast.makeText(this, m, Toast.LENGTH_LONG).show(); }
+    private void gmsError() { toast("Services Google indisponibles — utilisez la sauvegarde par fichier"); }
+
+    private void startDrive(boolean restore) {
+        driveRestoreMode = restore;
+        pendingDriveAction = () -> {};
+        try {
+            com.google.android.gms.auth.api.identity.AuthorizationRequest req =
+                com.google.android.gms.auth.api.identity.AuthorizationRequest.builder()
+                    .setRequestedScopes(java.util.Collections.singletonList(
+                        new com.google.android.gms.common.api.Scope(
+                            com.wisedesign.africomptaplus.services.DriveBackup.SCOPE))).build();
+            com.google.android.gms.auth.api.identity.Identity.getAuthorizationClient(this).authorize(req)
+                .addOnSuccessListener(r -> {
+                    if (r.hasResolution() && r.getPendingIntent() != null) {
+                        authLauncher.launch(new androidx.activity.result.IntentSenderRequest
+                                .Builder(r.getPendingIntent().getIntentSender()).build());
+                    } else if (r.getAccessToken() != null) runDrive(r.getAccessToken());
+                    else gmsError();
+                })
+                .addOnFailureListener(e -> gmsError());
+        } catch (Throwable t) { gmsError(); }
+    }
+
+    private void runDrive(String token) {
+        toast(driveRestoreMode ? "Recherche de la sauvegarde…" : "Envoi vers Drive…");
+        new Thread(() -> {
+            try {
+                if (!driveRestoreMode) {
+                    byte[] data = backup.createBackup();
+                    String name = "AfriCompta_" + new java.text.SimpleDateFormat("yyyyMMdd_HHmm", java.util.Locale.US)
+                            .format(new java.util.Date()) + com.wisedesign.africomptaplus.services.BackupManager.EXT;
+                    com.wisedesign.africomptaplus.services.DriveBackup.upload(token, name, data);
+                    runOnUiThread(() -> { markBackup(); toast("Sauvegarde Drive terminée ✓"); });
+                } else {
+                    org.json.JSONArray l = com.wisedesign.africomptaplus.services.DriveBackup.list(token);
+                    if (l.length() == 0) { runOnUiThread(() -> toast("Aucune sauvegarde sur Drive")); return; }
+                    byte[] data = com.wisedesign.africomptaplus.services.DriveBackup
+                            .download(token, l.getJSONObject(0).getString("id"));
+                    runOnUiThread(() -> confirmRestore(data));
+                }
+            } catch (Exception e) { runOnUiThread(() -> toast("Échec : " + e.getMessage())); }
+        }).start();
+    }
+
+    private void confirmRestore(byte[] data) {
+        String info;
+        try { info = backup.describe(data); } catch (Exception e) { toast("Sauvegarde invalide"); return; }
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Restaurer ?")
+            .setMessage(info + "\n\nLes données actuelles seront remplacées.")
+            .setNegativeButton("Annuler", null)
+            .setPositiveButton("Restaurer", (d, w) -> {
+                try { backup.restore(data); toast("Restauration terminée ✓"); recreate(); }
+                catch (Exception e) { toast("Échec : " + e.getMessage()); }
+            }).show();
+    }
+
+    private void markBackup() {
+        db.setConfig("cloud_last_backup", new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.FRANCE)
+                .format(new java.util.Date()));
+        showLastBackup();
+    }
+
+    private void showLastBackup() {
+        String t = db.getConfig("cloud_last_backup");
+        ((TextView) findViewById(R.id.tvLastBackup)).setText(
+            (t == null || t.isEmpty()) ? "Aucune sauvegarde effectuée" : "Dernière sauvegarde : " + t);
     }
 
     private void loadConfig() {
@@ -93,6 +220,11 @@ public class SettingsActivity extends AppCompatActivity {
         etFooter.setText(db.getConfig("invoice_footer"));
         selectedLogoPath = UiKit.logoPath(this);
         showLogo();
+        boolean tva = "1".equals(db.getConfig("tva_enabled"));
+        swTva.setChecked(tva);
+        String r = db.getConfig("tva_rate");
+        etTvaRate.setText(r.isEmpty() ? "18" : r);
+        findViewById(R.id.boxTvaRate).setVisibility(tva ? View.VISIBLE : View.GONE);
 
         tvDeviceId.setText("Identifiant appareil : " + sm.deviceId());
         if (sm.isActivated()) {
@@ -143,6 +275,19 @@ public class SettingsActivity extends AppCompatActivity {
         Toast.makeText(this, "Paramètres enregistrés", Toast.LENGTH_SHORT).show();
     }
 
+    private void saveTva() {
+        boolean on = swTva.isChecked();
+        String raw = etTvaRate.getText().toString().trim().replace(',', '.');
+        if (on) {
+            double r;
+            try { r = Double.parseDouble(raw); } catch (Exception e) { etTvaRate.setError("Taux invalide"); return; }
+            if (r <= 0 || r > 100) { etTvaRate.setError("Entre 0 et 100"); return; }
+            db.setConfig("tva_rate", raw);
+        }
+        db.setConfig("tva_enabled", on ? "1" : "0");
+        Toast.makeText(this, on ? "TVA activée" : "TVA désactivée", Toast.LENGTH_SHORT).show();
+    }
+
     /** Génère une facture d'exemple avec l'identité saisie (enregistre d'abord). */
     private void previewInvoice() {
         if (etShopName.getText().toString().trim().isEmpty()) { etShopName.setError("Nom requis"); return; }
@@ -157,7 +302,10 @@ public class SettingsActivity extends AppCompatActivity {
         items.add(new SaleItem(0, "Power Bank 20 000 mAh", 0, 2, 11000));
         items.add(new SaleItem(0, "Câble USB-C 1 m", 0, 1, 2250));
         double t = 0; for (SaleItem i : items) t += i.totalPrice;
-        s.totalAmount = t; s.items = items;
+        s.subtotal = t;
+        s.taxRate = new com.wisedesign.africomptaplus.services.SaleService(this).taxRate();
+        s.taxAmount = Math.round(t * s.taxRate / 100.0);
+        s.totalAmount = t + s.taxAmount; s.items = items;
         Uri uri = new InvoiceManager(this).generateInvoicePDF(s, items);
         if (uri == null) { Toast.makeText(this, "Erreur de génération", Toast.LENGTH_SHORT).show(); return; }
         Intent v = new Intent(Intent.ACTION_VIEW);

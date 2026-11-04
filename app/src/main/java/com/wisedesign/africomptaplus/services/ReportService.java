@@ -66,7 +66,7 @@ public class ReportService {
     // ── Requêtes ─────────────────────────────────────────────────────────────
 
     private double queryRevenue(String s, String e) {
-        Cursor c = db.rawQuery("SELECT COALESCE(SUM(" + DatabaseHelper.COL_TOTAL_AMOUNT + "),0)"
+        Cursor c = db.rawQuery("SELECT COALESCE(SUM(" + DatabaseHelper.COL_TOTAL_AMOUNT + " - COALESCE(" + DatabaseHelper.COL_TAX_AMOUNT + ",0)),0)"
                 + " FROM " + DatabaseHelper.T_SALES
                 + " WHERE date(" + DatabaseHelper.COL_CREATED_AT + ") BETWEEN date(?) AND date(?)", new String[]{s, e});
         try { return c.moveToFirst() ? c.getDouble(0) : 0; } finally { c.close(); }
@@ -135,7 +135,7 @@ public class ReportService {
         List<String[]> list = new ArrayList<>();
         Cursor c = db.rawQuery(
                 "SELECT date(" + DatabaseHelper.COL_CREATED_AT + ") AS day"
-                + ", SUM(" + DatabaseHelper.COL_TOTAL_AMOUNT + ") AS rev"
+                + ", SUM(" + DatabaseHelper.COL_TOTAL_AMOUNT + " - COALESCE(" + DatabaseHelper.COL_TAX_AMOUNT + ",0)) AS rev"
                 + " FROM " + DatabaseHelper.T_SALES
                 + " WHERE date(" + DatabaseHelper.COL_CREATED_AT + ") BETWEEN date(?) AND date(?)"
                 + " GROUP BY day ORDER BY day ASC", new String[]{s, e});
@@ -162,7 +162,7 @@ public class ReportService {
         try { return c.moveToFirst() ? c.getInt(0) : 0; } finally { c.close(); }
     }
     public double revenueToday(String today) {
-        Cursor c = db.rawQuery("SELECT COALESCE(SUM(" + DatabaseHelper.COL_TOTAL_AMOUNT + "),0) FROM " + DatabaseHelper.T_SALES
+        Cursor c = db.rawQuery("SELECT COALESCE(SUM(" + DatabaseHelper.COL_TOTAL_AMOUNT + " - COALESCE(" + DatabaseHelper.COL_TAX_AMOUNT + ",0)),0) FROM " + DatabaseHelper.T_SALES
                 + " WHERE date(" + DatabaseHelper.COL_CREATED_AT + ")=date(?)", new String[]{today});
         try { return c.moveToFirst() ? c.getDouble(0) : 0; } finally { c.close(); }
     }

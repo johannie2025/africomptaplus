@@ -1,6 +1,10 @@
 package com.wisedesign.africomptaplus.activities;
 
 import android.os.Bundle;
+import androidx.activity.result.ActivityResultLauncher;
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
+import com.wisedesign.africomptaplus.ui.Scanner;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -15,6 +19,19 @@ import com.wisedesign.africomptaplus.ui.UiKit;
 public class ProductFormActivity extends AppCompatActivity {
 
     public static final String EXTRA_PRODUCT_ID = "product_id";
+    public static final String EXTRA_BARCODE    = "barcode";
+
+    private final ActivityResultLauncher<ScanOptions> scanLauncher =
+            registerForActivityResult(new ScanContract(), result -> {
+                if (result.getContents() == null) return;
+                String code = result.getContents().trim();
+                etBarcode.setText(code);
+                Product other = productService.findByBarcode(code);
+                if (other != null && (currentProduct == null || other.id != currentProduct.id)) {
+                    etBarcode.setError("Déjà utilisé par : " + other.name);
+                    Toast.makeText(this, "Ce code existe déjà : " + other.name, Toast.LENGTH_LONG).show();
+                }
+            });
 
     private ProductService productService;
     private Product currentProduct;
@@ -35,6 +52,12 @@ public class ProductFormActivity extends AppCompatActivity {
         etSellingPrice = findViewById(R.id.etSellingPrice);
         etStock        = findViewById(R.id.etStock);
         etMinStock     = findViewById(R.id.etMinStock);
+
+        findViewById(R.id.btnScanBarcode).setOnClickListener(v ->
+                scanLauncher.launch(Scanner.options("Scannez le code-barres du produit")));
+        UiKit.pressScale(findViewById(R.id.btnScanBarcode));
+        String preset = getIntent().getStringExtra(EXTRA_BARCODE);
+        if (preset != null) etBarcode.setText(preset);
 
         long productId = getIntent().getLongExtra(EXTRA_PRODUCT_ID, 0);
         if (productId > 0) {
@@ -61,6 +84,15 @@ public class ProductFormActivity extends AppCompatActivity {
         if (name.isEmpty()) {
             etName.setError("Nom requis");
             return;
+        }
+
+        String code = etBarcode.getText().toString().trim();
+        if (!code.isEmpty()) {
+            Product other = productService.findByBarcode(code);
+            if (other != null && (currentProduct == null || other.id != currentProduct.id)) {
+                etBarcode.setError("Déjà utilisé par : " + other.name);
+                return;
+            }
         }
 
         double buyingPrice, sellingPrice;

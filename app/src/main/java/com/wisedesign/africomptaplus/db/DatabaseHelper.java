@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME    = "africompta.db";
-    private static final int    DB_VERSION = 2; // bumped for new tables
+    private static final int    DB_VERSION = 3; // v3 : TVA (subtotal, tax_rate, tax_amount)
 
     // ── Tables ──────────────────────────────────────────────────────────────
     public static final String T_PRODUCTS     = "products";
@@ -61,6 +61,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_UPDATED_AT  = "updated_at";
 
     // ── Sales (client) ───────────────────────────────────────────────────────
+    public static final String COL_SUBTOTAL     = "subtotal";
+    public static final String COL_TAX_RATE     = "tax_rate";
+    public static final String COL_TAX_AMOUNT   = "tax_amount";
     public static final String COL_CLIENT_NAME  = "client_name";
     public static final String COL_CLIENT_PHONE = "client_phone";
 
@@ -109,6 +112,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COL_CLIENT_NAME + " TEXT DEFAULT 'Client Passager',"
                 + COL_CLIENT_PHONE + " TEXT DEFAULT '',"
                 + COL_TOTAL_AMOUNT + " REAL NOT NULL DEFAULT 0,"
+                + COL_SUBTOTAL + " REAL NOT NULL DEFAULT 0,"
+                + COL_TAX_RATE + " REAL NOT NULL DEFAULT 0,"
+                + COL_TAX_AMOUNT + " REAL NOT NULL DEFAULT 0,"
                 + COL_PAYMENT_METHOD + " TEXT NOT NULL DEFAULT 'cash',"
                 + COL_CREATED_AT + " TEXT NOT NULL"
                 + ");");
@@ -168,6 +174,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         insertConfig(db, "invoice_footer", "Merci pour votre achat !");
         insertConfig(db, "cloud_backup_enabled", "0");
         insertConfig(db, "cloud_backup_token", "");
+        insertConfig(db, "tva_enabled", "0");
+        insertConfig(db, "tva_rate", "18");
 
         // Client passager par défaut
         db.execSQL("INSERT OR IGNORE INTO " + T_CLIENTS
@@ -211,6 +219,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             insertConfig(db, "invoice_footer", "Merci pour votre achat !");
             insertConfig(db, "cloud_backup_enabled", "0");
             insertConfig(db, "cloud_backup_token", "");
+        }
+        if (oldVersion < 3) {
+            try { db.execSQL("ALTER TABLE " + T_SALES + " ADD COLUMN " + COL_SUBTOTAL + " REAL NOT NULL DEFAULT 0"); } catch (Exception ignored) {}
+            try { db.execSQL("ALTER TABLE " + T_SALES + " ADD COLUMN " + COL_TAX_RATE + " REAL NOT NULL DEFAULT 0"); } catch (Exception ignored) {}
+            try { db.execSQL("ALTER TABLE " + T_SALES + " ADD COLUMN " + COL_TAX_AMOUNT + " REAL NOT NULL DEFAULT 0"); } catch (Exception ignored) {}
+            // Anciennes ventes : sous-total = total (aucune TVA)
+            try { db.execSQL("UPDATE " + T_SALES + " SET " + COL_SUBTOTAL + "=" + COL_TOTAL_AMOUNT + " WHERE " + COL_SUBTOTAL + "=0"); } catch (Exception ignored) {}
+            insertConfig(db, "tva_enabled", "0");
+            insertConfig(db, "tva_rate", "18");
         }
     }
 
