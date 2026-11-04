@@ -22,7 +22,7 @@
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
         android:orientation="horizontal" android:paddingStart="16dp" android:paddingEnd="16dp"
         android:layout_marginBottom="12dp">
-        <TextView android:id="@+id/chipAll" style="@style/Chip" android:text="Tous" android:selected="true"/>
+        <TextView android:id="@+id/chipAll" style="@style/Chip" android:text="Tous"/>
         <TextView android:id="@+id/chipDebtors" style="@style/Chip" android:text="Débiteurs"/>
         <TextView android:id="@+id/chipClear" style="@style/Chip" android:text="À jour"/>
     </LinearLayout>
