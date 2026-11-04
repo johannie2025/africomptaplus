@@ -56,38 +56,18 @@ jobs:
       - name: Rename APK files
         run: |
           mkdir -p artifacts
-          cp app/build/outputs/apk/debug/app-debug.apk \
-             artifacts/AfriComptaPlus-debug-${{ github.run_number }}.apk
-          cp app/build/outputs/apk/release/app-release.apk \
-             artifacts/AfriComptaPlus-release-${{ github.run_number }}.apk || \
-          cp app/build/outputs/apk/release/app-release-unsigned.apk \
-             artifacts/AfriComptaPlus-release-${{ github.run_number }}.apk
-
-      # ── 9. Upload APK artifact ───────────────────────────────────────────────
+          cp app/build/outputs/apk/debug/app-debug.apk             artifacts/AfriComptaPlus-debug-${{ github.run_number }}.apk
+          cp app/build/outputs/apk/release/app-release.apk             artifacts/AfriComptaPlus-release-${{ github.run_number }}.apk ||             cp app/build/outputs/apk/release/app-release-unsigned.apk             artifacts/AfriComptaPlus-release-${{ github.run_number }}.apk
+          
+      # ── 9. Upload Artifacts ──────────────────────────────────────────────────
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: AfriComptaPlus-debug-${{ github.run_number }}
           path: artifacts/AfriComptaPlus-debug-${{ github.run_number }}.apk
-          retention-days: 30
 
       - name: Upload Release APK
         uses: actions/upload-artifact@v4
         with:
           name: AfriComptaPlus-release-${{ github.run_number }}
           path: artifacts/AfriComptaPlus-release-${{ github.run_number }}.apk
-          retention-days: 30
-
-      # ── 10. Résumé ───────────────────────────────────────────────────────────
-      - name: Build Summary
-        run: |
-          echo "## ✅ AfriCompta+ Build #${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Fichier | Taille |" >> $GITHUB_STEP_SUMMARY
-          echo "|---------|--------|" >> $GITHUB_STEP_SUMMARY
-          for f in artifacts/*.apk; do
-            size=$(du -sh "$f" | cut -f1)
-            echo "| $(basename $f) | $size |" >> $GITHUB_STEP_SUMMARY
-          done
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "📥 Téléchargez l'APK dans l'onglet **Artifacts** ci-dessus." >> $GITHUB_STEP_SUMMARY
