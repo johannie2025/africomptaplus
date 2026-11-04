@@ -1,7 +1,7 @@
 # AfriCompta+ MVP
 
 **Micro-ERP commercial offline-first pour le commerce africain**  
-Développé par **Wise Design** · WhatsApp : +240 555 445 514
+Développé par **Wise Design** · WhatsApp : +240 222 886 007
 
 ---
 
@@ -78,7 +78,7 @@ app/
 - **14 jours d'essai** gratuits, 3 écrans max
 - Anti-cheat : détection de retour en arrière de l'horloge système
 - À expiration : écran rouge verrouillé + bouton WhatsApp Wise Design
-- Activation par code → contacter **+240 555 445 514**
+- Activation par code → contacter **+240 222 886 007**
 
 ---
 
