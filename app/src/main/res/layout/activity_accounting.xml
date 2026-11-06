@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/surface">
+    <include layout="@layout/view_topbar"/>
+    <include layout="@layout/view_filter_bar"/>
+    <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:scrollbars="none" android:paddingStart="12dp" android:paddingEnd="12dp">
+        <LinearLayout android:id="@+id/llTabs" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:orientation="horizontal"/>
+    </HorizontalScrollView>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:layout_marginStart="16dp" android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp">
+        <TextView android:id="@+id/btnAddEntry" android:layout_width="0dp" android:layout_height="44dp"
+            android:layout_weight="1" android:layout_marginEnd="6dp" android:gravity="center"
+            android:background="@drawable/bg_btn_cta" android:text="+ Écriture"
+            android:textColor="@color/white" android:textSize="14sp" android:textStyle="bold"/>
+        <TextView android:id="@+id/btnExportTable" android:layout_width="0dp" android:layout_height="44dp"
+            android:layout_weight="1" android:layout_marginStart="6dp" android:gravity="center"
+            android:background="@drawable/bg_card" android:text="Exporter PDF"
+            android:textColor="@color/primary" android:textSize="14sp" android:textStyle="bold"/>
+    </LinearLayout>
+    <TextView android:id="@+id/tvInfo" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginStart="20dp" android:layout_marginEnd="20dp" android:layout_marginTop="8dp"
+        android:textColor="@color/text_secondary" android:textSize="11sp"/>
+    <LinearLayout android:id="@+id/llHeader" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginStart="12dp" android:layout_marginEnd="12dp" android:layout_marginTop="6dp"
+        android:orientation="horizontal" android:background="@color/primary" android:paddingTop="8dp" android:paddingBottom="8dp"/>
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvTable"
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:layout_marginStart="12dp" android:layout_marginEnd="12dp" android:overScrollMode="never"/>
+        <TextView android:id="@+id/tvEmpty" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_gravity="center" android:text="Aucune écriture sur cette période."
+            android:textColor="@color/text_secondary" android:textSize="14sp" android:visibility="gone"/>
+    </FrameLayout>
+    <include layout="@layout/view_bottom_nav"/>
+</LinearLayout>

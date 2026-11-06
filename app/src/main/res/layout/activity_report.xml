@@ -25,6 +25,7 @@
                 <TextView android:id="@+id/tabQuarter"  style="@style/PeriodTab" android:text="TRIM."/>
                 <TextView android:id="@+id/tabSemester" style="@style/PeriodTab" android:text="SEM."/>
                 <TextView android:id="@+id/tabYear"     style="@style/PeriodTab" android:text="ANNÉE"/>
+                <TextView android:id="@+id/tabCustom"   style="@style/PeriodTab" android:text="PERSO"/>
             </LinearLayout>
 
             <TextView android:id="@+id/tvPeriod"

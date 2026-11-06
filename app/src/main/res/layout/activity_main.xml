@@ -192,6 +192,26 @@
                     <ImageView style="@style/ModuleChevron"/>
                 </LinearLayout>
 
+                <LinearLayout android:id="@+id/cardDocs" style="@style/ModuleRow">
+                    <ImageView style="@style/ModuleIcon" android:background="@drawable/bg_icon_blue"
+                        android:src="@drawable/ic_file" android:tint="@color/primary"/>
+                    <LinearLayout style="@style/ModuleText">
+                        <TextView style="@style/ModuleTitle" android:text="Devis &amp; Proforma"/>
+                        <TextView style="@style/ModuleSub" android:text="Créer, convertir en facture, imprimer"/>
+                    </LinearLayout>
+                    <ImageView style="@style/ModuleChevron"/>
+                </LinearLayout>
+
+                <LinearLayout android:id="@+id/cardAcct" style="@style/ModuleRow" android:visibility="gone">
+                    <ImageView style="@style/ModuleIcon" android:background="@drawable/bg_icon_green"
+                        android:src="@drawable/ic_chart" android:tint="@color/success"/>
+                    <LinearLayout style="@style/ModuleText">
+                        <TextView style="@style/ModuleTitle" android:text="Comptabilité"/>
+                        <TextView style="@style/ModuleSub" android:text="Journal, grand livre, bilan, analytique"/>
+                    </LinearLayout>
+                    <ImageView style="@style/ModuleChevron"/>
+                </LinearLayout>
+
                 <LinearLayout android:id="@+id/cardSettings" style="@style/ModuleRow">
                     <ImageView style="@style/ModuleIcon" android:background="@drawable/bg_icon_green"
                         android:src="@drawable/ic_store" android:tint="@color/success"/>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/surface">
+    <include layout="@layout/view_topbar"/>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginStart="16dp" android:layout_marginEnd="16dp" android:orientation="vertical"
+        android:padding="18dp" android:background="@drawable/bg_card">
+        <TextView android:id="@+id/tvDDClient" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textSize="17sp" android:textStyle="bold" android:textColor="@color/text_primary"/>
+        <TextView android:id="@+id/tvDDRef" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textSize="12sp" android:textColor="@color/text_secondary"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="14dp" android:orientation="horizontal">
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dette" android:textSize="11sp" android:textColor="@color/text_secondary"/>
+                <TextView android:id="@+id/tvDDTotal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="14sp" android:textStyle="bold" android:textColor="@color/text_primary"/>
+            </LinearLayout>
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Payé" android:textSize="11sp" android:textColor="@color/text_secondary"/>
+                <TextView android:id="@+id/tvDDPaid" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="14sp" android:textStyle="bold" android:textColor="@color/success"/>
+            </LinearLayout>
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Reste" android:textSize="11sp" android:textColor="@color/text_secondary"/>
+                <TextView android:id="@+id/tvDDRemaining" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="14sp" android:textStyle="bold" android:textColor="@color/accent"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout android:id="@+id/btnAddPayment"
+        android:layout_width="match_parent" android:layout_height="52dp"
+        android:layout_marginStart="16dp" android:layout_marginEnd="16dp" android:layout_marginTop="12dp"
+        android:gravity="center" android:background="@drawable/bg_btn_cta"
+        android:clickable="true" android:focusable="true">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Enregistrer un paiement" android:textColor="@color/white"
+            android:textSize="15sp" android:textStyle="bold"/>
+    </LinearLayout>
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginStart="20dp" android:layout_marginTop="16dp" android:layout_marginBottom="6dp"
+        android:text="Historique des paiements" android:textSize="14sp" android:textStyle="bold" android:textColor="@color/text_primary"/>
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvPayments"
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:clipToPadding="false" android:paddingStart="16dp" android:paddingEnd="16dp"
+            android:paddingBottom="12dp" android:overScrollMode="never"/>
+        <TextView android:id="@+id/tvEmptyPayments" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_gravity="center" android:text="Aucun paiement enregistré."
+            android:textColor="@color/text_secondary" android:textSize="14sp" android:visibility="gone"/>
+    </FrameLayout>
+    <include layout="@layout/view_bottom_nav"/>
+</LinearLayout>
