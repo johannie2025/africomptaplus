@@ -28,17 +28,77 @@ public class DebtService {
         return db.insert(DatabaseHelper.T_DEBTS, cv);
     }
 
-    /** Enregistre un paiement partiel ou total sur une dette. */
-    public void recordPayment(long debtId, double paymentAmount) {
+    /** Compat : paiement espèces sans note. */
+    public void recordPayment(long debtId, double paymentAmount) { recordPayment(debtId, paymentAmount, "cash", ""); }
+
+    /** Enregistre un paiement (plafonné au restant dû) et l'historise. Retourne l'id du paiement, -1 si refusé. */
+    public long recordPayment(long debtId, double paymentAmount, String method, String note) {
         Debt debt = findById(debtId);
-        if (debt == null) return;
-        double newPaid = debt.paidAmount + paymentAmount;
+        if (debt == null || paymentAmount <= 0) return -1;
+        double remaining = debt.amount - debt.paidAmount;
+        if (remaining <= 0) return -1;
+        double pay = Math.min(paymentAmount, remaining);
+        double newPaid = debt.paidAmount + pay;
         String status = newPaid >= debt.amount ? "paid" : "partial";
-        ContentValues cv = new ContentValues();
-        cv.put(DatabaseHelper.COL_PAID_AMOUNT, newPaid);
-        cv.put(DatabaseHelper.COL_STATUS,      status);
-        cv.put(DatabaseHelper.COL_UPDATED_AT,  now());
-        db.update(DatabaseHelper.T_DEBTS, cv, DatabaseHelper.COL_ID + "=?", new String[]{String.valueOf(debtId)});
+        String now = now();
+        android.database.sqlite.SQLiteDatabase sq = db.getWritableDatabase();
+        sq.beginTransaction();
+        try {
+            ContentValues cv = new ContentValues();
+            cv.put(DatabaseHelper.COL_PAID_AMOUNT, newPaid);
+            cv.put(DatabaseHelper.COL_STATUS,      status);
+            cv.put(DatabaseHelper.COL_UPDATED_AT,  now);
+            sq.update(DatabaseHelper.T_DEBTS, cv, DatabaseHelper.COL_ID + "=?", new String[]{String.valueOf(debtId)});
+            ContentValues pc = new ContentValues();
+            pc.put("debt_id", debtId);
+            pc.put("amount", pay);
+            pc.put("method", method != null ? method : "cash");
+            pc.put("note", note != null ? note : "");
+            pc.put("created_at", now);
+            long id = sq.insert(DatabaseHelper.T_DEBT_PAYMENTS, null, pc);
+            sq.setTransactionSuccessful();
+            return id;
+        } finally { sq.endTransaction(); }
+    }
+
+    public java.util.List<com.wisedesign.africomptaplus.models.DebtPayment> findPayments(long debtId) {
+        java.util.List<com.wisedesign.africomptaplus.models.DebtPayment> list = new ArrayList<>();
+        Cursor c = db.rawQuery("SELECT * FROM " + DatabaseHelper.T_DEBT_PAYMENTS + " WHERE debt_id=? ORDER BY id DESC",
+                new String[]{String.valueOf(debtId)});
+        try { while (c.moveToNext()) list.add(payment(c)); } finally { c.close(); }
+        return list;
+    }
+
+    public com.wisedesign.africomptaplus.models.DebtPayment findPayment(long id) {
+        Cursor c = db.rawQuery("SELECT * FROM " + DatabaseHelper.T_DEBT_PAYMENTS + " WHERE id=?", new String[]{String.valueOf(id)});
+        try { return c.moveToFirst() ? payment(c) : null; } finally { c.close(); }
+    }
+
+    private com.wisedesign.africomptaplus.models.DebtPayment payment(Cursor c) {
+        com.wisedesign.africomptaplus.models.DebtPayment p = new com.wisedesign.africomptaplus.models.DebtPayment();
+        p.id = c.getLong(c.getColumnIndexOrThrow("id"));
+        p.debtId = c.getLong(c.getColumnIndexOrThrow("debt_id"));
+        p.amount = c.getDouble(c.getColumnIndexOrThrow("amount"));
+        p.method = c.getString(c.getColumnIndexOrThrow("method"));
+        p.note = c.getString(c.getColumnIndexOrThrow("note"));
+        p.createdAt = c.getString(c.getColumnIndexOrThrow("created_at"));
+        return p;
+    }
+
+    /** Somme payée jusqu'à (et y compris) ce paiement — pour le solde affiché sur le reçu. */
+    public double paidUpTo(long debtId, long paymentId) {
+        Cursor c = db.rawQuery("SELECT COALESCE(SUM(amount),0) FROM " + DatabaseHelper.T_DEBT_PAYMENTS + " WHERE debt_id=? AND id<=?",
+                new String[]{String.valueOf(debtId), String.valueOf(paymentId)});
+        try { return c.moveToFirst() ? c.getDouble(0) : 0; } finally { c.close(); }
+    }
+
+    /** Toutes les dettes, soldées incluses (pour consulter l'historique). */
+    public List<Debt> findAllIncludingPaid() {
+        String sql = "SELECT d.*, c." + DatabaseHelper.COL_NAME + " AS client_name"
+                + " FROM " + DatabaseHelper.T_DEBTS + " d"
+                + " LEFT JOIN " + DatabaseHelper.T_CLIENTS + " c ON c." + DatabaseHelper.COL_ID + "=d." + DatabaseHelper.COL_CLIENT_ID
+                + " ORDER BY d." + DatabaseHelper.COL_CREATED_AT + " DESC";
+        return fetchList(sql, null);
     }
 
     public Debt findById(long id) {

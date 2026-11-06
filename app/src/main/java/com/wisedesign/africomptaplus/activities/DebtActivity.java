@@ -20,6 +20,7 @@ public class DebtActivity extends AppCompatActivity {
     private List<Debt>    debts = new ArrayList<>();
     private DebtAdapter   adapter;
     private TextView      tvTotalDebts;
+    private boolean       showAll = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +34,11 @@ public class DebtActivity extends AppCompatActivity {
         rv.setLayoutManager(new LinearLayoutManager(this));
         adapter = new DebtAdapter(debts);
         rv.setAdapter(adapter);
+        UiKit.topAction(this, "Soldées", R.drawable.ic_history, v -> {
+            showAll = !showAll;
+            ((TextView) findViewById(R.id.tvTopAction)).setText(showAll ? "En cours" : "Soldées");
+            loadDebts();
+        });
         loadDebts();
     }
 
@@ -40,7 +46,7 @@ public class DebtActivity extends AppCompatActivity {
 
     private void loadDebts() {
         debts.clear();
-        debts.addAll(debtService.findAllOpen());
+        debts.addAll(showAll ? debtService.findAllIncludingPaid() : debtService.findAllOpen());
         adapter.notifyDataSetChanged();
         double total = debtService.totalOutstanding();
         tvTotalDebts.setText(UiKit.xaf(total));
@@ -83,14 +89,15 @@ public class DebtActivity extends AppCompatActivity {
             h.tvInitials.setText(UiKit.initials(d.clientName));
             h.tvAmount.setText(UiKit.xaf(d.amount));
             h.tvRemaining.setText(UiKit.xaf(d.remainingAmount()));
-            boolean partial = "partial".equals(d.status);
+            boolean partial = "partial".equals(d.status) || "paid".equals(d.status);
             h.tvStatus.setText(statusLabel(d.status));
             h.tvStatus.setBackgroundResource(partial ? R.drawable.bg_pill_info : R.drawable.bg_pill_warning);
             h.tvStatus.setTextColor(getResources().getColor(partial ? R.color.primary : R.color.accent));
             boolean hasDue = d.dueDate != null && !d.dueDate.isEmpty();
             h.rowDue.setVisibility(hasDue ? View.VISIBLE : View.GONE);
             if (hasDue) h.tvDue.setText("Échéance : " + d.dueDate);
-            h.itemView.setOnClickListener(v -> showPaymentDialog(d));
+            h.itemView.setOnClickListener(v -> startActivity(new android.content.Intent(DebtActivity.this, DebtDetailActivity.class)
+                    .putExtra(DebtDetailActivity.EXTRA_DEBT_ID, d.id)));
             UiKit.pressScale(h.itemView);
         }
         @Override public int getItemCount() { return list.size(); }

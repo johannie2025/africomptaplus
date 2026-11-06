@@ -78,6 +78,8 @@ public class SaleActivity extends AppCompatActivity {
                 scanLauncher.launch(Scanner.options("Scannez le code-barres du produit")));
         UiKit.pressScale(findViewById(R.id.btnScan));
         findViewById(R.id.btnFinalizeSale).setOnClickListener(v -> finalizeSale());
+        findViewById(R.id.btnQuote).setOnClickListener(v -> createDocument());
+        UiKit.pressScale(findViewById(R.id.btnQuote));
         UiKit.pressScale(findViewById(R.id.btnFinalizeSale), payCash, payMobile, payCredit);
 
         payCash.setOnClickListener(v -> selectPayment("cash"));
@@ -250,6 +252,32 @@ public class SaleActivity extends AppCompatActivity {
         tvTotal.setText(UiKit.xaf(total + tax));
         tvArticlesTitle.setText("Articles (" + cart.size() + ")");
         tvEmptyCart.setVisibility(cart.isEmpty() ? View.VISIBLE : View.GONE);
+    }
+
+    // ── Devis / proforma (aucun impact stock ni caisse) ──────────────────────
+    private void createDocument() {
+        if (cart.isEmpty()) { Toast.makeText(this, "Panier vide", Toast.LENGTH_SHORT).show(); return; }
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Créer un document (valable 30 jours)")
+            .setItems(new String[]{"Devis", "Facture proforma"}, (dlg, w) -> {
+                String type = w == 0 ? com.wisedesign.africomptaplus.models.Document.QUOTE
+                                     : com.wisedesign.africomptaplus.models.Document.PROFORMA;
+                com.wisedesign.africomptaplus.services.DocumentService ds = new com.wisedesign.africomptaplus.services.DocumentService(this);
+                long id = ds.create(type, cart, selectedClientId, selectedClientName, selectedClientPhone, 30);
+                if (id < 0) { Toast.makeText(this, "Erreur de création", Toast.LENGTH_SHORT).show(); return; }
+                com.wisedesign.africomptaplus.models.Document doc = ds.findById(id);
+                Uri pdf = doc != null ? invoiceManager.generateDocumentPDF(doc) : null;
+                if (pdf != null) {
+                    Intent share = new Intent(Intent.ACTION_SEND);
+                    share.setType("application/pdf");
+                    share.putExtra(Intent.EXTRA_STREAM, pdf);
+                    share.putExtra(Intent.EXTRA_SUBJECT, doc.label() + " " + doc.number);
+                    share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    startActivity(Intent.createChooser(share, "Partager le document via"));
+                }
+                Toast.makeText(this, "Enregistré dans Devis & Proforma", Toast.LENGTH_LONG).show();
+                cart.clear(); refreshCart();
+            }).show();
     }
 
     // ── Finalisation ──────────────────────────────────────────────────────────

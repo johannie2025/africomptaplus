@@ -27,8 +27,9 @@ public class ReportActivity extends AppCompatActivity {
     private String currentPeriod = ReportService.PERIOD_DAY;
     private View[] tabs;
     private final String[] periods = {ReportService.PERIOD_DAY, ReportService.PERIOD_MONTH,
-            ReportService.PERIOD_QUARTER, ReportService.PERIOD_SEMESTER, ReportService.PERIOD_YEAR};
-    private final String[] periodNames = {"Jour", "Mois", "Trimestre", "Semestre", "Année"};
+            ReportService.PERIOD_QUARTER, ReportService.PERIOD_SEMESTER, ReportService.PERIOD_YEAR, "custom"};
+    private final String[] periodNames = {"Jour", "Mois", "Trimestre", "Semestre", "Année", "Période personnalisée"};
+    private String customFrom = "", customTo = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +41,7 @@ public class ReportActivity extends AppCompatActivity {
         BottomNav.attach(this, BottomNav.REPORTS);
 
         tabs = new View[]{findViewById(R.id.tabDay), findViewById(R.id.tabMonth),
-                findViewById(R.id.tabQuarter), findViewById(R.id.tabSemester), findViewById(R.id.tabYear)};
+                findViewById(R.id.tabQuarter), findViewById(R.id.tabSemester), findViewById(R.id.tabYear), findViewById(R.id.tabCustom)};
         for (int i = 0; i < tabs.length; i++) {
             final int idx = i;
             tabs[i].setOnClickListener(v -> select(idx));
@@ -48,14 +49,34 @@ public class ReportActivity extends AppCompatActivity {
         select(0);
     }
 
+    private void pickCustom() {
+        Calendar c = Calendar.getInstance();
+        android.app.DatePickerDialog d1 = new android.app.DatePickerDialog(this, (v, y, m, d) -> {
+            final String from = String.format(Locale.US, "%04d-%02d-%02d", y, m + 1, d);
+            android.app.DatePickerDialog d2 = new android.app.DatePickerDialog(this, (v2, y2, m2, dd2) -> {
+                String to = String.format(Locale.US, "%04d-%02d-%02d", y2, m2 + 1, dd2);
+                customFrom = from.compareTo(to) <= 0 ? from : to;
+                customTo   = from.compareTo(to) <= 0 ? to : from;
+                currentPeriod = "custom";
+                for (int i = 0; i < tabs.length; i++) tabs[i].setSelected(i == tabs.length - 1);
+                loadReport();
+            }, y, m, d);
+            d2.setTitle("Date de fin");
+            d2.show();
+        }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
+        d1.setTitle("Date de début");
+        d1.show();
+    }
+
     private void select(int idx) {
+        if (idx == periods.length - 1) { pickCustom(); return; }
         currentPeriod = periods[idx];
         for (int i = 0; i < tabs.length; i++) tabs[i].setSelected(i == idx);
         loadReport();
     }
 
     private void loadReport() {
-        String[] b = rs.periodBounds(currentPeriod);
+        String[] b = "custom".equals(currentPeriod) ? new String[]{customFrom, customTo} : rs.periodBounds(currentPeriod);
         SimpleDateFormat out = new SimpleDateFormat("dd/MM/yyyy", Locale.FRENCH);
         try {
             SimpleDateFormat in = new SimpleDateFormat("yyyy-MM-dd", Locale.US);

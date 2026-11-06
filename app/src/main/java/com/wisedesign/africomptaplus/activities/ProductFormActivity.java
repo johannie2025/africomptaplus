@@ -8,7 +8,9 @@ import com.wisedesign.africomptaplus.ui.Scanner;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.wisedesign.africomptaplus.R;
 import com.wisedesign.africomptaplus.models.Product;
 import com.wisedesign.africomptaplus.services.ProductService;
@@ -17,16 +19,10 @@ import com.wisedesign.africomptaplus.ui.UiKit;
 public class ProductFormActivity extends AppCompatActivity {
 
     public static final String EXTRA_PRODUCT_ID = "product_id";
-    public static final String EXTRA_BARCODE = "barcode";
+    public static final String EXTRA_BARCODE    = "barcode";
 
-    private ProductService productService;
-    private Product currentProduct;
-    private EditText etName, etBarcode, etBuyingPrice, etSellingPrice, etStock, etMinStock;
-
-    // Déclaré ICI pour que les variables ci-dessus soient déjà initialisées
-    private final ActivityResultLauncher<ScanOptions> scanLauncher = registerForActivityResult(
-            new ScanContract(),
-            result -> {
+    private final ActivityResultLauncher<ScanOptions> scanLauncher =
+            registerForActivityResult(new ScanContract(), result -> {
                 if (result.getContents() == null) return;
                 String code = result.getContents().trim();
                 etBarcode.setText(code);
@@ -35,8 +31,12 @@ public class ProductFormActivity extends AppCompatActivity {
                     etBarcode.setError("Déjà utilisé par : " + other.name);
                     Toast.makeText(this, "Ce code existe déjà : " + other.name, Toast.LENGTH_LONG).show();
                 }
-            }
-    );
+            });
+
+    private ProductService productService;
+    private Product currentProduct;
+
+    private EditText etName, etBarcode, etBuyingPrice, etSellingPrice, etStock, etMinStock;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,11 +53,9 @@ public class ProductFormActivity extends AppCompatActivity {
         etStock        = findViewById(R.id.etStock);
         etMinStock     = findViewById(R.id.etMinStock);
 
-        findViewById(R.id.btnScanBarcode).setOnClickListener(v -> 
-            scanLauncher.launch(Scanner.options("Scannez le code-barres du produit"))
-        );
+        findViewById(R.id.btnScanBarcode).setOnClickListener(v ->
+                scanLauncher.launch(Scanner.options("Scannez le code-barres du produit")));
         UiKit.pressScale(findViewById(R.id.btnScanBarcode));
-
         String preset = getIntent().getStringExtra(EXTRA_BARCODE);
         if (preset != null) etBarcode.setText(preset);
 

@@ -39,21 +39,47 @@ public class InvoiceManager {
         db  = DatabaseHelper.getInstance(ctx);
     }
 
+    /** Paramètres d'affichage selon le type de document. */
+    static class Meta { String title, rightLine, clientLabel, intro; boolean invoice; }
+
     public Uri generateInvoicePDF(Sale sale, List<SaleItem> items) {
+        Meta m = new Meta();
+        m.title = "FACTURE"; m.rightLine = "Paiement : " + payment(sale.paymentMethod);
+        m.clientLabel = "FACTURÉ À"; m.intro = "Arrêtée la présente facture"; m.invoice = true;
+        return render(sale, items, m, "facture");
+    }
+
+    /** Devis ou facture proforma (mêmes mise en page, libellés adaptés, aucune mention de paiement). */
+    public Uri generateDocumentPDF(com.wisedesign.africomptaplus.models.Document d) {
+        Sale s = new Sale();
+        s.invoiceNumber = d.number; s.createdAt = d.createdAt; s.clientName = d.clientName; s.clientPhone = d.clientPhone;
+        s.subtotal = d.subtotal; s.taxRate = d.taxRate; s.taxAmount = d.taxAmount; s.totalAmount = d.totalAmount;
+        boolean pro = com.wisedesign.africomptaplus.models.Document.PROFORMA.equals(d.docType);
+        Meta m = new Meta();
+        m.title = pro ? "FACTURE PROFORMA" : "DEVIS";
+        m.rightLine = (d.validUntil != null && d.validUntil.length() >= 10)
+                ? "Valable jusqu'au " + d.validUntil.substring(8, 10) + "/" + d.validUntil.substring(5, 7) + "/" + d.validUntil.substring(0, 4) : "";
+        m.clientLabel = "DESTINATAIRE";
+        m.intro = pro ? "Arrêtée la présente facture proforma" : "Arrêté le présent devis";
+        m.invoice = false;
+        return render(s, d.items, m, pro ? "proforma" : "devis");
+    }
+
+    private Uri render(Sale sale, List<SaleItem> items, Meta m, String filePrefix) {
         ShopConfig cfg = ShopConfig.load(db);
         boolean licensed = isLicensed();
 
         PdfDocument doc = new PdfDocument();
         FileOutputStream fos = null;
         try {
-            int h = (int) draw(new Canvas(), sale, items, cfg, licensed, true) + 30;
+            int h = (int) draw(new Canvas(), sale, items, cfg, licensed, true, m) + 30;
             PdfDocument.Page page = doc.startPage(new PdfDocument.PageInfo.Builder(W, h, 1).create());
-            draw(page.getCanvas(), sale, items, cfg, licensed, false);
+            draw(page.getCanvas(), sale, items, cfg, licensed, false, m);
             doc.finishPage(page);
 
             File dir = new File(ctx.getExternalCacheDir(), "invoices");
             if (!dir.exists()) dir.mkdirs();
-            File out = new File(dir, "facture_" + sale.invoiceNumber.replace("-", "_") + ".pdf");
+            File out = new File(dir, filePrefix + "_" + sale.invoiceNumber.replace("-", "_") + ".pdf");
             fos = new FileOutputStream(out);
             doc.writeTo(fos);
             return FileProvider.getUriForFile(ctx, ctx.getPackageName() + ".fileprovider", out);
@@ -67,7 +93,7 @@ public class InvoiceManager {
     }
 
     /** Dessine la facture ; retourne le y final (utilisé en mode "dry" pour calculer la hauteur). */
-    private float draw(Canvas cv, Sale sale, List<SaleItem> items, ShopConfig cfg, boolean licensed, boolean dry) {
+    private float draw(Canvas cv, Sale sale, List<SaleItem> items, ShopConfig cfg, boolean licensed, boolean dry, Meta m) {
         Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
         if (!dry) { p.setColor(0xFFFFFFFF); cv.drawRect(0, 0, W, 5000, p); }
 
@@ -83,18 +109,18 @@ public class InvoiceManager {
         cv.drawRoundRect(new RectF(M, y, W - M, y + 54), 10, 10, p);
         p.setColor(PdfStyle.PRIMARY); p.setTypeface(Typeface.DEFAULT_BOLD); p.setTextSize(15f);
         p.setTextAlign(Paint.Align.LEFT);
-        cv.drawText("FACTURE", M + 12, y + 22, p);
+        cv.drawText(m.title, M + 12, y + 22, p);
         p.setTypeface(Typeface.DEFAULT); p.setTextSize(10f); p.setColor(PdfStyle.TEXT);
         cv.drawText("N° " + sale.invoiceNumber, M + 12, y + 40, p);
         p.setTextAlign(Paint.Align.RIGHT); p.setColor(PdfStyle.MUTED);
         cv.drawText(sale.createdAt != null ? sale.createdAt : "", W - M - 12, y + 22, p);
-        cv.drawText("Paiement : " + payment(sale.paymentMethod), W - M - 12, y + 40, p);
+        cv.drawText(m.rightLine, W - M - 12, y + 40, p);
         y += 54 + 18;
 
         // Client
         p.setTextAlign(Paint.Align.LEFT);
         p.setColor(PdfStyle.MUTED); p.setTextSize(9f);
-        cv.drawText("FACTURÉ À", M, y, p);
+        cv.drawText(m.clientLabel, M, y, p);
         p.setColor(PdfStyle.TEXT); p.setTypeface(Typeface.DEFAULT_BOLD); p.setTextSize(12f);
         y += 15;
         cv.drawText(PdfStyle.ellipsize(p, sale.clientName != null ? sale.clientName : "Client Passager", W - 2 * M), M, y, p);
@@ -153,14 +179,21 @@ public class InvoiceManager {
         cv.drawText(UiKit.fmt(sale.totalAmount) + " " + cfg.currency, W - M - 12, y + 26, p);
         y += 40 + 10;
 
-        if ("credit".equals(sale.paymentMethod)) {
+        if (m.invoice && "credit".equals(sale.paymentMethod)) {
             p.setColor(0xFFF59E0B); p.setTextSize(10f); p.setTextAlign(Paint.Align.RIGHT);
             cv.drawText("VENTE À CRÉDIT — solde à régler", W - M, y + 8, p);
             y += 14;
         }
 
+        // Montant en lettres
+        y += 14;
+        p.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.ITALIC)); p.setTextSize(9.5f);
+        p.setColor(PdfStyle.MUTED); p.setTextAlign(Paint.Align.LEFT);
+        String words = m.intro + " à la somme de : " + AmountWords.amount(sale.totalAmount, cfg.currency) + ".";
+        for (String ln : PdfStyle.wrap(p, words, W - 2 * M)) { cv.drawText(ln, M, y, p); y += 13; }
+
         // Pied de page
-        y += 24;
+        y += 14;
         p.setTypeface(Typeface.DEFAULT); p.setTextAlign(Paint.Align.CENTER); p.setTextSize(11f);
         p.setColor(PdfStyle.TEXT);
         cv.drawText(PdfStyle.ellipsize(p, cfg.invoiceFooter, W - 2 * M), W / 2f, y, p);

@@ -33,11 +33,13 @@ import java.util.zip.GZIPOutputStream;
  */
 public class BackupManager {
     public static final String EXT = ".acbackup";
-    private static final int SCHEMA = 3;
+    private static final int SCHEMA = 5;
     /** Ordre d'insertion (parents d'abord). */
     private static final String[] TABLES = {
             DatabaseHelper.T_PRODUCTS, DatabaseHelper.T_CLIENTS, DatabaseHelper.T_SALES,
             DatabaseHelper.T_SALE_ITEMS, DatabaseHelper.T_EXPENSES, DatabaseHelper.T_DEBTS,
+            DatabaseHelper.T_DEBT_PAYMENTS, DatabaseHelper.T_DOCUMENTS, DatabaseHelper.T_DOC_ITEMS,
+            DatabaseHelper.T_ACCT_ENTRIES, DatabaseHelper.T_ACCT_ACCOUNTS,
             DatabaseHelper.T_SHOP_CONFIG};
 
     private final Context ctx;

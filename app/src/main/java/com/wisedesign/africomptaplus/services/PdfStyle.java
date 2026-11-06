@@ -55,6 +55,19 @@ final class PdfStyle {
         return Math.max(ty, top + (bmp != null ? 60f : 0f)) + 6;
     }
 
+    /** Coupe un texte en lignes qui tiennent dans maxW. */
+    static java.util.List<String> wrap(Paint p, String text, float maxW) {
+        java.util.List<String> lines = new java.util.ArrayList<>();
+        StringBuilder cur = new StringBuilder();
+        for (String w : text.split(" ")) {
+            String t = cur.length() == 0 ? w : cur + " " + w;
+            if (p.measureText(t) > maxW && cur.length() > 0) { lines.add(cur.toString()); cur = new StringBuilder(w); }
+            else { cur = new StringBuilder(t); }
+        }
+        if (cur.length() > 0) lines.add(cur.toString());
+        return lines;
+    }
+
     static String ellipsize(Paint p, String s, float w) {
         if (s == null) return "";
         if (p.measureText(s) <= w) return s;

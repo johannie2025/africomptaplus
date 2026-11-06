@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME    = "africompta.db";
-    private static final int    DB_VERSION = 3; // v3 : TVA (subtotal, tax_rate, tax_amount)
+    private static final int    DB_VERSION = 5; // v5 : comptabilité (écritures manuelles, comptes perso)
 
     // ── Tables ──────────────────────────────────────────────────────────────
     public static final String T_PRODUCTS     = "products";
@@ -20,6 +20,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String T_CLIENTS      = "clients";
     public static final String T_DEBTS        = "debts";
     public static final String T_SHOP_CONFIG  = "shop_config";
+    public static final String T_DEBT_PAYMENTS = "debt_payments";
+    public static final String T_DOCUMENTS     = "documents";
+    public static final String T_DOC_ITEMS     = "document_items";
+    public static final String T_ACCT_ENTRIES  = "acct_entries";
+    public static final String T_ACCT_ACCOUNTS = "acct_accounts";
 
     // ── Colonnes communes ────────────────────────────────────────────────────
     public static final String COL_ID            = "id";
@@ -176,6 +181,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         insertConfig(db, "cloud_backup_token", "");
         insertConfig(db, "tva_enabled", "0");
         insertConfig(db, "tva_rate", "18");
+        createV4Tables(db);
+        createV5Tables(db);
 
         // Client passager par défaut
         db.execSQL("INSERT OR IGNORE INTO " + T_CLIENTS
@@ -229,6 +236,59 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             insertConfig(db, "tva_enabled", "0");
             insertConfig(db, "tva_rate", "18");
         }
+        if (oldVersion < 4) createV4Tables(db);
+        if (oldVersion < 5) createV5Tables(db);
+    }
+
+    private void createV5Tables(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS acct_entries ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "entry_date TEXT NOT NULL,"
+                + "journal TEXT NOT NULL DEFAULT 'OD',"
+                + "label TEXT NOT NULL,"
+                + "debit_account TEXT NOT NULL,"
+                + "credit_account TEXT NOT NULL,"
+                + "amount REAL NOT NULL DEFAULT 0,"
+                + "created_at TEXT NOT NULL);");
+        db.execSQL("CREATE TABLE IF NOT EXISTS acct_accounts ("
+                + "code TEXT PRIMARY KEY,"
+                + "label TEXT NOT NULL);");
+        insertConfig(db, "acct_mode", "off");
+    }
+
+    private void createV4Tables(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + T_DEBT_PAYMENTS + " ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "debt_id INTEGER NOT NULL,"
+                + "amount REAL NOT NULL DEFAULT 0,"
+                + "method TEXT NOT NULL DEFAULT 'cash',"
+                + "note TEXT DEFAULT '',"
+                + "created_at TEXT NOT NULL,"
+                + "FOREIGN KEY(debt_id) REFERENCES " + T_DEBTS + "(id) ON DELETE CASCADE);");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + T_DOCUMENTS + " ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "doc_type TEXT NOT NULL DEFAULT 'quote',"
+                + "number TEXT UNIQUE NOT NULL,"
+                + "client_id INTEGER DEFAULT 0,"
+                + "client_name TEXT DEFAULT 'Client Passager',"
+                + "client_phone TEXT DEFAULT '',"
+                + "subtotal REAL NOT NULL DEFAULT 0,"
+                + "tax_rate REAL NOT NULL DEFAULT 0,"
+                + "tax_amount REAL NOT NULL DEFAULT 0,"
+                + "total_amount REAL NOT NULL DEFAULT 0,"
+                + "valid_until TEXT DEFAULT '',"
+                + "status TEXT NOT NULL DEFAULT 'open',"
+                + "converted_sale_id INTEGER DEFAULT 0,"
+                + "created_at TEXT NOT NULL);");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + T_DOC_ITEMS + " ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "document_id INTEGER NOT NULL,"
+                + "product_id INTEGER NOT NULL,"
+                + "product_name TEXT NOT NULL,"
+                + "quantity INTEGER NOT NULL DEFAULT 1,"
+                + "unit_price REAL NOT NULL,"
+                + "total_price REAL NOT NULL,"
+                + "FOREIGN KEY(document_id) REFERENCES " + T_DOCUMENTS + "(id) ON DELETE CASCADE);");
     }
 
     @Override

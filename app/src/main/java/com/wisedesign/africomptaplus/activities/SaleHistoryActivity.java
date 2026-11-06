@@ -46,13 +46,19 @@ public class SaleHistoryActivity extends AppCompatActivity {
         adapter = new SaleAdapter(sales);
         rv.setAdapter(adapter);
 
+        com.wisedesign.africomptaplus.ui.FilterBar.attach(this, (q, f, t) -> { fq = q; ffrom = f; fto = t; loadSales(); });
         loadSales();
     }
 
+    private String fq = "", ffrom = "", fto = "";
+
     private void loadSales() {
         sales.clear();
-        sales.addAll(saleService.findAll());
+        sales.addAll(saleService.search(fq, ffrom, fto));
         adapter.notifyDataSetChanged();
+        double total = 0;
+        for (Sale s : sales) total += s.totalAmount;
+        ((TextView) findViewById(R.id.tvSummary)).setText(sales.size() + " facture(s) — " + UiKit.xaf(total));
         findViewById(R.id.tvEmpty).setVisibility(sales.isEmpty() ? View.VISIBLE : View.GONE);
     }
 

@@ -85,6 +85,24 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         setupBackup();
+        setupAccounting();
+    }
+
+    private void setupAccounting() {
+        RadioGroup rg = findViewById(R.id.rgAcct);
+        String m = db.getConfig("acct_mode");
+        rg.check("simple".equals(m) ? R.id.rbAcctSimple : "double".equals(m) ? R.id.rbAcctDouble : R.id.rbAcctOff);
+        rg.setOnCheckedChangeListener((g, id) -> {
+            String v = id == R.id.rbAcctSimple ? "simple" : id == R.id.rbAcctDouble ? "double" : "off";
+            db.setConfig("acct_mode", v);
+            Toast.makeText(this, "Comptabilité : " + ("off".equals(v) ? "désactivée" : "simple".equals(v) ? "simple" : "double (OHADA)"), Toast.LENGTH_SHORT).show();
+        });
+        findViewById(R.id.btnOpenAccounting).setOnClickListener(v -> {
+            if ("off".equals(db.getConfig("acct_mode")) || db.getConfig("acct_mode").isEmpty())
+                Toast.makeText(this, "Choisissez d'abord un mode de comptabilité", Toast.LENGTH_SHORT).show();
+            else startActivity(new Intent(this, AccountingActivity.class));
+        });
+        UiKit.pressScale(findViewById(R.id.btnOpenAccounting));
     }
 
     // ── Sauvegarde / restauration ───────────────────────────────────────────

@@ -105,6 +105,24 @@ public class SaleService {
         return list;
     }
 
+    /** Recherche (N° facture / client / téléphone) + période (yyyy-MM-dd, vide = sans borne). */
+    public List<Sale> search(String q, String from, String to) {
+        List<Sale> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM " + DatabaseHelper.T_SALES + " WHERE 1=1");
+        List<String> args = new ArrayList<>();
+        if (q != null && !q.trim().isEmpty()) {
+            sql.append(" AND (" + DatabaseHelper.COL_INVOICE_NUMBER + " LIKE ? OR " + DatabaseHelper.COL_CLIENT_NAME
+                    + " LIKE ? OR " + DatabaseHelper.COL_CLIENT_PHONE + " LIKE ?)");
+            String l = "%" + q.trim() + "%"; args.add(l); args.add(l); args.add(l);
+        }
+        if (from != null && !from.isEmpty()) { sql.append(" AND date(" + DatabaseHelper.COL_CREATED_AT + ")>=date(?)"); args.add(from); }
+        if (to   != null && !to.isEmpty())   { sql.append(" AND date(" + DatabaseHelper.COL_CREATED_AT + ")<=date(?)"); args.add(to); }
+        sql.append(" ORDER BY " + DatabaseHelper.COL_CREATED_AT + " DESC");
+        Cursor c = db.rawQuery(sql.toString(), args.toArray(new String[0]));
+        try { while (c.moveToNext()) list.add(fromCursor(c)); } finally { c.close(); }
+        return list;
+    }
+
     public Sale findByIdWithItems(long saleId) {
         Cursor c = db.rawQuery("SELECT * FROM " + DatabaseHelper.T_SALES
                 + " WHERE " + DatabaseHelper.COL_ID + "=? LIMIT 1", new String[]{String.valueOf(saleId)});

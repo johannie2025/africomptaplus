@@ -42,6 +42,9 @@
         <activity android:name=".activities.ExpenseActivity"     android:exported="false"/>
         <activity android:name=".activities.ReportActivity"      android:exported="false"/>
         <activity android:name=".activities.DebtActivity"        android:exported="false"/>
+        <activity android:name=".activities.DebtDetailActivity"  android:exported="false"/>
+        <activity android:name=".activities.DocumentListActivity" android:exported="false"/>
+        <activity android:name=".activities.AccountingActivity"   android:exported="false"/>
         <activity android:name=".activities.SettingsActivity" android:exported="false"/>
         <activity android:name=".activities.PortraitCaptureActivity" android:exported="false"
             android:screenOrientation="portrait" android:stateNotNeeded="true"

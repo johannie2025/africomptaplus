@@ -41,6 +41,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         refreshDashboard();
+        View ca = findViewById(R.id.cardAcct);
+        if (ca != null) {
+            String mode = com.wisedesign.africomptaplus.db.DatabaseHelper.getInstance(this).getConfig("acct_mode");
+            ca.setVisibility(mode == null || mode.isEmpty() || "off".equals(mode) ? View.GONE : View.VISIBLE);
+        }
     }
 
     private void refreshDashboard() {
@@ -79,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
         click(R.id.cardExpenses, ExpenseActivity.class);
         click(R.id.cardReports,  ReportActivity.class);
         click(R.id.cardHistory,  SaleHistoryActivity.class);
+        click(R.id.cardDocs,     DocumentListActivity.class);
+        click(R.id.cardAcct,     AccountingActivity.class);
         click(R.id.cardSettings, SettingsActivity.class);
     }
 
