@@ -170,6 +170,23 @@
                     android:layout_marginTop="14dp" android:text="Enregistrer la TVA"/>
             </LinearLayout>
 
+            <!-- ───────── PAYS OHADA ───────── -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" android:orientation="vertical"
+                android:padding="16dp" android:background="@drawable/bg_card">
+                <TextView style="@style/SectionTitle" android:text="Pays (OHADA)"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Charge la devise, la TVA par défaut, l'identifiant fiscal et les comptes du pays"
+                    android:textColor="@color/text_secondary" android:textSize="12sp"/>
+                <Spinner android:id="@+id/spCountry" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"/>
+                <TextView android:id="@+id/tvCountryInfo" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp" android:textColor="@color/text_secondary" android:textSize="12sp"/>
+                <Button android:id="@+id/btnLoadCountry" style="@style/PrimaryButton"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp" android:text="Charger la configuration du pays"/>
+            </LinearLayout>
+
             <!-- ───────── COMPTABILITÉ ───────── -->
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:layout_marginTop="16dp" android:orientation="vertical"

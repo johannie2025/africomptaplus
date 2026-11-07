@@ -202,6 +202,26 @@
                     <ImageView style="@style/ModuleChevron"/>
                 </LinearLayout>
 
+                <LinearLayout android:id="@+id/cardSuppliers" style="@style/ModuleRow">
+                    <ImageView style="@style/ModuleIcon" android:background="@drawable/bg_icon_orange"
+                        android:src="@drawable/ic_box" android:tint="@color/accent"/>
+                    <LinearLayout style="@style/ModuleText">
+                        <TextView style="@style/ModuleTitle" android:text="Fournisseurs &amp; achats"/>
+                        <TextView style="@style/ModuleSub" android:text="Entrées de stock, dettes fournisseurs"/>
+                    </LinearLayout>
+                    <ImageView style="@style/ModuleChevron"/>
+                </LinearLayout>
+
+                <LinearLayout android:id="@+id/cardWhatsApp" style="@style/ModuleRow" android:visibility="gone">
+                    <ImageView style="@style/ModuleIcon" android:background="@drawable/bg_icon_orange"
+                        android:src="@drawable/ic_phone" android:tint="@color/accent"/>
+                    <LinearLayout style="@style/ModuleText">
+                        <TextView style="@style/ModuleTitle" android:text="Bot WhatsApp"/>
+                        <TextView style="@style/ModuleSub" android:text="Vente automatique par IA, facture envoyée"/>
+                    </LinearLayout>
+                    <ImageView style="@style/ModuleChevron"/>
+                </LinearLayout>
+
                 <LinearLayout android:id="@+id/cardAcct" style="@style/ModuleRow" android:visibility="gone">
                     <ImageView style="@style/ModuleIcon" android:background="@drawable/bg_icon_green"
                         android:src="@drawable/ic_chart" android:tint="@color/success"/>

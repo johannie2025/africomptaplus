@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/surface">
+    <include layout="@layout/view_topbar"/>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginStart="16dp" android:layout_marginEnd="16dp" android:layout_marginBottom="10dp"
+        android:orientation="horizontal" android:gravity="center_vertical" android:padding="18dp"
+        android:background="@drawable/bg_card">
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dettes fournisseurs"
+                android:textColor="@color/text_secondary" android:textSize="12sp"/>
+            <TextView android:id="@+id/tvTotalPayable" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:textColor="@color/accent" android:textSize="22sp" android:textStyle="bold"/>
+        </LinearLayout>
+        <TextView android:id="@+id/tvSupplierCount" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textColor="@color/text_secondary" android:textSize="12sp"/>
+    </LinearLayout>
+    <EditText android:id="@+id/etSupSearch" style="@style/AppEditText"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginStart="16dp" android:layout_marginEnd="16dp"
+        android:hint="Rechercher un fournisseur" android:singleLine="true"
+        android:drawableStart="@drawable/ic_search" android:drawablePadding="10dp" android:padding="12dp"/>
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvSuppliers"
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:clipToPadding="false" android:paddingStart="16dp" android:paddingEnd="16dp"
+            android:paddingTop="10dp" android:paddingBottom="80dp" android:overScrollMode="never"/>
+        <TextView android:id="@+id/tvEmpty" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_gravity="center" android:text="Aucun fournisseur."
+            android:textColor="@color/text_secondary" android:textSize="14sp" android:visibility="gone"/>
+        <LinearLayout android:id="@+id/btnAddSupplier" android:layout_width="match_parent" android:layout_height="52dp"
+            android:layout_gravity="bottom" android:layout_margin="16dp" android:gravity="center"
+            android:background="@drawable/bg_btn_cta" android:elevation="6dp" android:clickable="true" android:focusable="true">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="+ Nouveau fournisseur" android:textColor="@color/white" android:textSize="15sp" android:textStyle="bold"/>
+        </LinearLayout>
+    </FrameLayout>
+    <include layout="@layout/view_bottom_nav"/>
+</LinearLayout>

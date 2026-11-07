@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/surface">
+    <include layout="@layout/view_topbar"/>
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="16dp">
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="16dp" android:background="@drawable/bg_card">
+                <TextView android:id="@+id/tvWaState" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:textSize="16sp" android:textStyle="bold" android:textColor="@color/text_primary"/>
+                <TextView android:id="@+id/tvWaInfo" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp" android:textSize="12sp" android:textColor="@color/text_secondary"/>
+                <ImageView android:id="@+id/ivQr" android:layout_width="240dp" android:layout_height="240dp"
+                    android:layout_gravity="center_horizontal" android:layout_marginTop="12dp"
+                    android:background="@color/white" android:padding="8dp" android:visibility="gone"
+                    android:contentDescription="QR code WhatsApp"/>
+                <TextView android:id="@+id/tvPairing" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal" android:layout_marginTop="6dp"
+                    android:textSize="13sp" android:textColor="@color/text_secondary" android:visibility="gone"/>
+                <LinearLayout android:id="@+id/btnWaLink" android:layout_width="match_parent" android:layout_height="48dp"
+                    android:layout_marginTop="12dp" android:gravity="center" android:background="@drawable/bg_btn_cta"
+                    android:clickable="true" android:focusable="true">
+                    <TextView android:id="@+id/tvWaLinkLabel" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Lier mon WhatsApp (QR code)" android:textColor="@color/white" android:textSize="14sp" android:textStyle="bold"/>
+                </LinearLayout>
+                <TextView android:id="@+id/btnWaUnlink" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp" android:text="Déconnecter ce numéro" android:textColor="@color/accent"
+                    android:textSize="13sp" android:textStyle="bold" android:padding="6dp" android:clickable="true" android:focusable="true"/>
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/boxSettings" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" android:orientation="vertical" android:padding="16dp" android:background="@drawable/bg_card">
+                <com.google.android.material.switchmaterial.SwitchMaterial android:id="@+id/swBotAuto"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="Bot actif (répond aux clients)"/>
+                <CheckBox android:id="@+id/cbBotCredit" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Autoriser la vente à crédit par le bot"/>
+                <TextView style="@style/FormLabel" android:layout_marginTop="8dp" android:text="Infos Mobile Money (donnée au client)"/>
+                <EditText android:id="@+id/etBotMomo" style="@style/AppEditText" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="textCapSentences" android:hint="ex. MoMo/Orange 6xx xx xx xx — Nom"/>
+                <TextView style="@style/FormLabel" android:layout_marginTop="8dp" android:text="Consignes pour le bot (facultatif)"/>
+                <EditText android:id="@+id/etBotExtra" style="@style/AppEditText" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="textMultiLine|textCapSentences" android:minLines="2"
+                    android:hint="ex. Livraison gratuite à Bata, horaires 8h-19h"/>
+                <LinearLayout android:id="@+id/btnBotSave" android:layout_width="match_parent" android:layout_height="46dp"
+                    android:layout_marginTop="12dp" android:gravity="center" android:background="@drawable/bg_btn_cta"
+                    android:clickable="true" android:focusable="true">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Enregistrer" android:textColor="@color/white" android:textSize="14sp" android:textStyle="bold"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/boxSync" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" android:orientation="vertical" android:padding="16dp" android:background="@drawable/bg_card">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Stock &amp; ventes du bot" android:textSize="15sp" android:textStyle="bold" android:textColor="@color/text_primary"/>
+                <TextView android:id="@+id/tvSyncInfo" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp" android:textSize="12sp" android:textColor="@color/text_secondary"/>
+                <LinearLayout android:id="@+id/btnBotSync" android:layout_width="match_parent" android:layout_height="46dp"
+                    android:layout_marginTop="10dp" android:gravity="center" android:background="@drawable/bg_card"
+                    android:clickable="true" android:focusable="true">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Synchroniser maintenant" android:textColor="@color/primary" android:textSize="14sp" android:textStyle="bold"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
