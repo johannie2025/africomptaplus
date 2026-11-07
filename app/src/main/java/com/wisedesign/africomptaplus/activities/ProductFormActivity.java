@@ -21,6 +21,11 @@ public class ProductFormActivity extends AppCompatActivity {
     public static final String EXTRA_PRODUCT_ID = "product_id";
     public static final String EXTRA_BARCODE    = "barcode";
 
+    private ProductService productService;
+    private Product currentProduct;
+
+    private EditText etName, etBarcode, etBuyingPrice, etSellingPrice, etStock, etMinStock;
+
     private final ActivityResultLauncher<ScanOptions> scanLauncher =
             registerForActivityResult(new ScanContract(), result -> {
                 if (result.getContents() == null) return;
@@ -32,11 +37,6 @@ public class ProductFormActivity extends AppCompatActivity {
                     Toast.makeText(this, "Ce code existe déjà : " + other.name, Toast.LENGTH_LONG).show();
                 }
             });
-
-    private ProductService productService;
-    private Product currentProduct;
-
-    private EditText etName, etBarcode, etBuyingPrice, etSellingPrice, etStock, etMinStock;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
