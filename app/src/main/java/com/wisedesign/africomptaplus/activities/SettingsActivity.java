@@ -86,6 +86,31 @@ public class SettingsActivity extends AppCompatActivity {
 
         setupBackup();
         setupAccounting();
+        setupCountry();
+    }
+
+    private void setupCountry() {
+        Spinner sp = findViewById(R.id.spCountry);
+        java.util.List<com.wisedesign.africomptaplus.services.Countries.Country> list = com.wisedesign.africomptaplus.services.Countries.all();
+        sp.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, list));
+        com.wisedesign.africomptaplus.services.Countries.Country cur = com.wisedesign.africomptaplus.services.Countries.byCode(db.getConfig("shop_country"));
+        if (cur != null) sp.setSelection(list.indexOf(cur));
+        TextView info = findViewById(R.id.tvCountryInfo);
+        info.setText(cur == null ? "Aucun pays chargé" : "Chargé : " + cur.name + " — " + cur.currency + ", TVA " + com.wisedesign.africomptaplus.services.Countries.vatText(cur.vat) + " %");
+        findViewById(R.id.btnLoadCountry).setOnClickListener(v -> {
+            com.wisedesign.africomptaplus.services.Countries.Country c = (com.wisedesign.africomptaplus.services.Countries.Country) sp.getSelectedItem();
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Charger " + c.name + " ?")
+                .setMessage(com.wisedesign.africomptaplus.services.Countries.summary(c)
+                        + "\n\nLe taux de TVA est indicatif : vérifiez-le auprès de votre administration fiscale. Vos données ne sont pas modifiées.")
+                .setNegativeButton("Annuler", null)
+                .setPositiveButton("Charger", (d, w) -> {
+                    com.wisedesign.africomptaplus.services.Countries.apply(this, c);
+                    Toast.makeText(this, "Configuration " + c.name + " chargée", Toast.LENGTH_LONG).show();
+                    recreate();
+                }).show();
+        });
+        UiKit.pressScale(findViewById(R.id.btnLoadCountry));
     }
 
     private void setupAccounting() {

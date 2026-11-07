@@ -46,7 +46,7 @@ final class PdfStyle {
         cv.drawText(ellipsize(p, cfg.shopName.toUpperCase(), maxW - (textX - x)), textX, ty, p);
         p.setFakeBoldText(false); p.setTextSize(9.5f); p.setColor(MUTED);
         String[] lines = {cfg.tagline, cfg.shopAddress, cfg.shopPhone, cfg.shopEmail,
-                cfg.taxId.isEmpty() ? "" : "N° fiscal : " + cfg.taxId};
+                cfg.taxId.isEmpty() ? "" : cfg.taxLabel + " : " + cfg.taxId};
         for (String l : lines) {
             if (l == null || l.isEmpty()) continue;
             ty += 12.5f;

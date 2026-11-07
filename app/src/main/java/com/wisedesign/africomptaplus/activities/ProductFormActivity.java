@@ -21,7 +21,17 @@ public class ProductFormActivity extends AppCompatActivity {
     public static final String EXTRA_PRODUCT_ID = "product_id";
     public static final String EXTRA_BARCODE    = "barcode";
 
-    private ActivityResultLauncher<ScanOptions> scanLauncher;
+    private final ActivityResultLauncher<ScanOptions> scanLauncher =
+            registerForActivityResult(new ScanContract(), result -> {
+                if (result.getContents() == null) return;
+                String code = result.getContents().trim();
+                etBarcode.setText(code);
+                Product other = productService.findByBarcode(code);
+                if (other != null && (currentProduct == null || other.id != currentProduct.id)) {
+                    etBarcode.setError("Déjà utilisé par : " + other.name);
+                    Toast.makeText(this, "Ce code existe déjà : " + other.name, Toast.LENGTH_LONG).show();
+                }
+            });
 
     private ProductService productService;
     private Product currentProduct;
@@ -31,18 +41,6 @@ public class ProductFormActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        scanLauncher = registerForActivityResult(new ScanContract(), result -> {
-            if (result.getContents() == null) return;
-            String code = result.getContents().trim();
-            etBarcode.setText(code);
-            Product other = productService.findByBarcode(code);
-            if (other != null && (currentProduct == null || other.id != currentProduct.id)) {
-                etBarcode.setError("Déjà utilisé par : " + other.name);
-                Toast.makeText(this, "Ce code existe déjà : " + other.name, Toast.LENGTH_LONG).show();
-            }
-        });
-
         setContentView(R.layout.activity_product_form);
 
         productService = new ProductService(this);

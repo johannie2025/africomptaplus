@@ -21,7 +21,7 @@ import java.util.*;
  */
 public class AccountingService {
     public static final String CASH = "571", MOBILE = "5712", CLIENTS = "411", SALES = "7011",
-            VAT = "4431", COGS = "6011", STOCK = "311", MISC_INCOME = "758", MISC_EXPENSE = "658";
+            VAT = "4431", COGS = "6011", STOCK = "311", SUPPLIERS = "401", MISC_INCOME = "758", MISC_EXPENSE = "658";
 
     public static class Line { public String account; public double debit, credit; public String analytic = ""; }
     public static class Entry {
@@ -178,6 +178,40 @@ public class AccountingService {
                 out.add(e);
             }
         } finally { ec.close(); }
+
+        // achats fournisseurs : D 311 ; C caisse/mobile (acompte) ; C 401 (reste)
+        List<String> a6 = new ArrayList<>();
+        Cursor uc = db.rawQuery("SELECT id, reference, supplier_name, total_amount, initial_paid, payment_method, created_at FROM purchases WHERE 1=1"
+                + range("created_at", from, to, a6) + " ORDER BY created_at, id", a6.toArray(new String[0]));
+        try {
+            while (uc.moveToNext()) {
+                double total = uc.getDouble(3), paid = uc.getDouble(4);
+                Entry e = new Entry();
+                e.date = d10(uc.getString(6)); e.journal = "AC"; e.ref = uc.getString(1); e.kind = "stock";
+                e.label = "Achat " + uc.getString(1) + " – " + uc.getString(2);
+                e.line(STOCK, total, 0, "");
+                if (paid > 0) e.line("mobile_money".equals(uc.getString(5)) ? MOBILE : CASH, 0, paid, "");
+                if (total - paid > 0.001) e.line(SUPPLIERS, 0, total - paid, "");
+                out.add(e);
+            }
+        } finally { uc.close(); }
+
+        // règlements fournisseurs : D 401 / C caisse ou mobile
+        List<String> a7 = new ArrayList<>();
+        Cursor fc = db.rawQuery("SELECT sp.id, sp.amount, sp.method, sp.created_at, p.supplier_name, p.reference FROM supplier_payments sp"
+                + " JOIN purchases p ON p.id=sp.purchase_id WHERE 1=1" + range("sp.created_at", from, to, a7)
+                + " ORDER BY sp.created_at, sp.id", a7.toArray(new String[0]));
+        try {
+            while (fc.moveToNext()) {
+                boolean mm = "mobile_money".equals(fc.getString(2));
+                Entry e = new Entry();
+                e.date = d10(fc.getString(3)); e.journal = mm ? "BQ" : "CA"; e.kind = "stock";
+                e.ref = "RGF-" + String.format(Locale.US, "%05d", fc.getLong(0));
+                e.label = "Règlement fournisseur " + fc.getString(4) + " (" + fc.getString(5) + ")";
+                e.line(SUPPLIERS, fc.getDouble(1), 0, "").line(mm ? MOBILE : CASH, 0, fc.getDouble(1), "");
+                out.add(e);
+            }
+        } finally { fc.close(); }
 
         // écritures manuelles
         List<String> a5 = new ArrayList<>();
@@ -431,6 +465,9 @@ public class AccountingService {
         double cli = 0;
         for (Entry e : entries("", to)) for (Line l : e.lines) if (CLIENTS.equals(l.account)) cli += l.debit - l.credit;
         t.add(false, "Créances clients restant à encaisser (cumul)", UiKit.fmt(cli));
+        double fou = 0;
+        for (Entry e : entries("", to)) for (Line l : e.lines) if (SUPPLIERS.equals(l.account)) fou += l.credit - l.debit;
+        t.add(false, "Dettes fournisseurs restant à payer (cumul)", UiKit.fmt(fou));
         return t;
     }
 

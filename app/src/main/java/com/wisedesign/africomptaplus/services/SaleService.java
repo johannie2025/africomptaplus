@@ -21,6 +21,13 @@ public class SaleService {
     public long createSale(String paymentMethod, List<SaleItem> items,
                            long clientId, String clientName, String clientPhone,
                            String dueDate) {
+        return createSale(paymentMethod, items, clientId, clientName, clientPhone, dueDate, null, null);
+    }
+
+    /** Variante avec référence et date imposées (ventes importées du bot WhatsApp). */
+    public long createSale(String paymentMethod, List<SaleItem> items,
+                           long clientId, String clientName, String clientPhone,
+                           String dueDate, String invoiceOverride, String createdOverride) {
         if (items == null || items.isEmpty()) return -1;
         SQLiteDatabase sqdb = db.getWritableDatabase();
         sqdb.beginTransaction();
@@ -31,8 +38,10 @@ public class SaleService {
             double taxAmount = Math.round(subtotal * taxRate / 100.0);
             double total     = subtotal + taxAmount;
 
-            String inv = "INV-" + new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(new Date());
-            String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date());
+            String inv = invoiceOverride != null ? invoiceOverride
+                    : "INV-" + new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(new Date());
+            String now = createdOverride != null ? createdOverride
+                    : new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date());
 
             ContentValues cv = new ContentValues();
             cv.put(DatabaseHelper.COL_INVOICE_NUMBER, inv);

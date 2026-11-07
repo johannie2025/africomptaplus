@@ -147,7 +147,7 @@ public class ClientListActivity extends AppCompatActivity {
             h.tvStatus.setText(owes ? "Doit" : "Aucune dette");
             h.tvStatus.setBackgroundResource(owes ? R.drawable.bg_pill_danger : R.drawable.bg_pill_success);
             h.tvStatus.setTextColor(getResources().getColor(owes ? R.color.error : R.color.success));
-            h.tvDebt.setText(owes ? UiKit.xaf(total) : "0 XAF");
+            h.tvDebt.setText(owes ? UiKit.xaf(total) : UiKit.xaf(0));
             h.tvDebt.setTextColor(getResources().getColor(owes ? R.color.error : R.color.text_primary));
             h.itemView.setOnClickListener(v -> showClientForm(c));
             h.itemView.setOnLongClickListener(v -> {

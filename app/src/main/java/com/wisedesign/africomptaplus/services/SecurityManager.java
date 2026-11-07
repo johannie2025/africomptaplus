@@ -102,6 +102,7 @@ public class SecurityManager {
                         db.setConfig("license_customer", lic.optString("customer_name", ""));
                     }
                     db.setConfig("license_last_check", String.valueOf(System.currentTimeMillis()));
+                    saveBot(resp);
                 }
                 main.post(() -> callback.onResult(valid, msg));
             } catch (Exception ex) {
@@ -126,12 +127,22 @@ public class SecurityManager {
                 String status = resp.optString("status", "");
                 if (resp.optBoolean("valid", false)) {
                     db.setConfig("license_last_check", String.valueOf(System.currentTimeMillis()));
+                    saveBot(resp);
                 } else if ("revoked".equals(status) || "expired".equals(status) || "invalid".equals(status)) {
                     hardLock();
                 }
             } catch (Exception ex) { Log.w(TAG, "recheck offline: " + ex.getMessage()); }
         }).start();
     }
+
+    /** Mémorise la config du bot WhatsApp renvoyée par l'API à l'activation / au statut. */
+    private void saveBot(JSONObject resp) {
+        JSONObject bot = resp.optJSONObject("bot");
+        if (bot != null) db.setConfig("license_bot", bot.toString());
+    }
+
+    public static String apiBase() { return API_BASE; }
+    public String licenseKey() { return getLicenseKey(); }
 
     public String deviceId() {
         String id = android.provider.Settings.Secure.getString(appCtx.getContentResolver(),

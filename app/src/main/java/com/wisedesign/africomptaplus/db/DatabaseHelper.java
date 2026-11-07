@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME    = "africompta.db";
-    private static final int    DB_VERSION = 5; // v5 : comptabilité (écritures manuelles, comptes perso)
+    private static final int    DB_VERSION = 6; // v6 : fournisseurs & achats
 
     // ── Tables ──────────────────────────────────────────────────────────────
     public static final String T_PRODUCTS     = "products";
@@ -25,6 +25,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String T_DOC_ITEMS     = "document_items";
     public static final String T_ACCT_ENTRIES  = "acct_entries";
     public static final String T_ACCT_ACCOUNTS = "acct_accounts";
+    public static final String T_SUPPLIERS     = "suppliers";
+    public static final String T_PURCHASES     = "purchases";
+    public static final String T_PURCHASE_ITEMS = "purchase_items";
+    public static final String T_SUPPLIER_PAYMENTS = "supplier_payments";
 
     // ── Colonnes communes ────────────────────────────────────────────────────
     public static final String COL_ID            = "id";
@@ -183,6 +187,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         insertConfig(db, "tva_rate", "18");
         createV4Tables(db);
         createV5Tables(db);
+        createV6Tables(db);
 
         // Client passager par défaut
         db.execSQL("INSERT OR IGNORE INTO " + T_CLIENTS
@@ -238,6 +243,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         if (oldVersion < 4) createV4Tables(db);
         if (oldVersion < 5) createV5Tables(db);
+        if (oldVersion < 6) createV6Tables(db);
+    }
+
+    private void createV6Tables(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + T_SUPPLIERS + " ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "name TEXT NOT NULL,"
+                + "phone TEXT DEFAULT '', email TEXT DEFAULT '', address TEXT DEFAULT '', notes TEXT DEFAULT '',"
+                + "created_at TEXT NOT NULL);");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + T_PURCHASES + " ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "reference TEXT UNIQUE NOT NULL,"
+                + "supplier_id INTEGER NOT NULL,"
+                + "supplier_name TEXT NOT NULL DEFAULT '',"
+                + "total_amount REAL NOT NULL DEFAULT 0,"
+                + "initial_paid REAL NOT NULL DEFAULT 0,"
+                + "paid_amount REAL NOT NULL DEFAULT 0,"
+                + "payment_method TEXT NOT NULL DEFAULT 'cash',"
+                + "notes TEXT DEFAULT '',"
+                + "created_at TEXT NOT NULL);");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + T_PURCHASE_ITEMS + " ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "purchase_id INTEGER NOT NULL,"
+                + "product_id INTEGER NOT NULL,"
+                + "product_name TEXT NOT NULL,"
+                + "quantity INTEGER NOT NULL DEFAULT 1,"
+                + "unit_cost REAL NOT NULL DEFAULT 0,"
+                + "total_cost REAL NOT NULL DEFAULT 0,"
+                + "FOREIGN KEY(purchase_id) REFERENCES " + T_PURCHASES + "(id) ON DELETE CASCADE);");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + T_SUPPLIER_PAYMENTS + " ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "purchase_id INTEGER NOT NULL,"
+                + "supplier_id INTEGER NOT NULL,"
+                + "amount REAL NOT NULL DEFAULT 0,"
+                + "method TEXT NOT NULL DEFAULT 'cash',"
+                + "note TEXT DEFAULT '',"
+                + "created_at TEXT NOT NULL,"
+                + "FOREIGN KEY(purchase_id) REFERENCES " + T_PURCHASES + "(id) ON DELETE CASCADE);");
     }
 
     private void createV5Tables(SQLiteDatabase db) {

@@ -25,7 +25,9 @@ public final class UiKit {
         return String.format(Locale.FRENCH, "%,.0f", v)
                 .replace(' ', ' ').replace(' ', ' ');
     }
-    public static String xaf(double v) { return fmt(v) + " XAF"; }
+    /** Devise affichée (chargée au démarrage et lors du choix du pays). */
+    public static String currency = "XAF";
+    public static String xaf(double v) { return fmt(v) + " " + currency; }
 
     // ── Barre de titre commune ──────────────────────────────────────────────
     public static void topBar(Activity a, String title) {

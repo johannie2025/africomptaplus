@@ -45,6 +45,9 @@ public final class AmountWords {
         if (code == null) return "francs CFA";
         switch (code.toUpperCase()) {
             case "XAF": case "XOF": case "FCFA": case "": return "francs CFA";
+            case "GNF": return "francs guinéens";
+            case "CDF": return "francs congolais";
+            case "KMF": return "francs comoriens";
             case "EUR": return "euros";
             case "USD": return "dollars US";
             default: return code;

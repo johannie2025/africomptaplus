@@ -299,6 +299,7 @@ public class SaleActivity extends AppCompatActivity {
             return;
         }
 
+        new com.wisedesign.africomptaplus.services.BotService(this).syncIfDue();
         Sale sale = saleService.findByIdWithItems(saleId);
         if (sale != null) {
             Uri pdfUri = invoiceManager.generateInvoicePDF(sale, sale.items);

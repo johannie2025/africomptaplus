@@ -41,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         refreshDashboard();
+        com.wisedesign.africomptaplus.services.BotService botSvc = new com.wisedesign.africomptaplus.services.BotService(this);
+        findViewById(R.id.cardWhatsApp).setVisibility(botSvc.enabled() ? View.VISIBLE : View.GONE);
+        botSvc.syncIfDue();   // importe les ventes du bot + met à jour stock/prix côté serveur
         View ca = findViewById(R.id.cardAcct);
         if (ca != null) {
             String mode = com.wisedesign.africomptaplus.db.DatabaseHelper.getInstance(this).getConfig("acct_mode");
@@ -85,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
         click(R.id.cardReports,  ReportActivity.class);
         click(R.id.cardHistory,  SaleHistoryActivity.class);
         click(R.id.cardDocs,     DocumentListActivity.class);
+        click(R.id.cardSuppliers, SupplierActivity.class);
+        click(R.id.cardWhatsApp, WhatsAppActivity.class);
         click(R.id.cardAcct,     AccountingActivity.class);
         click(R.id.cardSettings, SettingsActivity.class);
     }

@@ -9,6 +9,7 @@
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -45,6 +46,10 @@
         <activity android:name=".activities.DebtDetailActivity"  android:exported="false"/>
         <activity android:name=".activities.DocumentListActivity" android:exported="false"/>
         <activity android:name=".activities.AccountingActivity"   android:exported="false"/>
+        <activity android:name=".activities.SupplierActivity"       android:exported="false"/>
+        <activity android:name=".activities.SupplierDetailActivity" android:exported="false"/>
+        <activity android:name=".activities.PurchaseActivity"       android:exported="false"/>
+        <activity android:name=".activities.WhatsAppActivity"       android:exported="false"/>
         <activity android:name=".activities.SettingsActivity" android:exported="false"/>
         <activity android:name=".activities.PortraitCaptureActivity" android:exported="false"
             android:screenOrientation="portrait" android:stateNotNeeded="true"
