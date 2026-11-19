@@ -30,12 +30,28 @@ public class SupplierService {
         return db.insert(DatabaseHelper.T_SUPPLIERS, cv);
     }
 
-    /** false si le fournisseur a des achats. */
+    /** Supprime ; avec des achats, le fournisseur est archivé (masqué) pour conserver l'historique. */
     public boolean delete(long id) {
         Cursor c = db.rawQuery("SELECT COUNT(*) FROM " + DatabaseHelper.T_PURCHASES + " WHERE supplier_id=?", new String[]{String.valueOf(id)});
-        try { if (c.moveToFirst() && c.getInt(0) > 0) return false; } finally { c.close(); }
+        try { if (c.moveToFirst() && c.getInt(0) > 0) { db.getWritableDatabase().execSQL("UPDATE " + DatabaseHelper.T_SUPPLIERS + " SET archived=1 WHERE id=?", new Object[]{id}); return true; } } finally { c.close(); }
         db.delete(DatabaseHelper.T_SUPPLIERS, "id=?", new String[]{String.valueOf(id)});
         return true;
+    }
+
+    /** Supprime un achat : stock retiré (sans passer sous 0), paiements et lignes supprimés. */
+    public boolean deletePurchase(long purchaseId) {
+        SQLiteDatabase q = db.getWritableDatabase();
+        q.beginTransaction();
+        try {
+            Cursor c = q.rawQuery("SELECT product_id, quantity FROM " + DatabaseHelper.T_PURCHASE_ITEMS + " WHERE purchase_id=?", new String[]{String.valueOf(purchaseId)});
+            try { while (c.moveToNext()) q.execSQL("UPDATE " + DatabaseHelper.T_PRODUCTS + " SET stock=MAX(0, stock-?) WHERE id=?", new Object[]{c.getInt(1), c.getLong(0)}); }
+            finally { c.close(); }
+            q.execSQL("DELETE FROM " + DatabaseHelper.T_SUPPLIER_PAYMENTS + " WHERE purchase_id=?", new Object[]{purchaseId});
+            q.execSQL("DELETE FROM " + DatabaseHelper.T_PURCHASE_ITEMS + " WHERE purchase_id=?", new Object[]{purchaseId});
+            int n = q.delete(DatabaseHelper.T_PURCHASES, "id=?", new String[]{String.valueOf(purchaseId)});
+            q.setTransactionSuccessful();
+            return n > 0;
+        } finally { q.endTransaction(); }
     }
 
     public List<Supplier> list(String q) {
@@ -43,7 +59,7 @@ public class SupplierService {
         String l = "%" + (q == null ? "" : q.trim()) + "%";
         Cursor c = db.rawQuery("SELECT s.*, COALESCE(SUM(p.total_amount - p.paid_amount),0) AS due, COUNT(p.id) AS n"
                 + " FROM suppliers s LEFT JOIN purchases p ON p.supplier_id=s.id"
-                + " WHERE s.name LIKE ? OR s.phone LIKE ? GROUP BY s.id ORDER BY s.name COLLATE NOCASE", new String[]{l, l});
+                + " WHERE s.archived=0 AND (s.name LIKE ? OR s.phone LIKE ?) GROUP BY s.id ORDER BY s.name COLLATE NOCASE", new String[]{l, l});
         try { while (c.moveToNext()) out.add(supplier(c)); } finally { c.close(); }
         return out;
     }

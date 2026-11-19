@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.services;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -89,6 +91,6 @@ public final class TablePdf {
 
     private static void footer(Canvas cv, Paint p, int n) {
         p.setColor(0xFF94A3B8); p.setTypeface(Typeface.DEFAULT); p.setTextSize(8f); p.setTextAlign(Paint.Align.CENTER);
-        cv.drawText("AfriCompta+ · Wise Design — page " + n, W / 2f, H - 20, p);
+        cv.drawText(I18n.t("AfriCompta+ · Wise Design — page ") + n, W / 2f, H - 20, p);
     }
 }

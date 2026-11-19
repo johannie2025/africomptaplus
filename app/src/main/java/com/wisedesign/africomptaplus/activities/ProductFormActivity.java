@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.activities;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.os.Bundle;
 import androidx.activity.result.ActivityResultLauncher;
 import com.journeyapps.barcodescanner.ScanContract;
@@ -16,7 +18,7 @@ import com.wisedesign.africomptaplus.models.Product;
 import com.wisedesign.africomptaplus.services.ProductService;
 import com.wisedesign.africomptaplus.ui.UiKit;
 
-public class ProductFormActivity extends AppCompatActivity {
+public class ProductFormActivity extends BaseActivity {
 
     public static final String EXTRA_PRODUCT_ID = "product_id";
     public static final String EXTRA_BARCODE    = "barcode";
@@ -33,8 +35,8 @@ public class ProductFormActivity extends AppCompatActivity {
                 etBarcode.setText(code);
                 Product other = productService.findByBarcode(code);
                 if (other != null && (currentProduct == null || other.id != currentProduct.id)) {
-                    etBarcode.setError("Déjà utilisé par : " + other.name);
-                    Toast.makeText(this, "Ce code existe déjà : " + other.name, Toast.LENGTH_LONG).show();
+                    etBarcode.setError(I18n.t("Déjà utilisé par : ") + other.name);
+                    Toast.makeText(this, I18n.t("Ce code existe déjà : ") + other.name, Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -44,7 +46,7 @@ public class ProductFormActivity extends AppCompatActivity {
         setContentView(R.layout.activity_product_form);
 
         productService = new ProductService(this);
-        UiKit.topBar(this, getIntent().getLongExtra(EXTRA_PRODUCT_ID, 0) > 0 ? "Modifier le produit" : "Nouveau produit");
+        UiKit.topBar(this, getIntent().getLongExtra(EXTRA_PRODUCT_ID, 0) > 0 ? I18n.t("Modifier le produit") : I18n.t("Nouveau produit"));
 
         etName         = findViewById(R.id.etName);
         etBarcode      = findViewById(R.id.etBarcode);
@@ -82,7 +84,7 @@ public class ProductFormActivity extends AppCompatActivity {
     private void saveProduct() {
         String name = etName.getText().toString().trim();
         if (name.isEmpty()) {
-            etName.setError("Nom requis");
+            etName.setError(I18n.t("Nom requis"));
             return;
         }
 
@@ -90,7 +92,7 @@ public class ProductFormActivity extends AppCompatActivity {
         if (!code.isEmpty()) {
             Product other = productService.findByBarcode(code);
             if (other != null && (currentProduct == null || other.id != currentProduct.id)) {
-                etBarcode.setError("Déjà utilisé par : " + other.name);
+                etBarcode.setError(I18n.t("Déjà utilisé par : ") + other.name);
                 return;
             }
         }
@@ -103,7 +105,7 @@ public class ProductFormActivity extends AppCompatActivity {
             stock        = Integer.parseInt(etStock.getText().toString().trim());
             minStock     = Integer.parseInt(etMinStock.getText().toString().trim());
         } catch (NumberFormatException e) {
-            Toast.makeText(this, "Veuillez saisir des valeurs numériques valides", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, I18n.t("Veuillez saisir des valeurs numériques valides"), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -117,10 +119,10 @@ public class ProductFormActivity extends AppCompatActivity {
 
         long id = productService.save(p);
         if (id > 0) {
-            Toast.makeText(this, "Produit enregistré", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, I18n.t("Produit enregistré"), Toast.LENGTH_SHORT).show();
             finish();
         } else {
-            Toast.makeText(this, "Erreur lors de l'enregistrement", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, I18n.t("Erreur lors de l'enregistrement"), Toast.LENGTH_SHORT).show();
         }
     }
 }

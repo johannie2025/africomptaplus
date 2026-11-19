@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.activities;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -31,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Nouvel achat : lignes (produit, quantité, coût unitaire), acompte, reste dû au fournisseur. Entre en stock + écritures comptables. */
-public class PurchaseActivity extends AppCompatActivity {
+public class PurchaseActivity extends BaseActivity {
     public static final String EXTRA_SUPPLIER_ID = "supplier_id";
     private SupplierService svc;
     private ProductService products;
@@ -45,12 +47,12 @@ public class PurchaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         setContentView(R.layout.activity_purchase);
-        UiKit.topBar(this, "Nouvel achat");
+        UiKit.topBar(this, I18n.t("Nouvel achat"));
         svc = new SupplierService(this);
         products = new ProductService(this);
         supplier = svc.find(getIntent().getLongExtra(EXTRA_SUPPLIER_ID, -1));
         if (supplier == null) { finish(); return; }
-        ((TextView) findViewById(R.id.tvPurSupplier)).setText("Fournisseur : " + supplier.name);
+        ((TextView) findViewById(R.id.tvPurSupplier)).setText(I18n.t("Fournisseur : ") + supplier.name);
         llLines = findViewById(R.id.llLines);
         etPaid = findViewById(R.id.etPurPaid);
         etPaid.addTextChangedListener(new TextWatcher() {
@@ -76,7 +78,7 @@ public class PurchaseActivity extends AppCompatActivity {
         for (int idx = 0; idx < lines.size(); idx++) {
             SaleItem i = lines.get(idx);
             TextView t = new TextView(this);
-            t.setText(i.quantity + " × " + i.productName + "\n" + UiKit.xaf(i.unitPrice) + " / unité  →  " + UiKit.xaf(i.quantity * i.unitPrice) + "   (appui long : retirer)");
+            t.setText(i.quantity + " × " + i.productName + "\n" + UiKit.xaf(i.unitPrice) + I18n.t(" / unité  →  ") + UiKit.xaf(i.quantity * i.unitPrice) + I18n.t("   (appui long : retirer)"));
             t.setTextSize(13);
             t.setPadding((int) (14 * d), (int) (10 * d), (int) (14 * d), (int) (10 * d));
             t.setBackgroundResource(R.drawable.bg_card);
@@ -87,14 +89,14 @@ public class PurchaseActivity extends AppCompatActivity {
             t.setOnLongClickListener(v -> { lines.remove(at); refresh(); return true; });
             llLines.addView(t);
         }
-        ((TextView) findViewById(R.id.tvPurTotal)).setText("Total : " + UiKit.xaf(total()));
+        ((TextView) findViewById(R.id.tvPurTotal)).setText(I18n.t("Total : ") + UiKit.xaf(total()));
         if (!paidTouched) etPaid.setText(total() > 0 ? String.valueOf((long) total()) : "");
         updateRemaining();
     }
 
     private void updateRemaining() {
         double rest = Math.max(0, total() - paid());
-        ((TextView) findViewById(R.id.tvPurRemaining)).setText(rest > 0 ? "Reste dû au fournisseur : " + UiKit.xaf(rest) : "Payé en totalité");
+        ((TextView) findViewById(R.id.tvPurRemaining)).setText(rest > 0 ? I18n.t("Reste dû au fournisseur : ") + UiKit.xaf(rest) : I18n.t("Payé en totalité"));
     }
 
     private void pickProduct() {
@@ -103,7 +105,7 @@ public class PurchaseActivity extends AppCompatActivity {
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
         EditText search = new EditText(this);
-        search.setHint("Rechercher un produit");
+        search.setHint(I18n.t("Rechercher un produit"));
         box.addView(search);
         ListView lv = new ListView(this);
         ArrayAdapter<String> ad = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>());
@@ -115,8 +117,8 @@ public class PurchaseActivity extends AppCompatActivity {
             ad.notifyDataSetChanged();
         };
         fill.run();
-        AlertDialog dlg = new AlertDialog.Builder(this).setTitle("Produit acheté").setView(box)
-                .setNegativeButton("Annuler", null).create();
+        AlertDialog dlg = new AlertDialog.Builder(this).setTitle(I18n.t("Produit acheté")).setView(box)
+                .setNegativeButton(I18n.t("Annuler"), null).create();
         search.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int a, int c, int d) {}
             @Override public void onTextChanged(CharSequence s, int a, int c, int d) {}
@@ -136,33 +138,33 @@ public class PurchaseActivity extends AppCompatActivity {
         box.setOrientation(LinearLayout.VERTICAL);
         int pad = (int) (20 * getResources().getDisplayMetrics().density);
         box.setPadding(pad, 8, pad, 0);
-        EditText qty = new EditText(this); qty.setHint("Quantité reçue"); qty.setInputType(InputType.TYPE_CLASS_NUMBER);
-        EditText cost = new EditText(this); cost.setHint("Coût d'achat unitaire");
+        EditText qty = new EditText(this); qty.setHint(I18n.t("Quantité reçue")); qty.setInputType(InputType.TYPE_CLASS_NUMBER);
+        EditText cost = new EditText(this); cost.setHint(I18n.t("Coût d'achat unitaire"));
         cost.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         if (p.buyingPrice > 0) cost.setText(String.valueOf((long) p.buyingPrice));
         box.addView(qty); box.addView(cost);
         new AlertDialog.Builder(this).setTitle(p.name).setView(box)
-                .setPositiveButton("Ajouter", (d, w) -> {
+                .setPositiveButton(I18n.t("Ajouter"), (d, w) -> {
                     int q; double c;
                     try { q = Integer.parseInt(qty.getText().toString().trim()); c = Double.parseDouble(cost.getText().toString().trim().replace(',', '.')); }
-                    catch (Exception e) { Toast.makeText(this, "Quantité et coût requis", Toast.LENGTH_SHORT).show(); return; }
-                    if (q <= 0 || c < 0) { Toast.makeText(this, "Valeurs invalides", Toast.LENGTH_SHORT).show(); return; }
+                    catch (Exception e) { Toast.makeText(this, I18n.t("Quantité et coût requis"), Toast.LENGTH_SHORT).show(); return; }
+                    if (q <= 0 || c < 0) { Toast.makeText(this, I18n.t("Valeurs invalides"), Toast.LENGTH_SHORT).show(); return; }
                     lines.add(new SaleItem(p.id, p.name, p.buyingPrice, q, c));
                     refresh();
-                }).setNegativeButton("Annuler", null).show();
+                }).setNegativeButton(I18n.t("Annuler"), null).show();
     }
 
     private void save() {
-        if (lines.isEmpty()) { Toast.makeText(this, "Ajoutez au moins un produit", Toast.LENGTH_SHORT).show(); return; }
+        if (lines.isEmpty()) { Toast.makeText(this, I18n.t("Ajoutez au moins un produit"), Toast.LENGTH_SHORT).show(); return; }
         double total = total(), paid = paid();
-        if (paid < 0 || paid > total) { Toast.makeText(this, "Le montant payé doit être entre 0 et " + UiKit.xaf(total), Toast.LENGTH_LONG).show(); return; }
+        if (paid < 0 || paid > total) { Toast.makeText(this, I18n.t("Le montant payé doit être entre 0 et ") + UiKit.xaf(total), Toast.LENGTH_LONG).show(); return; }
         RadioGroup rg = findViewById(R.id.rgPurMethod);
         String method = rg.getCheckedRadioButtonId() == R.id.rbPurMobile ? "mobile_money" : "cash";
         long id = svc.createPurchase(supplier, lines, paid, method,
                 ((EditText) findViewById(R.id.etPurNotes)).getText().toString().trim(),
                 ((CheckBox) findViewById(R.id.cbUpdateCost)).isChecked());
-        if (id < 0) { Toast.makeText(this, "Erreur d'enregistrement", Toast.LENGTH_SHORT).show(); return; }
-        Toast.makeText(this, "Achat enregistré — stock mis à jour", Toast.LENGTH_LONG).show();
+        if (id < 0) { Toast.makeText(this, I18n.t("Erreur d'enregistrement"), Toast.LENGTH_SHORT).show(); return; }
+        Toast.makeText(this, I18n.t("Achat enregistré — stock mis à jour"), Toast.LENGTH_LONG).show();
         finish();
     }
 }

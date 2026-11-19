@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.services;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -44,8 +46,8 @@ public class InvoiceManager {
 
     public Uri generateInvoicePDF(Sale sale, List<SaleItem> items) {
         Meta m = new Meta();
-        m.title = "FACTURE"; m.rightLine = "Paiement : " + payment(sale.paymentMethod);
-        m.clientLabel = "FACTURÉ À"; m.intro = "Arrêtée la présente facture"; m.invoice = true;
+        m.title = I18n.t("FACTURE"); m.rightLine = I18n.t("Paiement : ") + payment(sale.paymentMethod);
+        m.clientLabel = I18n.t("FACTURÉ À"); m.intro = I18n.t("Arrêtée la présente facture"); m.invoice = true;
         return render(sale, items, m, "facture");
     }
 
@@ -56,11 +58,11 @@ public class InvoiceManager {
         s.subtotal = d.subtotal; s.taxRate = d.taxRate; s.taxAmount = d.taxAmount; s.totalAmount = d.totalAmount;
         boolean pro = com.wisedesign.africomptaplus.models.Document.PROFORMA.equals(d.docType);
         Meta m = new Meta();
-        m.title = pro ? "FACTURE PROFORMA" : "DEVIS";
+        m.title = pro ? I18n.t("FACTURE PROFORMA") : I18n.t("DEVIS");
         m.rightLine = (d.validUntil != null && d.validUntil.length() >= 10)
-                ? "Valable jusqu'au " + d.validUntil.substring(8, 10) + "/" + d.validUntil.substring(5, 7) + "/" + d.validUntil.substring(0, 4) : "";
-        m.clientLabel = "DESTINATAIRE";
-        m.intro = pro ? "Arrêtée la présente facture proforma" : "Arrêté le présent devis";
+                ? I18n.t("Valable jusqu'au ") + d.validUntil.substring(8, 10) + "/" + d.validUntil.substring(5, 7) + "/" + d.validUntil.substring(0, 4) : "";
+        m.clientLabel = I18n.t("DESTINATAIRE");
+        m.intro = pro ? I18n.t("Arrêtée la présente facture proforma") : I18n.t("Arrêté le présent devis");
         m.invoice = false;
         return render(s, d.items, m, pro ? "proforma" : "devis");
     }
@@ -123,7 +125,7 @@ public class InvoiceManager {
         cv.drawText(m.clientLabel, M, y, p);
         p.setColor(PdfStyle.TEXT); p.setTypeface(Typeface.DEFAULT_BOLD); p.setTextSize(12f);
         y += 15;
-        cv.drawText(PdfStyle.ellipsize(p, sale.clientName != null ? sale.clientName : "Client Passager", W - 2 * M), M, y, p);
+        cv.drawText(PdfStyle.ellipsize(p, sale.clientName != null ? sale.clientName : I18n.t("Client Passager"), W - 2 * M), M, y, p);
         p.setTypeface(Typeface.DEFAULT); p.setTextSize(10f); p.setColor(PdfStyle.MUTED);
         if (sale.clientPhone != null && !sale.clientPhone.isEmpty()) { y += 13; cv.drawText(sale.clientPhone, M, y, p); }
         y += 18;
@@ -133,10 +135,10 @@ public class InvoiceManager {
         cv.drawRoundRect(new RectF(M, y, W - M, y + 24), 8, 8, p);
         p.setColor(0xFFFFFFFF); p.setTypeface(Typeface.DEFAULT_BOLD); p.setTextSize(10f);
         float cQty = W - M - 150, cPu = W - M - 90, cTot = W - M - 8;
-        p.setTextAlign(Paint.Align.LEFT);  cv.drawText("Article", M + 8, y + 16, p);
-        p.setTextAlign(Paint.Align.CENTER); cv.drawText("Qté", cQty, y + 16, p);
+        p.setTextAlign(Paint.Align.LEFT);  cv.drawText(I18n.t("Article"), M + 8, y + 16, p);
+        p.setTextAlign(Paint.Align.CENTER); cv.drawText(I18n.t("Qté"), cQty, y + 16, p);
         p.setTextAlign(Paint.Align.RIGHT);  cv.drawText("P.U.", cPu + 22, y + 16, p);
-        cv.drawText("Total", cTot, y + 16, p);
+        cv.drawText(I18n.t("Total"), cTot, y + 16, p);
         y += 24;
 
         // Lignes
@@ -162,8 +164,8 @@ public class InvoiceManager {
         if (sale.taxRate > 0) {
             p.setTypeface(Typeface.DEFAULT); p.setTextSize(10.5f); p.setColor(PdfStyle.MUTED);
             p.setTextAlign(Paint.Align.LEFT);
-            cv.drawText("Sous-total HT", W - M - 200, y + 4, p);
-            cv.drawText("TVA (" + (sale.taxRate == Math.floor(sale.taxRate) ? String.valueOf((long) sale.taxRate) : String.valueOf(sale.taxRate)) + " %)", W - M - 200, y + 20, p);
+            cv.drawText(I18n.t("Sous-total HT"), W - M - 200, y + 4, p);
+            cv.drawText(I18n.t("TVA (") + (sale.taxRate == Math.floor(sale.taxRate) ? String.valueOf((long) sale.taxRate) : String.valueOf(sale.taxRate)) + " %)", W - M - 200, y + 20, p);
             p.setTextAlign(Paint.Align.RIGHT); p.setColor(PdfStyle.TEXT);
             cv.drawText(UiKit.fmt(sale.subtotal), W - M, y + 4, p);
             cv.drawText(UiKit.fmt(sale.taxAmount), W - M, y + 20, p);
@@ -174,14 +176,14 @@ public class InvoiceManager {
         p.setColor(PdfStyle.PRIMARY);
         cv.drawRoundRect(new RectF(W - M - 200, y, W - M, y + 40), 12, 12, p);
         p.setColor(0xFFFFFFFF); p.setTextAlign(Paint.Align.LEFT); p.setTextSize(10f);
-        cv.drawText("TOTAL", W - M - 188, y + 24, p);
+        cv.drawText(I18n.t("TOTAL"), W - M - 188, y + 24, p);
         p.setTextAlign(Paint.Align.RIGHT); p.setTypeface(Typeface.DEFAULT_BOLD); p.setTextSize(15f);
         cv.drawText(UiKit.fmt(sale.totalAmount) + " " + cfg.currency, W - M - 12, y + 26, p);
         y += 40 + 10;
 
         if (m.invoice && "credit".equals(sale.paymentMethod)) {
             p.setColor(0xFFF59E0B); p.setTextSize(10f); p.setTextAlign(Paint.Align.RIGHT);
-            cv.drawText("VENTE À CRÉDIT — solde à régler", W - M, y + 8, p);
+            cv.drawText(I18n.t("VENTE À CRÉDIT — solde à régler"), W - M, y + 8, p);
             y += 14;
         }
 
@@ -189,7 +191,7 @@ public class InvoiceManager {
         y += 14;
         p.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.ITALIC)); p.setTextSize(9.5f);
         p.setColor(PdfStyle.MUTED); p.setTextAlign(Paint.Align.LEFT);
-        String words = m.intro + " à la somme de : " + AmountWords.amount(sale.totalAmount, cfg.currency) + ".";
+        String words = m.intro + I18n.t(" à la somme de : ") + AmountWords.amount(sale.totalAmount, cfg.currency) + ".";
         for (String ln : PdfStyle.wrap(p, words, W - 2 * M)) { cv.drawText(ln, M, y, p); y += 13; }
 
         // Pied de page
@@ -199,7 +201,7 @@ public class InvoiceManager {
         cv.drawText(PdfStyle.ellipsize(p, cfg.invoiceFooter, W - 2 * M), W / 2f, y, p);
         y += 14;
         p.setTextSize(8f); p.setColor(0xFF94A3B8);
-        cv.drawText("Généré avec AfriCompta+ · Wise Design", W / 2f, y, p);
+        cv.drawText(I18n.t("Généré avec AfriCompta+ · Wise Design"), W / 2f, y, p);
 
         if (!licensed && !dry) watermark(cv, y);
         return y;
@@ -211,15 +213,15 @@ public class InvoiceManager {
         wp.setTypeface(Typeface.DEFAULT_BOLD); wp.setTextAlign(Paint.Align.CENTER);
         cv.save();
         cv.rotate(-35, W / 2f, height / 2f);
-        cv.drawText("VERSION DÉMO", W / 2f, height / 2f - 20, wp);
+        cv.drawText(I18n.t("VERSION DÉMO"), W / 2f, height / 2f - 20, wp);
         cv.drawText("WISE DESIGN", W / 2f, height / 2f + 12, wp);
         cv.drawText("+240 222 886 007", W / 2f, height / 2f + 44, wp);
         cv.restore();
     }
 
     private String payment(String m) {
-        if (m == null) return "Espèces";
-        switch (m) { case "mobile_money": return "Mobile Money"; case "credit": return "Crédit"; default: return "Espèces"; }
+        if (m == null) return I18n.t("Espèces");
+        switch (m) { case "mobile_money": return I18n.t("Mobile Money"); case "credit": return I18n.t("Crédit"); default: return I18n.t("Espèces"); }
     }
 
     private boolean isLicensed() {

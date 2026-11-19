@@ -20,8 +20,15 @@ public class ClientService {
         return c.id;
     }
 
+    /** Supprime ; avec ventes/dettes/devis, le client est archivé (masqué) pour conserver l'historique. */
     public boolean delete(long id) {
-        return db.delete(DatabaseHelper.T_CLIENTS, DatabaseHelper.COL_ID + "=?", new String[]{String.valueOf(id)}) > 0;
+        String[] a = {String.valueOf(id)};
+        boolean used = false;
+        for (String q : new String[]{"SELECT 1 FROM sales WHERE client_id=? LIMIT 1", "SELECT 1 FROM debts WHERE client_id=? LIMIT 1", "SELECT 1 FROM documents WHERE client_id=? LIMIT 1"}) {
+            Cursor c = db.rawQuery(q, a); try { if (c.moveToFirst()) used = true; } finally { c.close(); }
+        }
+        if (used) { db.getWritableDatabase().execSQL("UPDATE " + DatabaseHelper.T_CLIENTS + " SET archived=1 WHERE id=?", a); return true; }
+        return db.delete(DatabaseHelper.T_CLIENTS, DatabaseHelper.COL_ID + "=?", a) > 0;
     }
 
     public Client findById(long id) {
@@ -31,7 +38,7 @@ public class ClientService {
 
     public List<Client> findAll() {
         List<Client> list = new ArrayList<>();
-        Cursor c = db.rawQuery("SELECT * FROM " + DatabaseHelper.T_CLIENTS + " ORDER BY " + DatabaseHelper.COL_NAME + " ASC", null);
+        Cursor c = db.rawQuery("SELECT * FROM " + DatabaseHelper.T_CLIENTS + " WHERE archived=0 ORDER BY " + DatabaseHelper.COL_NAME + " ASC", null);
         try { while (c.moveToNext()) list.add(fromCursor(c)); } finally { c.close(); }
         return list;
     }
@@ -39,7 +46,7 @@ public class ClientService {
     public List<Client> search(String q) {
         List<Client> list = new ArrayList<>();
         Cursor c = db.rawQuery("SELECT * FROM " + DatabaseHelper.T_CLIENTS
-                + " WHERE " + DatabaseHelper.COL_NAME + " LIKE ? OR " + DatabaseHelper.COL_PHONE + " LIKE ?"
+                + " WHERE archived=0 AND (" + DatabaseHelper.COL_NAME + " LIKE ? OR " + DatabaseHelper.COL_PHONE + " LIKE ?)"
                 + " ORDER BY " + DatabaseHelper.COL_NAME + " ASC",
                 new String[]{"%" + q + "%", "%" + q + "%"});
         try { while (c.moveToNext()) list.add(fromCursor(c)); } finally { c.close(); }

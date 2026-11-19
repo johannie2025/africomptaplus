@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.activities;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -33,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Détail d'une dette : résumé, nouveau paiement, historique, reçu PDF (imprimer / partager). */
-public class DebtDetailActivity extends AppCompatActivity {
+public class DebtDetailActivity extends BaseActivity {
     public static final String EXTRA_DEBT_ID = "debt_id";
 
     private DebtService debts;
@@ -46,7 +48,7 @@ public class DebtDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         setContentView(R.layout.activity_debt_detail);
-        UiKit.topBar(this, "Détail de la dette");
+        UiKit.topBar(this, I18n.t("Détail de la dette"));
         BottomNav.attach(this, BottomNav.DEBTS);
         debts = new DebtService(this);
         receipts = new ReceiptManager(this);
@@ -86,53 +88,53 @@ public class DebtDetailActivity extends AppCompatActivity {
 
         EditText etAmount = new EditText(this);
         etAmount.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        etAmount.setHint("Montant payé");
+        etAmount.setHint(I18n.t("Montant payé"));
         etAmount.setText(String.valueOf((long) d.remainingAmount()));
         etAmount.selectAll();
         box.addView(etAmount);
 
         RadioGroup rg = new RadioGroup(this);
         rg.setOrientation(RadioGroup.HORIZONTAL);
-        RadioButton rCash = new RadioButton(this); rCash.setText("Espèces"); rCash.setId(View.generateViewId());
-        RadioButton rMobile = new RadioButton(this); rMobile.setText("Mobile Money"); rMobile.setId(View.generateViewId());
+        RadioButton rCash = new RadioButton(this); rCash.setText(I18n.t("Espèces")); rCash.setId(View.generateViewId());
+        RadioButton rMobile = new RadioButton(this); rMobile.setText(I18n.t("Mobile Money")); rMobile.setId(View.generateViewId());
         rg.addView(rCash); rg.addView(rMobile);
         rg.check(rCash.getId());
         box.addView(rg);
 
         EditText etNote = new EditText(this);
-        etNote.setHint("Note (facultatif)");
+        etNote.setHint(I18n.t("Note (facultatif)"));
         box.addView(etNote);
 
         new AlertDialog.Builder(this)
-                .setTitle("Paiement — " + d.clientName)
-                .setMessage("Restant : " + UiKit.xaf(d.remainingAmount()))
+                .setTitle(I18n.t("Paiement — ") + d.clientName)
+                .setMessage(I18n.t("Restant : ") + UiKit.xaf(d.remainingAmount()))
                 .setView(box)
-                .setPositiveButton("Enregistrer", (dlg, w) -> {
+                .setPositiveButton(I18n.t("Enregistrer"), (dlg, w) -> {
                     double amount;
                     try { amount = Double.parseDouble(etAmount.getText().toString().trim().replace(',', '.')); }
-                    catch (Exception e) { Toast.makeText(this, "Montant invalide", Toast.LENGTH_SHORT).show(); return; }
-                    if (amount <= 0) { Toast.makeText(this, "Montant invalide", Toast.LENGTH_SHORT).show(); return; }
+                    catch (Exception e) { Toast.makeText(this, I18n.t("Montant invalide"), Toast.LENGTH_SHORT).show(); return; }
+                    if (amount <= 0) { Toast.makeText(this, I18n.t("Montant invalide"), Toast.LENGTH_SHORT).show(); return; }
                     String method = rg.getCheckedRadioButtonId() == rMobile.getId() ? "mobile_money" : "cash";
                     long pid = debts.recordPayment(debtId, amount, method, etNote.getText().toString().trim());
-                    if (pid < 0) { Toast.makeText(this, "Paiement refusé", Toast.LENGTH_SHORT).show(); return; }
+                    if (pid < 0) { Toast.makeText(this, I18n.t("Paiement refusé"), Toast.LENGTH_SHORT).show(); return; }
                     load();
                     offerReceipt(pid);
                 })
-                .setNegativeButton("Annuler", null).show();
+                .setNegativeButton(I18n.t("Annuler"), null).show();
     }
 
     private void offerReceipt(long paymentId) {
         new AlertDialog.Builder(this)
-                .setTitle("Paiement enregistré ✓")
-                .setMessage("Imprimer ou partager le reçu ?")
-                .setPositiveButton("Imprimer", (d, w) -> receipt(paymentId, true))
-                .setNeutralButton("Partager", (d, w) -> receipt(paymentId, false))
-                .setNegativeButton("Plus tard", null).show();
+                .setTitle(I18n.t("Paiement enregistré ✓"))
+                .setMessage(I18n.t("Imprimer ou partager le reçu ?"))
+                .setPositiveButton(I18n.t("Imprimer"), (d, w) -> receipt(paymentId, true))
+                .setNeutralButton(I18n.t("Partager"), (d, w) -> receipt(paymentId, false))
+                .setNegativeButton(I18n.t("Plus tard"), null).show();
     }
 
     private void receipt(long paymentId, boolean print) {
         Uri pdf = receipts.generate(paymentId);
-        if (pdf == null) { Toast.makeText(this, "Erreur de génération du reçu", Toast.LENGTH_SHORT).show(); return; }
+        if (pdf == null) { Toast.makeText(this, I18n.t("Erreur de génération du reçu"), Toast.LENGTH_SHORT).show(); return; }
         if (print) { PdfPrinter.print(this, pdf, "Recu_REC_" + paymentId); return; }
         Intent share = new Intent(Intent.ACTION_SEND);
         share.setType("application/pdf");
@@ -154,8 +156,8 @@ public class DebtDetailActivity extends AppCompatActivity {
             h.date.setText(p.createdAt);
             UiKit.pressScale(h.itemView);
             h.itemView.setOnClickListener(v -> new AlertDialog.Builder(DebtDetailActivity.this)
-                    .setTitle("Reçu REC-" + String.format(java.util.Locale.US, "%05d", p.id))
-                    .setItems(new String[]{"Imprimer", "Partager le PDF"}, (d, w) -> receipt(p.id, w == 0))
+                    .setTitle(I18n.t("Reçu REC-") + String.format(java.util.Locale.US, "%05d", p.id))
+                    .setItems(new String[]{I18n.t("Imprimer"), I18n.t("Partager le PDF")}, (d, w) -> receipt(p.id, w == 0))
                     .show());
         }
         @Override public int getItemCount() { return payments.size(); }

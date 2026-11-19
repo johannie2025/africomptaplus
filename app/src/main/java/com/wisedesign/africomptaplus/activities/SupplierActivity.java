@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.activities;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -29,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Liste des fournisseurs avec solde dû ; création / édition. */
-public class SupplierActivity extends AppCompatActivity {
+public class SupplierActivity extends BaseActivity {
     private SupplierService svc;
     private final List<Supplier> list = new ArrayList<>();
     private Adapter adapter;
@@ -39,7 +41,7 @@ public class SupplierActivity extends AppCompatActivity {
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         setContentView(R.layout.activity_suppliers);
-        UiKit.topBar(this, "Fournisseurs");
+        UiKit.topBar(this, I18n.t("Fournisseurs"));
         BottomNav.attach(this, BottomNav.NONE);
         svc = new SupplierService(this);
         RecyclerView rv = findViewById(R.id.rvSuppliers);
@@ -61,7 +63,7 @@ public class SupplierActivity extends AppCompatActivity {
         list.clear(); list.addAll(svc.list(q));
         adapter.notifyDataSetChanged();
         ((TextView) findViewById(R.id.tvTotalPayable)).setText(UiKit.xaf(svc.totalPayable()));
-        ((TextView) findViewById(R.id.tvSupplierCount)).setText(list.size() + " fournisseur(s)");
+        ((TextView) findViewById(R.id.tvSupplierCount)).setText(list.size() + I18n.t(" fournisseur(s)"));
         findViewById(R.id.tvEmpty).setVisibility(list.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
@@ -78,18 +80,18 @@ public class SupplierActivity extends AppCompatActivity {
         EditText notes = field(a, "Notes", InputType.TYPE_CLASS_TEXT, s.notes);
         box.addView(name); box.addView(phone); box.addView(email); box.addView(addr); box.addView(notes);
         AlertDialog.Builder bd = new AlertDialog.Builder(a)
-                .setTitle(s.id > 0 ? "Modifier le fournisseur" : "Nouveau fournisseur").setView(box)
-                .setPositiveButton("Enregistrer", (d, w) -> {
+                .setTitle(s.id > 0 ? I18n.t("Modifier le fournisseur") : I18n.t("Nouveau fournisseur")).setView(box)
+                .setPositiveButton(I18n.t("Enregistrer"), (d, w) -> {
                     String n = name.getText().toString().trim();
-                    if (n.isEmpty()) { Toast.makeText(a, "Nom obligatoire", Toast.LENGTH_SHORT).show(); return; }
+                    if (n.isEmpty()) { Toast.makeText(a, I18n.t("Nom obligatoire"), Toast.LENGTH_SHORT).show(); return; }
                     s.name = n; s.phone = phone.getText().toString().trim(); s.email = email.getText().toString().trim();
                     s.address = addr.getText().toString().trim(); s.notes = notes.getText().toString().trim();
                     svc.save(s); done.run();
                 })
-                .setNegativeButton("Annuler", null);
-        if (s.id > 0) bd.setNeutralButton("Supprimer", (d, w) -> {
+                .setNegativeButton(I18n.t("Annuler"), null);
+        if (s.id > 0) bd.setNeutralButton(I18n.t("Supprimer"), (d, w) -> {
             if (svc.delete(s.id)) { done.run(); a.finish(); }
-            else Toast.makeText(a, "Suppression impossible : ce fournisseur a des achats", Toast.LENGTH_LONG).show();
+            else Toast.makeText(a, I18n.t("Suppression impossible : ce fournisseur a des achats"), Toast.LENGTH_LONG).show();
         });
         bd.show();
     }
@@ -108,8 +110,8 @@ public class SupplierActivity extends AppCompatActivity {
             Supplier s = list.get(pos);
             h.init.setText(UiKit.initials(s.name));
             h.name.setText(s.name);
-            h.info.setText((s.phone.isEmpty() ? "" : s.phone + " · ") + s.purchaseCount + " achat(s)");
-            h.due.setText(s.due > 0 ? UiKit.xaf(s.due) : "Soldé");
+            h.info.setText((s.phone.isEmpty() ? "" : s.phone + " · ") + s.purchaseCount + I18n.t(" achat(s)"));
+            h.due.setText(s.due > 0 ? UiKit.xaf(s.due) : I18n.t("Soldé"));
             h.due.setTextColor(getResources().getColor(s.due > 0 ? R.color.accent : R.color.success));
             UiKit.pressScale(h.itemView);
             h.itemView.setOnClickListener(v -> startActivity(new Intent(SupplierActivity.this, SupplierDetailActivity.class)

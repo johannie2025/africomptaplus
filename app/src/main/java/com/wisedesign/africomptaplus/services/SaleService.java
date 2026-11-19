@@ -92,6 +92,23 @@ public class SaleService {
         } finally { sqdb.endTransaction(); }
     }
 
+    /** Supprime une vente : stock remis, dette et paiements supprimés. (Le panel web reçoit la suppression à la synchro.) */
+    public boolean deleteSale(long saleId) {
+        SQLiteDatabase q = db.getWritableDatabase();
+        q.beginTransaction();
+        try {
+            Cursor c = q.rawQuery("SELECT product_id, quantity FROM " + DatabaseHelper.T_SALE_ITEMS + " WHERE " + DatabaseHelper.COL_SALE_ID + "=?", new String[]{String.valueOf(saleId)});
+            try { while (c.moveToNext()) q.execSQL("UPDATE " + DatabaseHelper.T_PRODUCTS + " SET " + DatabaseHelper.COL_STOCK + "=" + DatabaseHelper.COL_STOCK + "+? WHERE " + DatabaseHelper.COL_ID + "=?", new Object[]{c.getInt(1), c.getLong(0)}); }
+            finally { c.close(); }
+            q.execSQL("DELETE FROM " + DatabaseHelper.T_DEBT_PAYMENTS + " WHERE debt_id IN (SELECT id FROM " + DatabaseHelper.T_DEBTS + " WHERE sale_id=?)", new Object[]{saleId});
+            q.execSQL("DELETE FROM " + DatabaseHelper.T_DEBTS + " WHERE sale_id=?", new Object[]{saleId});
+            q.execSQL("DELETE FROM " + DatabaseHelper.T_SALE_ITEMS + " WHERE " + DatabaseHelper.COL_SALE_ID + "=?", new Object[]{saleId});
+            int n = q.delete(DatabaseHelper.T_SALES, DatabaseHelper.COL_ID + "=?", new String[]{String.valueOf(saleId)});
+            q.setTransactionSuccessful();
+            return n > 0;
+        } finally { q.endTransaction(); }
+    }
+
     /** Taux de TVA actif (0 si désactivée). */
     public double taxRate() {
         if (!"1".equals(db.getConfig("tva_enabled"))) return 0;

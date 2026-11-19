@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.services;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.content.Context;
 
 import com.wisedesign.africomptaplus.db.DatabaseHelper;
@@ -70,12 +72,12 @@ public final class Countries {
 
     public static String summary(Country c) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Zone : ").append(c.zone).append("\n");
-        sb.append("Devise : ").append(c.currency).append("\n");
-        sb.append("TVA par défaut : ").append(vatText(c.vat)).append(" % (indicatif)\n");
-        sb.append("Identifiant fiscal : ").append(c.taxIdLabel).append("\n");
-        sb.append("Organisme social : ").append(c.social).append("\n");
-        sb.append("Comptes ajoutés au plan : ").append(accounts(c).length);
+        sb.append(I18n.t("Zone : ")).append(c.zone).append("\n");
+        sb.append(I18n.t("Devise : ")).append(c.currency).append("\n");
+        sb.append(I18n.t("TVA par défaut : ")).append(vatText(c.vat)).append(I18n.t(" % (indicatif)\n"));
+        sb.append(I18n.t("Identifiant fiscal : ")).append(c.taxIdLabel).append("\n");
+        sb.append(I18n.t("Organisme social : ")).append(c.social).append("\n");
+        sb.append(I18n.t("Comptes ajoutés au plan : ")).append(accounts(c).length);
         return sb.toString();
     }
 

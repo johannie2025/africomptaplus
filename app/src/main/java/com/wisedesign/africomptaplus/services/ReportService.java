@@ -158,7 +158,7 @@ public class ReportService {
     }
     public int countLowStockProducts() {
         Cursor c = db.rawQuery("SELECT COUNT(*) FROM " + DatabaseHelper.T_PRODUCTS
-                + " WHERE " + DatabaseHelper.COL_STOCK + "<=" + DatabaseHelper.COL_MIN_STOCK, null);
+                + " WHERE archived=0 AND " + DatabaseHelper.COL_STOCK + "<=" + DatabaseHelper.COL_MIN_STOCK, null);
         try { return c.moveToFirst() ? c.getInt(0) : 0; } finally { c.close(); }
     }
     public double revenueToday(String today) {

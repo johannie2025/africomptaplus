@@ -122,7 +122,7 @@ public class BotService {
 
     private JSONArray productsJson() throws Exception {
         JSONArray a = new JSONArray();
-        Cursor c = db.rawQuery("SELECT id, name, barcode, selling_price, stock, category FROM " + DatabaseHelper.T_PRODUCTS, null);
+        Cursor c = db.rawQuery("SELECT id, name, barcode, selling_price, stock, category FROM " + DatabaseHelper.T_PRODUCTS + " WHERE archived=0", null);
         try {
             while (c.moveToNext()) {
                 JSONObject o = new JSONObject();

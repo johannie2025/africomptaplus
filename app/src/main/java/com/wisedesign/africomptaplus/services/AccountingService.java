@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.services;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -245,7 +247,7 @@ public class AccountingService {
 
     // ── États ───────────────────────────────────────────────────────────────
     public ReportTable journal(String from, String to, String q) {
-        ReportTable t = new ReportTable("Journal général", new String[]{"Date", "Jnl", "Compte", "Libellé", "Débit", "Crédit"},
+        ReportTable t = new ReportTable(I18n.t("Journal général"), new String[]{I18n.t("Date"), I18n.t("Jnl"), I18n.t("Compte"), I18n.t("Libellé"), I18n.t("Débit"), I18n.t("Crédit")},
                 new float[]{1.15f, 0.6f, 0.85f, 2.3f, 1.15f, 1.15f}, new boolean[]{false, false, false, false, true, true});
         double td = 0, tc = 0;
         for (Entry e : entries(from, to)) {
@@ -264,7 +266,7 @@ public class AccountingService {
     }
 
     public ReportTable ledger(String from, String to, String q) {
-        ReportTable t = new ReportTable("Grand livre", new String[]{"Date", "Jnl", "Libellé", "Débit", "Crédit", "Solde"},
+        ReportTable t = new ReportTable(I18n.t("Grand livre"), new String[]{I18n.t("Date"), I18n.t("Jnl"), I18n.t("Libellé"), I18n.t("Débit"), I18n.t("Crédit"), I18n.t("Solde")},
                 new float[]{1.15f, 0.6f, 2.2f, 1.1f, 1.1f, 1.25f}, new boolean[]{false, false, false, true, true, true});
         TreeMap<String, List<Object[]>> by = new TreeMap<>();
         for (Entry e : entries(from, to))
@@ -299,7 +301,7 @@ public class AccountingService {
     }
 
     public ReportTable balance(String from, String to, String q) {
-        ReportTable t = new ReportTable("Balance générale", new String[]{"Compte", "Intitulé", "Débit", "Crédit", "Solde D", "Solde C"},
+        ReportTable t = new ReportTable(I18n.t("Balance générale"), new String[]{I18n.t("Compte"), I18n.t("Intitulé"), I18n.t("Débit"), I18n.t("Crédit"), I18n.t("Solde D"), I18n.t("Solde C")},
                 new float[]{0.8f, 2.1f, 1.05f, 1.05f, 1.05f, 1.05f}, new boolean[]{false, false, true, true, true, true});
         double td = 0, tc = 0, sd = 0, sc = 0;
         for (Map.Entry<String, double[]> e : totals(from, to).entrySet()) {
@@ -313,7 +315,7 @@ public class AccountingService {
     }
 
     public ReportTable income(String from, String to) {
-        ReportTable t = new ReportTable("Compte de résultat", new String[]{"Compte", "Libellé", "Montant"},
+        ReportTable t = new ReportTable(I18n.t("Compte de résultat"), new String[]{I18n.t("Compte"), I18n.t("Libellé"), I18n.t("Montant")},
                 new float[]{0.9f, 3f, 1.6f}, new boolean[]{false, false, true});
         TreeMap<String, double[]> m = totals(from, to);
         double prod = 0, chg = 0, ventes = 0, achats = 0;
@@ -338,7 +340,7 @@ public class AccountingService {
 
     /** Bilan cumulé jusqu'à `to` (les soldes débiteurs vont à l'actif, créditeurs au passif). */
     public ReportTable balanceSheet(String to) {
-        ReportTable t = new ReportTable("Bilan", new String[]{"Compte", "Libellé", "Montant"},
+        ReportTable t = new ReportTable(I18n.t("Bilan"), new String[]{I18n.t("Compte"), I18n.t("Libellé"), I18n.t("Montant")},
                 new float[]{0.9f, 3f, 1.6f}, new boolean[]{false, false, true});
         TreeMap<String, double[]> m = totals("", to);
         double actif = 0, passif = 0, res = 0;
@@ -369,7 +371,7 @@ public class AccountingService {
 
     /** Comptabilité analytique : centres = catégories de produits (ventilation automatique) + charges par nature. */
     public ReportTable analytic(String from, String to) {
-        ReportTable t = new ReportTable("Comptabilité analytique", new String[]{"Centre / nature", "CA HT", "Coûts", "Marge", "Taux"},
+        ReportTable t = new ReportTable(I18n.t("Comptabilité analytique"), new String[]{I18n.t("Centre / nature"), "CA HT", I18n.t("Coûts"), I18n.t("Marge"), I18n.t("Taux")},
                 new float[]{2.2f, 1.2f, 1.2f, 1.2f, 0.8f}, new boolean[]{false, true, true, true, true});
         TreeMap<String, double[]> centers = new TreeMap<>();
         TreeMap<String, Double> charges = new TreeMap<>();
@@ -403,7 +405,7 @@ public class AccountingService {
 
     // ── Comptabilité simple (trésorerie) ────────────────────────────────────
     public ReportTable cashBook(String from, String to, String q) {
-        ReportTable t = new ReportTable("Livre de caisse", new String[]{"Date", "Libellé", "Entrée", "Sortie", "Solde"},
+        ReportTable t = new ReportTable(I18n.t("Livre de caisse"), new String[]{I18n.t("Date"), I18n.t("Libellé"), I18n.t("Entrée"), I18n.t("Sortie"), I18n.t("Solde")},
                 new float[]{1.15f, 2.4f, 1.15f, 1.15f, 1.3f}, new boolean[]{false, false, true, true, true});
         double run = 0;
         if (from != null && !from.isEmpty()) {
@@ -437,7 +439,7 @@ public class AccountingService {
     }
 
     public ReportTable simpleSummary(String from, String to) {
-        ReportTable t = new ReportTable("Synthèse de trésorerie", new String[]{"Libellé", "Montant"},
+        ReportTable t = new ReportTable(I18n.t("Synthèse de trésorerie"), new String[]{I18n.t("Libellé"), I18n.t("Montant")},
                 new float[]{3f, 1.6f}, new boolean[]{false, true});
         double sale = 0, debt = 0, otherIn = 0, exp = 0, stock = 0, otherOut = 0;
         for (Entry e : entries(from, to)) {
@@ -472,7 +474,7 @@ public class AccountingService {
     }
 
     public ReportTable plan(String q) {
-        ReportTable t = new ReportTable("Plan comptable SYSCOHADA", new String[]{"Compte", "Intitulé"},
+        ReportTable t = new ReportTable(I18n.t("Plan comptable SYSCOHADA"), new String[]{I18n.t("Compte"), I18n.t("Intitulé")},
                 new float[]{1f, 4f}, new boolean[]{false, false});
         for (Map.Entry<String, String> e : accounts().entrySet())
             if (match(q, e.getKey(), e.getValue())) t.add(e.getKey().length() <= 2, e.getKey(), e.getValue());
@@ -490,7 +492,7 @@ public class AccountingService {
     public void deleteManual(long id) { db.delete(DatabaseHelper.T_ACCT_ENTRIES, "id=?", new String[]{String.valueOf(id)}); }
 
     public ReportTable manualList(String from, String to, String q) {
-        ReportTable t = new ReportTable("Écritures saisies (appuyez pour supprimer)", new String[]{"Date", "Jnl", "Libellé", "Débit → Crédit", "Montant"},
+        ReportTable t = new ReportTable(I18n.t("Écritures saisies (appuyez pour supprimer)"), new String[]{I18n.t("Date"), I18n.t("Jnl"), I18n.t("Libellé"), I18n.t("Débit → Crédit"), I18n.t("Montant")},
                 new float[]{1.15f, 0.6f, 2f, 1.4f, 1.1f}, new boolean[]{false, false, false, false, true});
         for (Entry e : entries(from, to)) {
             if (e.manualId < 0 || !match(q, e.label, e.ref)) continue;

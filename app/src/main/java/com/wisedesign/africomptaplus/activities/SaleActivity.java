@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.activities;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,7 +23,7 @@ import com.wisedesign.africomptaplus.ui.UiKit;
 import java.util.*;
 
 /** Point de vente : client · articles (± orange) · mode de paiement · Encaisser. Logique XAF inchangée. */
-public class SaleActivity extends AppCompatActivity {
+public class SaleActivity extends BaseActivity {
 
     private ProductService productService;
     private SaleService    saleService;
@@ -48,7 +50,7 @@ public class SaleActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sale);
-        UiKit.topBar(this, "Point de vente");
+        UiKit.topBar(this, I18n.t("Point de vente"));
 
         productService = new ProductService(this);
         saleService    = new SaleService(this);
@@ -114,7 +116,7 @@ public class SaleActivity extends AppCompatActivity {
         for (int i = 0; i < clients.size(); i++) names[i + 1] = clients.get(i).toString();
 
         new AlertDialog.Builder(this)
-                .setTitle("Sélectionner le client")
+                .setTitle(I18n.t("Sélectionner le client"))
                 .setItems(names, (dialog, which) -> {
                     if (which == 0) {
                         selectedClientId = 0; selectedClientName = "Client Passager"; selectedClientPhone = "";
@@ -133,22 +135,22 @@ public class SaleActivity extends AppCompatActivity {
         EditText etName  = v.findViewById(R.id.etClientName);
         EditText etPhone = v.findViewById(R.id.etClientPhone);
         new AlertDialog.Builder(this)
-                .setTitle("Nouveau client")
+                .setTitle(I18n.t("Nouveau client"))
                 .setView(v)
-                .setPositiveButton("Créer", (d, w) -> {
+                .setPositiveButton(I18n.t("Créer"), (d, w) -> {
                     String name  = etName.getText().toString().trim();
                     String phone = etPhone.getText().toString().trim();
-                    if (name.isEmpty()) { Toast.makeText(this, "Nom requis", Toast.LENGTH_SHORT).show(); return; }
+                    if (name.isEmpty()) { Toast.makeText(this, I18n.t("Nom requis"), Toast.LENGTH_SHORT).show(); return; }
                     long id = clientService.save(new Client(name, phone));
                     selectedClientId = id; selectedClientName = name; selectedClientPhone = phone;
                     updateClientLabel();
                 })
-                .setNegativeButton("Annuler", null).show();
+                .setNegativeButton(I18n.t("Annuler"), null).show();
     }
 
     private void updateClientLabel() {
         tvClientSelected.setText(selectedClientName);
-        tvClientPhone.setText(selectedClientPhone.isEmpty() ? "Vente comptoir" : selectedClientPhone);
+        tvClientPhone.setText(selectedClientPhone.isEmpty() ? I18n.t("Vente comptoir") : selectedClientPhone);
         tvClientAvatar.setText(UiKit.initials(selectedClientName));
     }
 
@@ -156,7 +158,7 @@ public class SaleActivity extends AppCompatActivity {
     private void showProductPicker() {
         List<Product> products = productService.findAll();
         if (products.isEmpty()) {
-            Toast.makeText(this, "Aucun produit. Ajoutez d'abord des produits.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, I18n.t("Aucun produit. Ajoutez d'abord des produits."), Toast.LENGTH_LONG).show();
             return;
         }
         String[] names = new String[products.size()];
@@ -165,7 +167,7 @@ public class SaleActivity extends AppCompatActivity {
                      + "  (stock " + products.get(i).stock + ")";
 
         new AlertDialog.Builder(this)
-                .setTitle("Choisir un produit")
+                .setTitle(I18n.t("Choisir un produit"))
                 .setItems(names, (d, w) -> showQuantityDialog(products.get(w)))
                 .show();
     }
@@ -179,20 +181,20 @@ public class SaleActivity extends AppCompatActivity {
         box.setPadding(pad, pad / 2, pad, 0);
         box.addView(et);
         new AlertDialog.Builder(this)
-                .setTitle("Quantité — " + product.name)
+                .setTitle(I18n.t("Quantité — ") + product.name)
                 .setView(box)
-                .setPositiveButton("Ajouter", (d, w) -> {
+                .setPositiveButton(I18n.t("Ajouter"), (d, w) -> {
                     int qty;
                     try { qty = Integer.parseInt(et.getText().toString().trim()); }
                     catch (Exception e) { qty = 1; }
-                    if (qty <= 0) { Toast.makeText(this, "Quantité invalide", Toast.LENGTH_SHORT).show(); return; }
+                    if (qty <= 0) { Toast.makeText(this, I18n.t("Quantité invalide"), Toast.LENGTH_SHORT).show(); return; }
                     if (qty + qtyInCart(product.id) > product.stock) {
-                        Toast.makeText(this, "Stock insuffisant (" + product.stock + " dispo)", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, I18n.t("Stock insuffisant (") + product.stock + I18n.t(" dispo)"), Toast.LENGTH_SHORT).show();
                         return;
                     }
                     addToCart(product, qty);
                 })
-                .setNegativeButton("Annuler", null).show();
+                .setNegativeButton(I18n.t("Annuler"), null).show();
     }
 
     /** Scan → ajoute 1 unité au panier ; propose la création si le code est inconnu. */
@@ -200,22 +202,22 @@ public class SaleActivity extends AppCompatActivity {
         Product p = productService.findByBarcode(code);
         if (p == null) {
             new AlertDialog.Builder(this)
-                    .setTitle("Produit introuvable")
-                    .setMessage("Aucun produit avec le code " + code + ".\nLe créer maintenant ?")
-                    .setPositiveButton("Créer", (d, w) -> {
+                    .setTitle(I18n.t("Produit introuvable"))
+                    .setMessage(I18n.t("Aucun produit avec le code ") + code + I18n.t(".\nLe créer maintenant ?"))
+                    .setPositiveButton(I18n.t("Créer"), (d, w) -> {
                         Intent i = new Intent(this, ProductFormActivity.class);
                         i.putExtra(ProductFormActivity.EXTRA_BARCODE, code);
                         startActivity(i);
                     })
-                    .setNegativeButton("Annuler", null).show();
+                    .setNegativeButton(I18n.t("Annuler"), null).show();
             return;
         }
         if (qtyInCart(p.id) + 1 > p.stock) {
-            Toast.makeText(this, "Stock insuffisant : " + p.name + " (" + p.stock + " dispo)", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, I18n.t("Stock insuffisant : ") + p.name + " (" + p.stock + I18n.t(" dispo)"), Toast.LENGTH_LONG).show();
             return;
         }
         addToCart(p, 1);
-        Toast.makeText(this, "Ajouté : " + p.name, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, I18n.t("Ajouté : ") + p.name, Toast.LENGTH_SHORT).show();
     }
 
     private int qtyInCart(long productId) {
@@ -246,25 +248,25 @@ public class SaleActivity extends AppCompatActivity {
         if (rate > 0) {
             taxes.setVisibility(View.VISIBLE);
             ((TextView) findViewById(R.id.tvSubtotal)).setText(UiKit.xaf(total));
-            ((TextView) findViewById(R.id.tvTaxLabel)).setText("TVA (" + trimRate(rate) + " %)");
+            ((TextView) findViewById(R.id.tvTaxLabel)).setText(I18n.t("TVA (") + trimRate(rate) + " %)");
             ((TextView) findViewById(R.id.tvTaxAmount)).setText(UiKit.xaf(tax));
         } else taxes.setVisibility(View.GONE);
         tvTotal.setText(UiKit.xaf(total + tax));
-        tvArticlesTitle.setText("Articles (" + cart.size() + ")");
+        tvArticlesTitle.setText(I18n.t("Articles (") + cart.size() + ")");
         tvEmptyCart.setVisibility(cart.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     // ── Devis / proforma (aucun impact stock ni caisse) ──────────────────────
     private void createDocument() {
-        if (cart.isEmpty()) { Toast.makeText(this, "Panier vide", Toast.LENGTH_SHORT).show(); return; }
+        if (cart.isEmpty()) { Toast.makeText(this, I18n.t("Panier vide"), Toast.LENGTH_SHORT).show(); return; }
         new androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("Créer un document (valable 30 jours)")
-            .setItems(new String[]{"Devis", "Facture proforma"}, (dlg, w) -> {
+            .setTitle(I18n.t("Créer un document (valable 30 jours)"))
+            .setItems(new String[]{I18n.t("Devis"), I18n.t("Facture proforma")}, (dlg, w) -> {
                 String type = w == 0 ? com.wisedesign.africomptaplus.models.Document.QUOTE
                                      : com.wisedesign.africomptaplus.models.Document.PROFORMA;
                 com.wisedesign.africomptaplus.services.DocumentService ds = new com.wisedesign.africomptaplus.services.DocumentService(this);
                 long id = ds.create(type, cart, selectedClientId, selectedClientName, selectedClientPhone, 30);
-                if (id < 0) { Toast.makeText(this, "Erreur de création", Toast.LENGTH_SHORT).show(); return; }
+                if (id < 0) { Toast.makeText(this, I18n.t("Erreur de création"), Toast.LENGTH_SHORT).show(); return; }
                 com.wisedesign.africomptaplus.models.Document doc = ds.findById(id);
                 Uri pdf = doc != null ? invoiceManager.generateDocumentPDF(doc) : null;
                 if (pdf != null) {
@@ -275,17 +277,17 @@ public class SaleActivity extends AppCompatActivity {
                     share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     startActivity(Intent.createChooser(share, "Partager le document via"));
                 }
-                Toast.makeText(this, "Enregistré dans Devis & Proforma", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, I18n.t("Enregistré dans Devis & Proforma"), Toast.LENGTH_LONG).show();
                 cart.clear(); refreshCart();
             }).show();
     }
 
     // ── Finalisation ──────────────────────────────────────────────────────────
     private void finalizeSale() {
-        if (cart.isEmpty()) { Toast.makeText(this, "Panier vide", Toast.LENGTH_SHORT).show(); return; }
+        if (cart.isEmpty()) { Toast.makeText(this, I18n.t("Panier vide"), Toast.LENGTH_SHORT).show(); return; }
 
         if ("credit".equals(paymentMethod) && selectedClientId == 0) {
-            Toast.makeText(this, "Sélectionnez un client pour une vente à crédit", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, I18n.t("Sélectionnez un client pour une vente à crédit"), Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -295,11 +297,12 @@ public class SaleActivity extends AppCompatActivity {
                 selectedClientId, selectedClientName, selectedClientPhone, dueDate);
 
         if (saleId < 0) {
-            Toast.makeText(this, "Erreur enregistrement vente", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, I18n.t("Erreur enregistrement vente"), Toast.LENGTH_SHORT).show();
             return;
         }
 
         new com.wisedesign.africomptaplus.services.BotService(this).syncIfDue();
+        new com.wisedesign.africomptaplus.services.SyncService(this).syncIfDue();
         Sale sale = saleService.findByIdWithItems(saleId);
         if (sale != null) {
             Uri pdfUri = invoiceManager.generateInvoicePDF(sale, sale.items);
@@ -313,7 +316,7 @@ public class SaleActivity extends AppCompatActivity {
             }
         }
 
-        Toast.makeText(this, "Vente enregistrée !", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, I18n.t("Vente enregistrée !"), Toast.LENGTH_SHORT).show();
         cart.clear();
         selectedClientId = 0; selectedClientName = "Client Passager"; selectedClientPhone = "";
         etDueDate.setText("");
@@ -334,7 +337,7 @@ public class SaleActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull VH h, int pos) {
             SaleItem item = list.get(pos);
             h.tvName.setText(item.productName);
-            h.tvUnit.setText(UiKit.xaf(item.unitPrice) + " / unité");
+            h.tvUnit.setText(UiKit.xaf(item.unitPrice) + I18n.t(" / unité"));
             h.tvQty.setText(String.valueOf(item.quantity));
             h.tvPrice.setText(UiKit.xaf(item.totalPrice));
 
@@ -352,7 +355,7 @@ public class SaleActivity extends AppCompatActivity {
                 SaleItem it = list.get(p);
                 Product prod = productService.findById(it.productId);
                 if (prod != null && it.quantity + 1 > prod.stock) {
-                    Toast.makeText(SaleActivity.this, "Stock insuffisant (" + prod.stock + " dispo)", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SaleActivity.this, I18n.t("Stock insuffisant (") + prod.stock + I18n.t(" dispo)"), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 it.quantity++; it.totalPrice = it.unitPrice * it.quantity;

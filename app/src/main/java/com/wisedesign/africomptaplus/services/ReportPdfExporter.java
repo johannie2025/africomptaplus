@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.services;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -50,16 +52,16 @@ public class ReportPdfExporter {
 
         p.setTextAlign(Paint.Align.RIGHT); p.setColor(PdfStyle.PRIMARY);
         p.setTypeface(Typeface.DEFAULT_BOLD); p.setTextSize(18f);
-        cv.drawText("RAPPORT FINANCIER", W - M, 46, p);
+        cv.drawText(I18n.t("RAPPORT FINANCIER"), W - M, 46, p);
         p.setTypeface(Typeface.DEFAULT); p.setTextSize(10f); p.setColor(PdfStyle.MUTED);
         cv.drawText(period + " · " + r.periodStart + " → " + r.periodEnd, W - M, 62, p);
 
         y = Math.max(y, 90) + 14;
         String[][] k = {
-                {"Chiffre d'affaires", UiKit.xaf(r.totalRevenue)}, {"Bénéfice brut", UiKit.xaf(r.grossProfit)},
-                {"Dépenses", UiKit.xaf(r.totalExpenses)}, {"Bénéfice net", UiKit.xaf(r.netProfit)},
-                {"Nombre de ventes", String.valueOf(r.salesCount)}, {"Panier moyen", UiKit.xaf(r.avgBasket)},
-                {"Dettes en cours", UiKit.xaf(r.totalDebts)}};
+                {I18n.t("Chiffre d'affaires"), UiKit.xaf(r.totalRevenue)}, {I18n.t("Bénéfice brut"), UiKit.xaf(r.grossProfit)},
+                {I18n.t("Dépenses"), UiKit.xaf(r.totalExpenses)}, {I18n.t("Bénéfice net"), UiKit.xaf(r.netProfit)},
+                {I18n.t("Nombre de ventes"), String.valueOf(r.salesCount)}, {I18n.t("Panier moyen"), UiKit.xaf(r.avgBasket)},
+                {I18n.t("Dettes en cours"), UiKit.xaf(r.totalDebts)}};
         float cw = (W - 2 * M - 12) / 2f;
         for (int i = 0; i < k.length; i++) {
             float x = M + (i % 2) * (cw + 12), yy = y + (i / 2) * 62;
@@ -73,11 +75,11 @@ public class ReportPdfExporter {
         }
         y += 4 * 62 + 10;
 
-        y = table(cv, p, "Meilleures ventes par produit", r.topProducts, true, y);
-        table(cv, p, "Répartition par catégorie", r.topCategories, false, y + 10);
+        y = table(cv, p, I18n.t("Meilleures ventes par produit"), r.topProducts, true, y);
+        table(cv, p, I18n.t("Répartition par catégorie"), r.topCategories, false, y + 10);
 
         p.setTextAlign(Paint.Align.CENTER); p.setTextSize(8f); p.setColor(0xFF94A3B8);
-        cv.drawText("Généré avec AfriCompta+ · Wise Design", W / 2f, H - 24, p);
+        cv.drawText(I18n.t("Généré avec AfriCompta+ · Wise Design"), W / 2f, H - 24, p);
     }
 
     private float table(Canvas cv, Paint p, String title, List<String[]> rows, boolean product, float y) {
@@ -87,7 +89,7 @@ public class ReportPdfExporter {
         y += 22;
         p.setTypeface(Typeface.DEFAULT); p.setTextSize(10.5f);
         if (rows == null || rows.isEmpty()) {
-            p.setColor(PdfStyle.MUTED); cv.drawText("Aucune vente sur la période", M, y + 14, p);
+            p.setColor(PdfStyle.MUTED); cv.drawText(I18n.t("Aucune vente sur la période"), M, y + 14, p);
             return y + 24;
         }
         int i = 1;
@@ -96,7 +98,7 @@ public class ReportPdfExporter {
             p.setColor(PdfStyle.TEXT); p.setTextAlign(Paint.Align.LEFT);
             cv.drawText(i++ + ".  " + PdfStyle.ellipsize(p, row[0], 280), M, y + 15, p);
             p.setColor(PdfStyle.MUTED);
-            if (product) cv.drawText(row[1] + " vente(s)", M + 330, y + 15, p);
+            if (product) cv.drawText(row[1] + I18n.t(" vente(s)"), M + 330, y + 15, p);
             p.setColor(PdfStyle.PRIMARY); p.setTypeface(Typeface.DEFAULT_BOLD);
             p.setTextAlign(Paint.Align.RIGHT);
             double amt = Double.parseDouble(product ? row[2] : row[1]);

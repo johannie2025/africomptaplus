@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.activities;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -29,7 +31,7 @@ import com.wisedesign.africomptaplus.ui.UiKit;
 import java.util.*;
 
 /** Comptabilité simple (livre de caisse, synthèse) ou double SYSCOHADA (journal, grand livre, balance, résultat, bilan, analytique). */
-public class AccountingActivity extends AppCompatActivity {
+public class AccountingActivity extends BaseActivity {
     private AccountingService svc;
     private String mode, q = "", from = "", to = "";
     private String[] tabs;
@@ -42,17 +44,17 @@ public class AccountingActivity extends AppCompatActivity {
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         setContentView(R.layout.activity_accounting);
-        UiKit.topBar(this, "Comptabilité");
+        UiKit.topBar(this, I18n.t("Comptabilité"));
         BottomNav.attach(this, BottomNav.NONE);
         svc = new AccountingService(this);
         mode = svc.mode();
         if ("off".equals(mode)) {
-            Toast.makeText(this, "Activez la comptabilité dans Réglages", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, I18n.t("Activez la comptabilité dans Réglages"), Toast.LENGTH_LONG).show();
             finish(); return;
         }
         tabs = "double".equals(mode)
-                ? new String[]{"Journal", "Grand livre", "Balance", "Résultat", "Bilan", "Analytique", "Plan", "Saisies"}
-                : new String[]{"Livre de caisse", "Synthèse", "Saisies"};
+                ? new String[]{I18n.t("Journal"), I18n.t("Grand livre"), I18n.t("Balance"), I18n.t("Résultat"), I18n.t("Bilan"), I18n.t("Analytique"), I18n.t("Plan"), I18n.t("Saisies")}
+                : new String[]{I18n.t("Livre de caisse"), I18n.t("Synthèse"), I18n.t("Saisies")};
 
         RecyclerView rv = findViewById(R.id.rvTable);
         rv.setLayoutManager(new LinearLayoutManager(this));
@@ -144,7 +146,7 @@ public class AccountingActivity extends AppCompatActivity {
     private void export() {
         if (current == null) return;
         Uri u = TablePdf.export(this, current, subtitle(), "compta_" + tabs[tab].replace(' ', '_') + "_" + System.currentTimeMillis());
-        if (u == null) { Toast.makeText(this, "Erreur de génération du PDF", Toast.LENGTH_SHORT).show(); return; }
+        if (u == null) { Toast.makeText(this, I18n.t("Erreur de génération du PDF"), Toast.LENGTH_SHORT).show(); return; }
         Intent s = new Intent(Intent.ACTION_SEND);
         s.setType("application/pdf");
         s.putExtra(Intent.EXTRA_STREAM, u);
@@ -168,13 +170,13 @@ public class AccountingActivity extends AppCompatActivity {
         // modèles (double) / type (simple)
         final String[] tplNames, tplJ, tplD, tplC;
         if (dbl) {
-            tplNames = new String[]{"Écriture libre", "Apport en capital", "Achat de marchandises comptant", "Achat de marchandises à crédit",
+            tplNames = new String[]{I18n.t("Écriture libre"), I18n.t("Apport en capital"), I18n.t("Achat de marchandises comptant"), I18n.t("Achat de marchandises à crédit"),
                     "Règlement fournisseur", "Dépôt en banque", "Retrait personnel (exploitant)", "Emprunt reçu", "Paiement de loyer"};
             tplJ = new String[]{"OD", "CA", "AC", "AC", "CA", "BQ", "CA", "BQ", "AC"};
             tplD = new String[]{"", "571", "311", "311", "401", "521", "108", "521", "6222"};
             tplC = new String[]{"", "101", "571", "401", "571", "571", "571", "162", "571"};
         } else {
-            tplNames = new String[]{"Entrée de caisse", "Sortie de caisse"};
+            tplNames = new String[]{I18n.t("Entrée de caisse"), I18n.t("Sortie de caisse")};
             tplJ = new String[]{"CA", "CA"}; tplD = new String[]{"571", "658"}; tplC = new String[]{"758", "571"};
         }
         Spinner spTpl = new Spinner(this);
@@ -188,14 +190,14 @@ public class AccountingActivity extends AppCompatActivity {
 
         TextView tvDate = new TextView(this);
         final String[] date = {new java.text.SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date())};
-        tvDate.setText("Date : " + date[0]);
+        tvDate.setText(I18n.t("Date : ") + date[0]);
         tvDate.setPadding(0, dp(10), 0, dp(10));
         tvDate.setTextColor(0xFF1E40AF);
         tvDate.setOnClickListener(v -> {
             Calendar c = Calendar.getInstance();
             new android.app.DatePickerDialog(this, (dp0, y, m, d) -> {
                 date[0] = String.format(Locale.US, "%04d-%02d-%02d", y, m + 1, d);
-                tvDate.setText("Date : " + date[0]);
+                tvDate.setText(I18n.t("Date : ") + date[0]);
             }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
         });
         box.addView(tvDate);
@@ -218,9 +220,9 @@ public class AccountingActivity extends AppCompatActivity {
         });
 
         new AlertDialog.Builder(this)
-                .setTitle(dbl ? "Nouvelle écriture (partie double)" : "Mouvement de caisse")
+                .setTitle(dbl ? I18n.t("Nouvelle écriture (partie double)") : I18n.t("Mouvement de caisse"))
                 .setView(box)
-                .setPositiveButton("Enregistrer", (d, w) -> {
+                .setPositiveButton(I18n.t("Enregistrer"), (d, w) -> {
                     String label = etLabel.getText().toString().trim();
                     String deb = dbl ? etDebit.getText().toString().trim() : tplD[spTpl.getSelectedItemPosition()];
                     String cre = dbl ? etCredit.getText().toString().trim() : tplC[spTpl.getSelectedItemPosition()];
@@ -228,14 +230,14 @@ public class AccountingActivity extends AppCompatActivity {
                     try { amt = Double.parseDouble(etAmount.getText().toString().trim().replace(',', '.')); }
                     catch (Exception e) { amt = 0; }
                     if (label.isEmpty() || amt <= 0 || deb.isEmpty() || cre.isEmpty()) {
-                        Toast.makeText(this, "Libellé, comptes et montant requis", Toast.LENGTH_LONG).show(); return;
+                        Toast.makeText(this, I18n.t("Libellé, comptes et montant requis"), Toast.LENGTH_LONG).show(); return;
                     }
                     if (deb.equals(cre)) { Toast.makeText(this, "Comptes débit et crédit identiques", Toast.LENGTH_LONG).show(); return; }
                     svc.addManual(date[0], dbl ? journals[spJ.getSelectedItemPosition()] : "CA", label, deb, cre, amt);
-                    Toast.makeText(this, "Écriture enregistrée", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, I18n.t("Écriture enregistrée"), Toast.LENGTH_SHORT).show();
                     reload();
                 })
-                .setNegativeButton("Annuler", null).show();
+                .setNegativeButton(I18n.t("Annuler"), null).show();
     }
 
     private void addAccountDialog() {
@@ -245,12 +247,12 @@ public class AccountingActivity extends AppCompatActivity {
         EditText code = input("Numéro de compte (ex. 4111)", InputType.TYPE_CLASS_NUMBER);
         EditText lab = input("Intitulé", InputType.TYPE_CLASS_TEXT);
         box.addView(code); box.addView(lab);
-        new AlertDialog.Builder(this).setTitle("Ajouter un compte").setView(box)
-                .setPositiveButton("Ajouter", (d, w) -> {
+        new AlertDialog.Builder(this).setTitle(I18n.t("Ajouter un compte")).setView(box)
+                .setPositiveButton(I18n.t("Ajouter"), (d, w) -> {
                     String c = code.getText().toString().trim(), l = lab.getText().toString().trim();
-                    if (c.length() < 2 || l.isEmpty()) { Toast.makeText(this, "Numéro (2 chiffres min.) et intitulé requis", Toast.LENGTH_LONG).show(); return; }
+                    if (c.length() < 2 || l.isEmpty()) { Toast.makeText(this, I18n.t("Numéro (2 chiffres min.) et intitulé requis"), Toast.LENGTH_LONG).show(); return; }
                     svc.addAccount(c, l); reload();
-                }).setNegativeButton("Annuler", null).show();
+                }).setNegativeButton(I18n.t("Annuler"), null).show();
     }
 
     // ── Adapter ─────────────────────────────────────────────────────────────
@@ -272,9 +274,9 @@ public class AccountingActivity extends AppCompatActivity {
             final long id = current.ids.get(pos);
             if (id < 0) { row.setOnClickListener(null); row.setClickable(false); }
             else row.setOnClickListener(v -> new AlertDialog.Builder(AccountingActivity.this)
-                    .setTitle("Supprimer cette écriture ?").setMessage(r[2])
-                    .setPositiveButton("Supprimer", (d, w) -> { svc.deleteManual(id); reload(); })
-                    .setNegativeButton("Annuler", null).show());
+                    .setTitle(I18n.t("Supprimer cette écriture ?")).setMessage(r[2])
+                    .setPositiveButton(I18n.t("Supprimer"), (d, w) -> { svc.deleteManual(id); reload(); })
+                    .setNegativeButton(I18n.t("Annuler"), null).show());
         }
         @Override public int getItemCount() { return current == null ? 0 : current.rows.size(); }
         class VH extends RecyclerView.ViewHolder { VH(View v) { super(v); } }

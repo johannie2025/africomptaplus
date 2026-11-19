@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.activities;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -27,7 +29,7 @@ import java.text.DateFormat;
 import java.util.Date;
 
 /** Lien du numéro WhatsApp (QR), réglages du bot et synchronisation stock / ventes. */
-public class WhatsAppActivity extends AppCompatActivity {
+public class WhatsAppActivity extends BaseActivity {
     private BotService bot;
     private final Handler h = new Handler(Looper.getMainLooper());
     private boolean polling = false;
@@ -37,13 +39,13 @@ public class WhatsAppActivity extends AppCompatActivity {
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         setContentView(R.layout.activity_whatsapp);
-        UiKit.topBar(this, "Bot WhatsApp");
+        UiKit.topBar(this, I18n.t("Bot WhatsApp"));
         bot = new BotService(this);
         findViewById(R.id.btnWaLink).setOnClickListener(v -> link());
         findViewById(R.id.btnWaUnlink).setOnClickListener(v -> new AlertDialog.Builder(this)
-                .setTitle("Déconnecter WhatsApp ?").setMessage("Le bot cessera de répondre jusqu'à un nouveau scan.")
-                .setPositiveButton("Déconnecter", (d, w) -> bot.logout((ok, msg, r) -> { toast(ok ? "Déconnecté" : msg); render(); }))
-                .setNegativeButton("Annuler", null).show());
+                .setTitle(I18n.t("Déconnecter WhatsApp ?")).setMessage(I18n.t("Le bot cessera de répondre jusqu'à un nouveau scan."))
+                .setPositiveButton(I18n.t("Déconnecter"), (d, w) -> bot.logout((ok, msg, r) -> { toast(ok ? I18n.t("Déconnecté") : msg); render(); }))
+                .setNegativeButton(I18n.t("Annuler"), null).show());
         findViewById(R.id.btnBotSave).setOnClickListener(v -> saveSettings());
         findViewById(R.id.btnBotSync).setOnClickListener(v -> sync());
         UiKit.pressScale(findViewById(R.id.btnWaLink), findViewById(R.id.btnBotSave), findViewById(R.id.btnBotSync));
@@ -69,15 +71,15 @@ public class WhatsAppActivity extends AppCompatActivity {
         findViewById(R.id.boxSettings).setVisibility(enabled ? View.VISIBLE : View.GONE);
         findViewById(R.id.boxSync).setVisibility(enabled ? View.VISIBLE : View.GONE);
         if (!enabled) {
-            st.setText("Bot WhatsApp non activé");
-            info.setText("Cette fonction n'est pas incluse dans votre licence. Contactez le support pour l'activer.");
+            st.setText(I18n.t("Bot WhatsApp non activé"));
+            info.setText(I18n.t("Cette fonction n'est pas incluse dans votre licence. Contactez le support pour l'activer."));
             link.setVisibility(View.GONE); unlink.setVisibility(View.GONE);
             return;
         }
         boolean open = bot.linked();
-        st.setText(open ? "● Connecté" + (c.optString("wa_phone").isEmpty() ? "" : "  +" + c.optString("wa_phone")) : "○ Numéro non lié");
+        st.setText(open ? I18n.t("● Connecté") + (c.optString("wa_phone").isEmpty() ? "" : "  +" + c.optString("wa_phone")) : I18n.t("○ Numéro non lié"));
         st.setTextColor(getResources().getColor(open ? R.color.success : R.color.accent));
-        info.setText(open ? "Le bot répond à vos clients, ajoute au panier, encaisse et envoie la facture PDF."
+        info.setText(open ? I18n.t("Le bot répond à vos clients, ajoute au panier, encaisse et envoie la facture PDF.")
                 : "Scannez le QR code : WhatsApp → Appareils connectés → Connecter un appareil.");
         link.setVisibility(open ? View.GONE : View.VISIBLE);
         unlink.setVisibility(open ? View.VISIBLE : View.GONE);
@@ -89,9 +91,9 @@ public class WhatsAppActivity extends AppCompatActivity {
     }
 
     private void link() {
-        ((TextView) findViewById(R.id.tvWaLinkLabel)).setText("Génération du QR…");
+        ((TextView) findViewById(R.id.tvWaLinkLabel)).setText(I18n.t("Génération du QR…"));
         bot.connect((ok, msg, r) -> {
-            ((TextView) findViewById(R.id.tvWaLinkLabel)).setText("Lier mon WhatsApp (QR code)");
+            ((TextView) findViewById(R.id.tvWaLinkLabel)).setText(I18n.t("Lier mon WhatsApp (QR code)"));
             if (!ok || r == null) { toast(msg.isEmpty() ? "Échec" : msg); return; }
             if ("open".equals(r.optString("wa_state"))) { toast("Déjà connecté"); bot.status((o, m, x) -> render()); return; }
             showQr(r.optString("qr", ""), r.optString("pairing_code", ""));
@@ -109,7 +111,7 @@ public class WhatsAppActivity extends AppCompatActivity {
             if (bm != null) { iv.setImageBitmap(bm); iv.setVisibility(View.VISIBLE); }
         } catch (Exception ignored) {}
         TextView tp = findViewById(R.id.tvPairing);
-        if (!pairing.isEmpty()) { tp.setText("Ou code de jumelage : " + pairing); tp.setVisibility(View.VISIBLE); }
+        if (!pairing.isEmpty()) { tp.setText(I18n.t("Ou code de jumelage : ") + pairing); tp.setVisibility(View.VISIBLE); }
     }
 
     private void startPolling() {

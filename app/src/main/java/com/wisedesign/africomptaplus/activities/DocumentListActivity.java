@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.activities;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Devis & factures proforma : recherche, filtre de période, PDF, impression, conversion en facture. */
-public class DocumentListActivity extends AppCompatActivity {
+public class DocumentListActivity extends BaseActivity {
     private DocumentService ds;
     private SaleService ss;
     private InvoiceManager im;
@@ -43,7 +45,7 @@ public class DocumentListActivity extends AppCompatActivity {
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         setContentView(R.layout.activity_documents);
-        UiKit.topBar(this, "Devis & Proforma");
+        UiKit.topBar(this, I18n.t("Devis & Proforma"));
         BottomNav.attach(this, BottomNav.NONE);
         ds = new DocumentService(this); ss = new SaleService(this); im = new InvoiceManager(this);
 
@@ -71,7 +73,7 @@ public class DocumentListActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
         double total = 0;
         for (Document d : docs) total += d.totalAmount;
-        ((TextView) findViewById(R.id.tvSummary)).setText(docs.size() + " document(s) — " + UiKit.xaf(total));
+        ((TextView) findViewById(R.id.tvSummary)).setText(docs.size() + I18n.t(" document(s) — ") + UiKit.xaf(total));
         findViewById(R.id.tvEmpty).setVisibility(docs.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
@@ -81,7 +83,7 @@ public class DocumentListActivity extends AppCompatActivity {
     }
 
     private void share(Uri u, String subject) {
-        if (u == null) { Toast.makeText(this, "Erreur de génération du PDF", Toast.LENGTH_SHORT).show(); return; }
+        if (u == null) { Toast.makeText(this, I18n.t("Erreur de génération du PDF"), Toast.LENGTH_SHORT).show(); return; }
         Intent s = new Intent(Intent.ACTION_SEND);
         s.setType("application/pdf");
         s.putExtra(Intent.EXTRA_STREAM, u);
@@ -92,10 +94,10 @@ public class DocumentListActivity extends AppCompatActivity {
 
     private void actions(Document d) {
         List<String> labels = new ArrayList<>();
-        labels.add("Partager le PDF"); labels.add("Imprimer");
+        labels.add(I18n.t("Partager le PDF")); labels.add(I18n.t("Imprimer"));
         boolean open = "open".equals(d.status);
-        if (open) labels.add("Convertir en facture");
-        labels.add("Supprimer");
+        if (open) labels.add(I18n.t("Convertir en facture"));
+        labels.add(I18n.t("Supprimer"));
         new AlertDialog.Builder(this).setTitle(d.label() + " " + d.number)
                 .setItems(labels.toArray(new String[0]), (dlg, w) -> {
                     String l = labels.get(w);
@@ -111,23 +113,23 @@ public class DocumentListActivity extends AppCompatActivity {
 
     private void chooseTender(Document d) {
         final String[] methods = {"cash", "mobile_money", "credit"};
-        new AlertDialog.Builder(this).setTitle("Mode de paiement de la facture")
-                .setItems(new String[]{"Espèces", "Mobile Money", "Crédit (dette client)"}, (dlg, w) -> {
+        new AlertDialog.Builder(this).setTitle(I18n.t("Mode de paiement de la facture"))
+                .setItems(new String[]{I18n.t("Espèces"), I18n.t("Mobile Money"), I18n.t("Crédit (dette client)")}, (dlg, w) -> {
                     String[] err = new String[1];
                     long saleId = ds.convert(d.id, methods[w], err);
                     if (saleId < 0) { Toast.makeText(this, err[0], Toast.LENGTH_LONG).show(); return; }
                     Sale sale = ss.findByIdWithItems(saleId);
-                    Toast.makeText(this, "Facture créée — stock mis à jour", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, I18n.t("Facture créée — stock mis à jour"), Toast.LENGTH_SHORT).show();
                     load();
                     if (sale != null) share(im.generateInvoicePDF(sale, sale.items), "Facture " + sale.invoiceNumber);
                 }).show();
     }
 
     private void confirmDelete(Document d) {
-        new AlertDialog.Builder(this).setTitle("Supprimer ?")
-                .setMessage(d.number + " sera supprimé définitivement.")
-                .setPositiveButton("Supprimer", (dlg, w) -> { ds.delete(d.id); load(); })
-                .setNegativeButton("Annuler", null).show();
+        new AlertDialog.Builder(this).setTitle(I18n.t("Supprimer ?"))
+                .setMessage(d.number + I18n.t(" sera supprimé définitivement."))
+                .setPositiveButton(I18n.t("Supprimer"), (dlg, w) -> { ds.delete(d.id); load(); })
+                .setNegativeButton(I18n.t("Annuler"), null).show();
     }
 
     private class Adapter extends RecyclerView.Adapter<Adapter.VH> {

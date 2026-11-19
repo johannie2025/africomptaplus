@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.activities;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
@@ -32,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Fiche fournisseur : soldes, historique des achats (recherche + période), règlements. */
-public class SupplierDetailActivity extends AppCompatActivity {
+public class SupplierDetailActivity extends BaseActivity {
     public static final String EXTRA_ID = "supplier_id";
     private SupplierService svc;
     private long id;
@@ -44,7 +46,7 @@ public class SupplierDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         setContentView(R.layout.activity_supplier_detail);
-        UiKit.topBar(this, "Fournisseur");
+        UiKit.topBar(this, I18n.t("Fournisseur"));
         BottomNav.attach(this, BottomNav.NONE);
         svc = new SupplierService(this);
         id = getIntent().getLongExtra(EXTRA_ID, -1);
@@ -82,10 +84,24 @@ public class SupplierDetailActivity extends AppCompatActivity {
 
     private void actions(Purchase p) {
         List<String> l = new ArrayList<>();
-        l.add("Voir le détail");
-        if (p.remaining() > 0) l.add("Régler (paiement)");
+        l.add(I18n.t("Voir le détail"));
+        final boolean canPay = p.remaining() > 0;
+        if (canPay) l.add(I18n.t("Régler (paiement)"));
+        l.add(I18n.t("Supprimer l'achat"));
         new AlertDialog.Builder(this).setTitle(p.reference)
-                .setItems(l.toArray(new String[0]), (d, w) -> { if (w == 0) detail(p.id); else payDialog(p); }).show();
+                .setItems(l.toArray(new String[0]), (d, w) -> {
+                    if (w == 0) detail(p.id);
+                    else if (canPay && w == 1) payDialog(p);
+                    else new AlertDialog.Builder(this).setTitle(I18n.t("Supprimer l'achat"))
+                            .setMessage(I18n.t("Le stock sera retiré et l'achat supprimé aussi sur le panel web."))
+                            .setNegativeButton(I18n.t("Annuler"), null)
+                            .setPositiveButton(I18n.t("Supprimer"), (d2, w2) -> {
+                                svc.deletePurchase(p.id);
+                                com.wisedesign.africomptaplus.services.SyncService sy = new com.wisedesign.africomptaplus.services.SyncService(this);
+                                if (sy.enabled()) sy.syncNow(null);
+                                recreate();
+                            }).show();
+                }).show();
     }
 
     private void detail(long purchaseId) {
@@ -94,14 +110,14 @@ public class SupplierDetailActivity extends AppCompatActivity {
         StringBuilder sb = new StringBuilder();
         for (SaleItem i : p.items) sb.append(i.quantity).append(" × ").append(i.productName).append(" @ ").append(UiKit.fmt(i.unitPrice))
                 .append(" = ").append(UiKit.xaf(i.totalPrice)).append("\n");
-        sb.append("\nTotal : ").append(UiKit.xaf(p.total)).append("\nPayé : ").append(UiKit.xaf(p.paid))
-          .append("\nReste : ").append(UiKit.xaf(p.remaining()));
+        sb.append(I18n.t("\nTotal : ")).append(UiKit.xaf(p.total)).append(I18n.t("\nPayé : ")).append(UiKit.xaf(p.paid))
+          .append(I18n.t("\nReste : ")).append(UiKit.xaf(p.remaining()));
         List<String> pays = svc.paymentLines(purchaseId);
-        if (p.initialPaid > 0) sb.append("\n\nAcompte : ").append(UiKit.xaf(p.initialPaid));
-        if (!pays.isEmpty()) { sb.append("\n\nRèglements :"); for (String s : pays) sb.append("\n• ").append(s); }
-        if (!p.notes.isEmpty()) sb.append("\n\nNote : ").append(p.notes);
+        if (p.initialPaid > 0) sb.append(I18n.t("\n\nAcompte : ")).append(UiKit.xaf(p.initialPaid));
+        if (!pays.isEmpty()) { sb.append(I18n.t("\n\nRèglements :")); for (String s : pays) sb.append("\n• ").append(s); }
+        if (!p.notes.isEmpty()) sb.append(I18n.t("\n\nNote : ")).append(p.notes);
         new AlertDialog.Builder(this).setTitle(p.reference + " — " + p.createdAt).setMessage(sb.toString())
-                .setPositiveButton("Fermer", null).show();
+                .setPositiveButton(I18n.t("Fermer"), null).show();
     }
 
     private void payDialog(Purchase p) {
@@ -111,22 +127,22 @@ public class SupplierDetailActivity extends AppCompatActivity {
         box.setPadding(pad, 8, pad, 0);
         EditText amount = new EditText(this);
         amount.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        amount.setHint("Montant"); amount.setText(String.valueOf((long) p.remaining()));
+        amount.setHint(I18n.t("Montant")); amount.setText(String.valueOf((long) p.remaining()));
         box.addView(amount);
         RadioGroup rg = new RadioGroup(this); rg.setOrientation(RadioGroup.HORIZONTAL);
-        RadioButton rc = new RadioButton(this); rc.setText("Espèces"); rc.setId(View.generateViewId());
-        RadioButton rm = new RadioButton(this); rm.setText("Mobile Money"); rm.setId(View.generateViewId());
+        RadioButton rc = new RadioButton(this); rc.setText(I18n.t("Espèces")); rc.setId(View.generateViewId());
+        RadioButton rm = new RadioButton(this); rm.setText(I18n.t("Mobile Money")); rm.setId(View.generateViewId());
         rg.addView(rc); rg.addView(rm); rg.check(rc.getId());
         box.addView(rg);
-        new AlertDialog.Builder(this).setTitle("Règlement — " + p.supplierName)
-                .setMessage("Reste dû : " + UiKit.xaf(p.remaining())).setView(box)
-                .setPositiveButton("Enregistrer", (d, w) -> {
+        new AlertDialog.Builder(this).setTitle(I18n.t("Règlement — ") + p.supplierName)
+                .setMessage(I18n.t("Reste dû : ") + UiKit.xaf(p.remaining())).setView(box)
+                .setPositiveButton(I18n.t("Enregistrer"), (d, w) -> {
                     double a;
                     try { a = Double.parseDouble(amount.getText().toString().trim().replace(',', '.')); } catch (Exception e) { a = 0; }
                     double done = svc.pay(p.id, a, rg.getCheckedRadioButtonId() == rm.getId() ? "mobile_money" : "cash", "");
-                    if (done <= 0) Toast.makeText(this, "Montant invalide", Toast.LENGTH_SHORT).show();
-                    else { Toast.makeText(this, "Règlement de " + UiKit.xaf(done) + " enregistré", Toast.LENGTH_LONG).show(); load(); }
-                }).setNegativeButton("Annuler", null).show();
+                    if (done <= 0) Toast.makeText(this, I18n.t("Montant invalide"), Toast.LENGTH_SHORT).show();
+                    else { Toast.makeText(this, I18n.t("Règlement de ") + UiKit.xaf(done) + I18n.t(" enregistré"), Toast.LENGTH_LONG).show(); load(); }
+                }).setNegativeButton(I18n.t("Annuler"), null).show();
     }
 
     private class Adapter extends RecyclerView.Adapter<Adapter.VH> {
@@ -136,10 +152,10 @@ public class SupplierDetailActivity extends AppCompatActivity {
         @Override public void onBindViewHolder(@NonNull VH h, int pos) {
             Purchase p = list.get(pos);
             h.ref.setText(p.reference);
-            h.client.setText(p.remaining() > 0 ? "Reste dû : " + UiKit.xaf(p.remaining()) : "Entièrement payé");
+            h.client.setText(p.remaining() > 0 ? I18n.t("Reste dû : ") + UiKit.xaf(p.remaining()) : I18n.t("Entièrement payé"));
             h.date.setText(p.createdAt);
             h.amount.setText(UiKit.xaf(p.total));
-            h.tag.setText(p.remaining() <= 0 ? "Payé" : p.paid > 0 ? "Partiel" : "À payer");
+            h.tag.setText(p.remaining() <= 0 ? I18n.t("Payé") : p.paid > 0 ? I18n.t("Partiel") : I18n.t("À payer"));
             UiKit.pressScale(h.itemView);
             h.itemView.setOnClickListener(v -> actions(p));
         }

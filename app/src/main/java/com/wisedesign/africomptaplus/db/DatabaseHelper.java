@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME    = "africompta.db";
-    private static final int    DB_VERSION = 6; // v6 : fournisseurs & achats
+    private static final int    DB_VERSION = 8; // v8 : archivage (produits/clients/fournisseurs) + base de fusion synchro
 
     // ── Tables ──────────────────────────────────────────────────────────────
     public static final String T_PRODUCTS     = "products";
@@ -188,6 +188,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createV4Tables(db);
         createV5Tables(db);
         createV6Tables(db);
+        createV7Tables(db);
+        createV8Tables(db);
 
         // Client passager par défaut
         db.execSQL("INSERT OR IGNORE INTO " + T_CLIENTS
@@ -244,6 +246,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (oldVersion < 4) createV4Tables(db);
         if (oldVersion < 5) createV5Tables(db);
         if (oldVersion < 6) createV6Tables(db);
+        if (oldVersion < 7) createV7Tables(db);
+        if (oldVersion < 8) createV8Tables(db);
+    }
+
+    private void createV8Tables(SQLiteDatabase db) {
+        for (String t : new String[]{T_PRODUCTS, T_CLIENTS, T_SUPPLIERS})
+            try { db.execSQL("ALTER TABLE " + t + " ADD COLUMN archived INTEGER NOT NULL DEFAULT 0"); } catch (Exception ignored) {}
+        try { db.execSQL("ALTER TABLE sync_map ADD COLUMN base TEXT NOT NULL DEFAULT ''"); } catch (Exception ignored) {}
+    }
+
+    private void createV7Tables(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS sync_map (entity TEXT NOT NULL, local_id INTEGER NOT NULL, uid TEXT NOT NULL, hash TEXT NOT NULL DEFAULT '', stk INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(entity, local_id));");
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_sync_uid ON sync_map(entity, uid);");
     }
 
     private void createV6Tables(SQLiteDatabase db) {

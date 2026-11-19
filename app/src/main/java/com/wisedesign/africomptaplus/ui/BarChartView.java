@@ -71,7 +71,7 @@ public class BarChartView extends View {
         float w = getWidth(), h = getHeight();
         if (values.isEmpty()) {
             txt.setTextAlign(Paint.Align.CENTER);
-            cv.drawText("Aucune vente sur la période", w / 2f, h / 2f, txt);
+            cv.drawText(I18n.t("Aucune vente sur la période"), w / 2f, h / 2f, txt);
             return;
         }
         double max = 0;

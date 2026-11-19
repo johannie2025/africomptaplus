@@ -16,7 +16,7 @@ import com.wisedesign.africomptaplus.ui.UiKit;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
     private ReportService   reportService;
     private SecurityManager securityManager;
     private DatabaseHelper  db;
@@ -43,7 +43,8 @@ public class MainActivity extends AppCompatActivity {
         refreshDashboard();
         com.wisedesign.africomptaplus.services.BotService botSvc = new com.wisedesign.africomptaplus.services.BotService(this);
         findViewById(R.id.cardWhatsApp).setVisibility(botSvc.enabled() ? View.VISIBLE : View.GONE);
-        botSvc.syncIfDue();   // importe les ventes du bot + met à jour stock/prix côté serveur
+        botSvc.syncIfDue();
+        new com.wisedesign.africomptaplus.services.SyncService(this).syncIfDue();   // importe les ventes du bot + met à jour stock/prix côté serveur
         View ca = findViewById(R.id.cardAcct);
         if (ca != null) {
             String mode = com.wisedesign.africomptaplus.db.DatabaseHelper.getInstance(this).getConfig("acct_mode");

@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.activities;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,7 +16,7 @@ import com.wisedesign.africomptaplus.R;
 import com.wisedesign.africomptaplus.services.SecurityManager;
 
 /** Écran de verrouillage : saisie directe de la clé de licence (API) ou demande WhatsApp. */
-public class LockActivity extends AppCompatActivity {
+public class LockActivity extends BaseActivity {
 
     public static final String EXTRA_LOCK_REASON = "lock_reason";
     private static final String WHATSAPP_PHONE = "+240222886007";
@@ -33,7 +35,7 @@ public class LockActivity extends AppCompatActivity {
             switch (reason) {
                 case "CLOCK_FRAUD": tvReason.setText("Modification de l'horloge système détectée."); break;
                 case "TRIAL_EXPIRED": tvReason.setText("Votre période d'évaluation de 14 jours est terminée."); break;
-                default: tvReason.setText("Cette application est verrouillée. Saisissez une clé valide.");
+                default: tvReason.setText(I18n.t("Cette application est verrouillée. Saisissez une clé valide."));
             }
         }
 
@@ -44,11 +46,11 @@ public class LockActivity extends AppCompatActivity {
 
         btn.setOnClickListener(v -> {
             String key = etKey.getText().toString().trim();
-            if (key.isEmpty()) { etKey.setError("Clé requise"); return; }
-            btn.setEnabled(false); btn.setText("Vérification…");
+            if (key.isEmpty()) { etKey.setError(I18n.t("Clé requise")); return; }
+            btn.setEnabled(false); btn.setText(I18n.t("Vérification…"));
             tvStatus.setVisibility(View.GONE);
             sm.verifyLicense(key, sm.deviceId(), (valid, message) -> {
-                btn.setEnabled(true); btn.setText("Activer");
+                btn.setEnabled(true); btn.setText(I18n.t("Activer"));
                 if (valid) {
                     Intent i = new Intent(this, MainActivity.class);
                     i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

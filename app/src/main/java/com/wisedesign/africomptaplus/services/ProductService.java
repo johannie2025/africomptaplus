@@ -29,9 +29,15 @@ public class ProductService {
         }
     }
 
+    /** Supprime ; si le produit a de l'historique (ventes, achats, devis), il est archivé (masqué) pour garder les factures intactes. */
     public boolean delete(long id) {
-        return db.delete(DatabaseHelper.T_PRODUCTS,
-                DatabaseHelper.COL_ID + "=?", new String[]{String.valueOf(id)}) > 0;
+        String[] a = {String.valueOf(id)};
+        boolean used = false;
+        for (String q : new String[]{"SELECT 1 FROM sale_items WHERE product_id=? LIMIT 1", "SELECT 1 FROM purchase_items WHERE product_id=? LIMIT 1", "SELECT 1 FROM document_items WHERE product_id=? LIMIT 1"}) {
+            Cursor c = db.rawQuery(q, a); try { if (c.moveToFirst()) used = true; } finally { c.close(); }
+        }
+        if (used) { db.getWritableDatabase().execSQL("UPDATE " + DatabaseHelper.T_PRODUCTS + " SET archived=1 WHERE id=?", a); return true; }
+        return db.delete(DatabaseHelper.T_PRODUCTS, DatabaseHelper.COL_ID + "=?", a) > 0;
     }
 
     public Product findById(long id) {
@@ -48,7 +54,7 @@ public class ProductService {
     public Product findByBarcode(String barcode) {
         Cursor c = db.rawQuery(
                 "SELECT * FROM " + DatabaseHelper.T_PRODUCTS
-                + " WHERE " + DatabaseHelper.COL_BARCODE + "=? LIMIT 1",
+                + " WHERE archived=0 AND " + DatabaseHelper.COL_BARCODE + "=? LIMIT 1",
                 new String[]{barcode});
         try {
             if (c.moveToFirst()) return fromCursor(c);
@@ -59,7 +65,7 @@ public class ProductService {
     public List<Product> findAll() {
         List<Product> list = new ArrayList<>();
         Cursor c = db.rawQuery(
-                "SELECT * FROM " + DatabaseHelper.T_PRODUCTS
+                "SELECT * FROM " + DatabaseHelper.T_PRODUCTS + " WHERE archived=0"
                 + " ORDER BY " + DatabaseHelper.COL_NAME + " ASC", null);
         try {
             while (c.moveToNext()) list.add(fromCursor(c));
@@ -71,8 +77,8 @@ public class ProductService {
         List<Product> list = new ArrayList<>();
         Cursor c = db.rawQuery(
                 "SELECT * FROM " + DatabaseHelper.T_PRODUCTS
-                + " WHERE " + DatabaseHelper.COL_NAME + " LIKE ?"
-                + " OR " + DatabaseHelper.COL_BARCODE + " LIKE ?"
+                + " WHERE archived=0 AND (" + DatabaseHelper.COL_NAME + " LIKE ?"
+                + " OR " + DatabaseHelper.COL_BARCODE + " LIKE ?)"
                 + " ORDER BY " + DatabaseHelper.COL_NAME + " ASC",
                 new String[]{"%" + query + "%", "%" + query + "%"});
         try {

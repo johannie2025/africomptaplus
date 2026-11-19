@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.activities;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -26,7 +28,7 @@ import com.wisedesign.africomptaplus.ui.UiKit;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductListActivity extends AppCompatActivity {
+public class ProductListActivity extends BaseActivity {
 
     private ProductService productService;
     private ProductAdapter adapter;
@@ -38,7 +40,7 @@ public class ProductListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_list);
-        UiKit.topBar(this, "Produits");
+        UiKit.topBar(this, I18n.t("Produits"));
         UiKit.topAction(this, "Ajouter", R.drawable.ic_plus,
                 v -> startActivity(new Intent(this, ProductFormActivity.class)));
 
@@ -70,7 +72,7 @@ public class ProductListActivity extends AppCompatActivity {
         productList.clear();
         productList.addAll(query.isEmpty() ? productService.findAll() : productService.search(query));
         adapter.notifyDataSetChanged();
-        tvCount.setText(productList.size() + " produit(s)");
+        tvCount.setText(productList.size() + I18n.t(" produit(s)"));
         tvEmpty.setVisibility(productList.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
@@ -88,11 +90,11 @@ public class ProductListActivity extends AppCompatActivity {
             Product p = list.get(pos);
             h.tvName.setText(p.name);
             h.tvPrice.setText(UiKit.xaf(p.sellingPrice));
-            h.tvBarcode.setText(p.barcode != null && !p.barcode.isEmpty() ? "SKU : " + p.barcode : "");
+            h.tvBarcode.setText(p.barcode != null && !p.barcode.isEmpty() ? I18n.t("SKU : ") + p.barcode : "");
             h.tvBarcode.setVisibility(h.tvBarcode.getText().length() == 0 ? View.GONE : View.VISIBLE);
 
             boolean low = p.isLowStock();
-            h.tvStock.setText((low ? "Stock faible : " : "Stock : ") + p.stock);
+            h.tvStock.setText((low ? I18n.t("Stock faible : ") : I18n.t("Stock : ")) + p.stock);
             h.tvStock.setBackgroundResource(low ? R.drawable.bg_pill_danger : R.drawable.bg_pill_success);
             h.tvStock.setTextColor(getResources().getColor(low ? R.color.error : R.color.success));
 
@@ -103,13 +105,13 @@ public class ProductListActivity extends AppCompatActivity {
             });
             h.itemView.setOnLongClickListener(v -> {
                 new AlertDialog.Builder(ProductListActivity.this)
-                        .setTitle("Supprimer " + p.name + " ?")
-                        .setPositiveButton("Oui", (d, w) -> {
+                        .setTitle(I18n.t("Supprimer ") + p.name + " ?")
+                        .setPositiveButton(I18n.t("Oui"), (d, w) -> {
                             productService.delete(p.id);
                             loadProducts(etSearch.getText().toString());
-                            Toast.makeText(ProductListActivity.this, "Produit supprimé", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ProductListActivity.this, I18n.t("Produit supprimé"), Toast.LENGTH_SHORT).show();
                         })
-                        .setNegativeButton("Non", null).show();
+                        .setNegativeButton(I18n.t("Non"), null).show();
                 return true;
             });
             UiKit.pressScale(h.itemView);

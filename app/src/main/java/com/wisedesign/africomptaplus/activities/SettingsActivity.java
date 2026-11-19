@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.activities;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -21,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Ma boutique & licence : identité (logo, coordonnées, pied de page) → factures PDF ; activation licence. */
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends BaseActivity {
 
     private static final int PICK_LOGO = 101;
     private DatabaseHelper db;
@@ -37,7 +39,7 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        UiKit.topBar(this, "Ma boutique");
+        UiKit.topBar(this, I18n.t("Ma boutique"));
         db = DatabaseHelper.getInstance(this);
         sm = new SecurityManager(this);
 
@@ -76,8 +78,8 @@ public class SettingsActivity extends AppCompatActivity {
 
         findViewById(R.id.btnActivateLicense).setOnClickListener(v -> {
             String key = etLicenseKey.getText().toString().trim();
-            if (key.isEmpty()) { Toast.makeText(this, "Saisissez votre clé", Toast.LENGTH_SHORT).show(); return; }
-            Toast.makeText(this, "Vérification en cours…", Toast.LENGTH_SHORT).show();
+            if (key.isEmpty()) { Toast.makeText(this, I18n.t("Saisissez votre clé"), Toast.LENGTH_SHORT).show(); return; }
+            Toast.makeText(this, I18n.t("Vérification en cours…"), Toast.LENGTH_SHORT).show();
             sm.verifyLicense(key, sm.deviceId(), (valid, message) -> {
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
                 if (valid) { etLicenseKey.setText(""); loadConfig(); }
@@ -87,6 +89,8 @@ public class SettingsActivity extends AppCompatActivity {
         setupBackup();
         setupAccounting();
         setupCountry();
+        setupLanguage();
+        setupWebSync();
     }
 
     private void setupCountry() {
@@ -96,17 +100,17 @@ public class SettingsActivity extends AppCompatActivity {
         com.wisedesign.africomptaplus.services.Countries.Country cur = com.wisedesign.africomptaplus.services.Countries.byCode(db.getConfig("shop_country"));
         if (cur != null) sp.setSelection(list.indexOf(cur));
         TextView info = findViewById(R.id.tvCountryInfo);
-        info.setText(cur == null ? "Aucun pays chargé" : "Chargé : " + cur.name + " — " + cur.currency + ", TVA " + com.wisedesign.africomptaplus.services.Countries.vatText(cur.vat) + " %");
+        info.setText(cur == null ? I18n.t("Aucun pays chargé") : I18n.t("Chargé : ") + cur.name + " — " + cur.currency + I18n.t(", TVA ") + com.wisedesign.africomptaplus.services.Countries.vatText(cur.vat) + " %");
         findViewById(R.id.btnLoadCountry).setOnClickListener(v -> {
             com.wisedesign.africomptaplus.services.Countries.Country c = (com.wisedesign.africomptaplus.services.Countries.Country) sp.getSelectedItem();
             new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Charger " + c.name + " ?")
+                .setTitle(I18n.t("Charger ") + c.name + " ?")
                 .setMessage(com.wisedesign.africomptaplus.services.Countries.summary(c)
                         + "\n\nLe taux de TVA est indicatif : vérifiez-le auprès de votre administration fiscale. Vos données ne sont pas modifiées.")
-                .setNegativeButton("Annuler", null)
-                .setPositiveButton("Charger", (d, w) -> {
+                .setNegativeButton(I18n.t("Annuler"), null)
+                .setPositiveButton(I18n.t("Charger"), (d, w) -> {
                     com.wisedesign.africomptaplus.services.Countries.apply(this, c);
-                    Toast.makeText(this, "Configuration " + c.name + " chargée", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, I18n.t("Configuration ") + c.name + I18n.t(" chargée"), Toast.LENGTH_LONG).show();
                     recreate();
                 }).show();
         });
@@ -124,7 +128,7 @@ public class SettingsActivity extends AppCompatActivity {
         });
         findViewById(R.id.btnOpenAccounting).setOnClickListener(v -> {
             if ("off".equals(db.getConfig("acct_mode")) || db.getConfig("acct_mode").isEmpty())
-                Toast.makeText(this, "Choisissez d'abord un mode de comptabilité", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, I18n.t("Choisissez d'abord un mode de comptabilité"), Toast.LENGTH_SHORT).show();
             else startActivity(new Intent(this, AccountingActivity.class));
         });
         UiKit.pressScale(findViewById(R.id.btnOpenAccounting));
@@ -232,10 +236,10 @@ public class SettingsActivity extends AppCompatActivity {
         String info;
         try { info = backup.describe(data); } catch (Exception e) { toast("Sauvegarde invalide"); return; }
         new androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("Restaurer ?")
-            .setMessage(info + "\n\nLes données actuelles seront remplacées.")
-            .setNegativeButton("Annuler", null)
-            .setPositiveButton("Restaurer", (d, w) -> {
+            .setTitle(I18n.t("Restaurer ?"))
+            .setMessage(info + I18n.t("\n\nLes données actuelles seront remplacées."))
+            .setNegativeButton(I18n.t("Annuler"), null)
+            .setPositiveButton(I18n.t("Restaurer"), (d, w) -> {
                 try { backup.restore(data); toast("Restauration terminée ✓"); recreate(); }
                 catch (Exception e) { toast("Échec : " + e.getMessage()); }
             }).show();
@@ -269,20 +273,20 @@ public class SettingsActivity extends AppCompatActivity {
         etTvaRate.setText(r.isEmpty() ? "18" : r);
         findViewById(R.id.boxTvaRate).setVisibility(tva ? View.VISIBLE : View.GONE);
 
-        tvDeviceId.setText("Identifiant appareil : " + sm.deviceId());
+        tvDeviceId.setText(I18n.t("Identifiant appareil : ") + sm.deviceId());
         if (sm.isActivated()) {
-            tvLicenseStatus.setText("Active");
+            tvLicenseStatus.setText(I18n.t("Active"));
             tvLicenseStatus.setBackgroundResource(R.drawable.bg_pill_success);
             tvLicenseStatus.setTextColor(getResources().getColor(R.color.success));
             String plan = db.getConfig("license_plan"), exp = db.getConfig("license_expires"), cust = db.getConfig("license_customer");
             StringBuilder sb = new StringBuilder();
-            if (!cust.isEmpty()) sb.append("Titulaire : ").append(cust).append("\n");
-            if (!plan.isEmpty()) sb.append("Offre : ").append(plan).append("\n");
-            sb.append("Validité : ").append(exp.isEmpty() ? "illimitée" : exp);
+            if (!cust.isEmpty()) sb.append(I18n.t("Titulaire : ")).append(cust).append("\n");
+            if (!plan.isEmpty()) sb.append(I18n.t("Offre : ")).append(plan).append("\n");
+            sb.append(I18n.t("Validité : ")).append(exp.isEmpty() ? I18n.t("illimitée") : exp);
             tvLicenseInfo.setText(sb.toString());
             tvLicenseInfo.setVisibility(View.VISIBLE);
         } else {
-            tvLicenseStatus.setText("Essai : " + sm.getRemainingDays() + " j");
+            tvLicenseStatus.setText(I18n.t("Essai : ") + sm.getRemainingDays() + " j");
             tvLicenseStatus.setBackgroundResource(R.drawable.bg_pill_warning);
             tvLicenseStatus.setTextColor(getResources().getColor(R.color.accent));
             tvLicenseInfo.setVisibility(View.GONE);
@@ -293,20 +297,20 @@ public class SettingsActivity extends AppCompatActivity {
         if (selectedLogoPath.isEmpty() || !new File(selectedLogoPath).exists()) {
             ivLogo.setImageResource(R.drawable.ic_image);
             ivLogo.setImageTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.text_hint)));
-            tvLogoPath.setText("Aucun logo (PNG/JPG, fond transparent conseillé)");
+            tvLogoPath.setText(I18n.t("Aucun logo (PNG/JPG, fond transparent conseillé)"));
             btnRemoveLogo.setVisibility(View.GONE);
         } else {
             Bitmap b = BitmapFactory.decodeFile(selectedLogoPath);
             ivLogo.setImageTintList(null);
             ivLogo.setImageBitmap(b);
-            tvLogoPath.setText("Logo prêt — apparaît sur vos factures");
+            tvLogoPath.setText(I18n.t("Logo prêt — apparaît sur vos factures"));
             btnRemoveLogo.setVisibility(View.VISIBLE);
         }
     }
 
     private void saveConfig() {
         String name = etShopName.getText().toString().trim();
-        if (name.isEmpty()) { etShopName.setError("Nom requis"); return; }
+        if (name.isEmpty()) { etShopName.setError(I18n.t("Nom requis")); return; }
         db.setConfig("shop_name",      name);
         db.setConfig("shop_tagline",   etTagline.getText().toString().trim());
         db.setConfig("shop_phone",     etShopPhone.getText().toString().trim());
@@ -315,7 +319,7 @@ public class SettingsActivity extends AppCompatActivity {
         db.setConfig("shop_tax_id",    etTaxId.getText().toString().trim());
         db.setConfig("invoice_footer", etFooter.getText().toString().trim());
         db.setConfig("shop_logo_path", selectedLogoPath);
-        Toast.makeText(this, "Paramètres enregistrés", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, I18n.t("Paramètres enregistrés"), Toast.LENGTH_SHORT).show();
     }
 
     private void saveTva() {
@@ -323,17 +327,17 @@ public class SettingsActivity extends AppCompatActivity {
         String raw = etTvaRate.getText().toString().trim().replace(',', '.');
         if (on) {
             double r;
-            try { r = Double.parseDouble(raw); } catch (Exception e) { etTvaRate.setError("Taux invalide"); return; }
-            if (r <= 0 || r > 100) { etTvaRate.setError("Entre 0 et 100"); return; }
+            try { r = Double.parseDouble(raw); } catch (Exception e) { etTvaRate.setError(I18n.t("Taux invalide")); return; }
+            if (r <= 0 || r > 100) { etTvaRate.setError(I18n.t("Entre 0 et 100")); return; }
             db.setConfig("tva_rate", raw);
         }
         db.setConfig("tva_enabled", on ? "1" : "0");
-        Toast.makeText(this, on ? "TVA activée" : "TVA désactivée", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, on ? I18n.t("TVA activée") : I18n.t("TVA désactivée"), Toast.LENGTH_SHORT).show();
     }
 
     /** Génère une facture d'exemple avec l'identité saisie (enregistre d'abord). */
     private void previewInvoice() {
-        if (etShopName.getText().toString().trim().isEmpty()) { etShopName.setError("Nom requis"); return; }
+        if (etShopName.getText().toString().trim().isEmpty()) { etShopName.setError(I18n.t("Nom requis")); return; }
         saveConfig();
         Sale s = new Sale();
         s.invoiceNumber = "APERCU-0001";
@@ -350,7 +354,7 @@ public class SettingsActivity extends AppCompatActivity {
         s.taxAmount = Math.round(t * s.taxRate / 100.0);
         s.totalAmount = t + s.taxAmount; s.items = items;
         Uri uri = new InvoiceManager(this).generateInvoicePDF(s, items);
-        if (uri == null) { Toast.makeText(this, "Erreur de génération", Toast.LENGTH_SHORT).show(); return; }
+        if (uri == null) { Toast.makeText(this, I18n.t("Erreur de génération"), Toast.LENGTH_SHORT).show(); return; }
         Intent v = new Intent(Intent.ACTION_VIEW);
         v.setDataAndType(uri, "application/pdf");
         v.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -385,7 +389,63 @@ public class SettingsActivity extends AppCompatActivity {
             selectedLogoPath = f.getAbsolutePath();
             showLogo();
         } catch (Exception e) {
-            Toast.makeText(this, "Erreur chargement logo", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, I18n.t("Erreur chargement logo"), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /** Sélecteur de langue : automatique (appareil) / Français / English / Español. */
+    private void setupLanguage() {
+        final String[] codes = {com.wisedesign.africomptaplus.ui.I18n.AUTO, "fr", "en", "es"};
+        final String[] labels = {"Automatique (langue de l'appareil)", "Français", "English", "Español"};
+        android.widget.Spinner sp = findViewById(R.id.spLanguage);
+        sp.setAdapter(new android.widget.ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, labels));
+        String cur = com.wisedesign.africomptaplus.ui.I18n.pref(this);
+        for (int i = 0; i < codes.length; i++) if (codes[i].equals(cur)) sp.setSelection(i);
+        sp.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(android.widget.AdapterView<?> p, android.view.View v, int pos, long id) {
+                if (codes[pos].equals(com.wisedesign.africomptaplus.ui.I18n.pref(SettingsActivity.this))) return;
+                com.wisedesign.africomptaplus.ui.I18n.setPref(SettingsActivity.this, codes[pos]);
+                android.content.Intent i = new android.content.Intent(SettingsActivity.this, MainActivity.class)
+                        .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(i);   // relance l'app dans la nouvelle langue
+            }
+            @Override public void onNothingSelected(android.widget.AdapterView<?> p) {}
+        });
+    }
+
+    private void setupWebSync() {
+        final com.wisedesign.africomptaplus.services.SyncService sy = new com.wisedesign.africomptaplus.services.SyncService(this);
+        final com.google.android.material.switchmaterial.SwitchMaterial sw = findViewById(R.id.swWebSync);
+        final TextView info = findViewById(R.id.tvSyncInfo);
+        final Runnable refresh = () -> info.setText(sy.lastInfo().isEmpty() ? I18n.t("Jamais synchronisé") : I18n.t("Dernière synchro : ") + sy.lastInfo());
+        final String[] mc = {"web", "app", "sum"};
+        final String[] ml = {I18n.t("Celui du web (recommandé)"), I18n.t("Celui de l'appli"), I18n.t("La somme des deux")};
+        final Spinner sm = findViewById(R.id.spSyncMerge);
+        sm.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, ml));
+        String curM = db.getConfig("web_sync_merge"); for (int i = 0; i < mc.length; i++) if (mc[i].equals(curM)) sm.setSelection(i);
+        sm.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(AdapterView<?> p, View v, int pos, long id) { db.setConfig("web_sync_merge", mc[pos]); }
+            @Override public void onNothingSelected(AdapterView<?> p) {}
+        });
+        sw.setChecked("1".equals(db.getConfig("web_sync")));
+        refresh.run();
+        sw.setOnCheckedChangeListener((b, on) -> { sy.setEnabled(on); if (on) Toast.makeText(this, I18n.t("Synchronisation activée"), Toast.LENGTH_SHORT).show(); });
+        findViewById(R.id.btnSyncNow).setOnClickListener(v -> {
+            if (!"1".equals(db.getConfig("web_sync"))) { sw.setChecked(true); }
+            info.setText(I18n.t("Synchronisation en cours…"));
+            sy.syncNow((ok, msg) -> {
+                String out = msg;
+                if (ok) {
+                    out = I18n.t("Synchronisation terminée ✓");
+                    java.util.regex.Matcher mt = java.util.regex.Pattern.compile("c=(\\d+);m=(\\d+)").matcher(msg);
+                    if (mt.find()) {
+                        if (!"0".equals(mt.group(2))) out += "\n" + mt.group(2) + I18n.t(" élément(s) fusionné(s) avec le web");
+                        if (!"0".equals(mt.group(1))) out += "\n" + mt.group(1) + I18n.t(" conflit(s) : à vérifier dans Paramètres du panel web");
+                    }
+                }
+                Toast.makeText(this, out, Toast.LENGTH_LONG).show();
+                refresh.run();
+            });
+        });
     }
 }

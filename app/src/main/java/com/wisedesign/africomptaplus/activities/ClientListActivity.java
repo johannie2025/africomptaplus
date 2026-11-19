@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.activities;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,7 +20,7 @@ import com.wisedesign.africomptaplus.ui.BottomNav;
 import com.wisedesign.africomptaplus.ui.UiKit;
 import java.util.*;
 
-public class ClientListActivity extends AppCompatActivity {
+public class ClientListActivity extends BaseActivity {
 
     private ClientService clientService;
     private DebtService   debtService;
@@ -34,7 +36,7 @@ public class ClientListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client_list);
-        UiKit.topBar(this, "Clients");
+        UiKit.topBar(this, I18n.t("Clients"));
         UiKit.topAction(this, "Nouveau", R.drawable.ic_plus, v -> showClientForm(null));
         clientService = new ClientService(this);
         debtService   = new DebtService(this);
@@ -112,11 +114,11 @@ public class ClientListActivity extends AppCompatActivity {
             etEmail.setText(existing.email); etAddress.setText(existing.address);
         }
         new AlertDialog.Builder(this)
-                .setTitle(existing == null ? "Nouveau client" : "Modifier " + existing.name)
+                .setTitle(existing == null ? I18n.t("Nouveau client") : I18n.t("Modifier ") + existing.name)
                 .setView(v)
-                .setPositiveButton("Enregistrer", (d, w) -> {
+                .setPositiveButton(I18n.t("Enregistrer"), (d, w) -> {
                     String name = etName.getText().toString().trim();
-                    if (name.isEmpty()) { Toast.makeText(this, "Nom requis", Toast.LENGTH_SHORT).show(); return; }
+                    if (name.isEmpty()) { Toast.makeText(this, I18n.t("Nom requis"), Toast.LENGTH_SHORT).show(); return; }
                     Client c = existing != null ? existing : new Client();
                     c.name = name;
                     c.phone = etPhone.getText().toString().trim();
@@ -124,9 +126,9 @@ public class ClientListActivity extends AppCompatActivity {
                     c.address = etAddress.getText().toString().trim();
                     clientService.save(c);
                     loadClients();
-                    Toast.makeText(this, "Client enregistré", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, I18n.t("Client enregistré"), Toast.LENGTH_SHORT).show();
                 })
-                .setNegativeButton("Annuler", null).show();
+                .setNegativeButton(I18n.t("Annuler"), null).show();
     }
 
     private class ClientAdapter extends RecyclerView.Adapter<ClientAdapter.VH> {
@@ -144,7 +146,7 @@ public class ClientListActivity extends AppCompatActivity {
             h.tvName.setText(c.name);
             h.tvPhone.setText(c.phone != null ? c.phone : "");
             boolean owes = total > 0;
-            h.tvStatus.setText(owes ? "Doit" : "Aucune dette");
+            h.tvStatus.setText(owes ? I18n.t("Doit") : I18n.t("Aucune dette"));
             h.tvStatus.setBackgroundResource(owes ? R.drawable.bg_pill_danger : R.drawable.bg_pill_success);
             h.tvStatus.setTextColor(getResources().getColor(owes ? R.color.error : R.color.success));
             h.tvDebt.setText(owes ? UiKit.xaf(total) : UiKit.xaf(0));
@@ -152,9 +154,9 @@ public class ClientListActivity extends AppCompatActivity {
             h.itemView.setOnClickListener(v -> showClientForm(c));
             h.itemView.setOnLongClickListener(v -> {
                 new AlertDialog.Builder(ClientListActivity.this)
-                        .setTitle("Supprimer " + c.name + " ?")
-                        .setPositiveButton("Oui", (d, w) -> { clientService.delete(c.id); loadClients(); })
-                        .setNegativeButton("Non", null).show();
+                        .setTitle(I18n.t("Supprimer ") + c.name + " ?")
+                        .setPositiveButton(I18n.t("Oui"), (d, w) -> { clientService.delete(c.id); loadClients(); })
+                        .setNegativeButton(I18n.t("Non"), null).show();
                 return true;
             });
             UiKit.pressScale(h.itemView);

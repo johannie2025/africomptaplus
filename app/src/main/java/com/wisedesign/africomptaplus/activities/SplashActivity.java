@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.activities;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,7 +17,7 @@ import com.wisedesign.africomptaplus.services.SecurityManager;
  * SplashActivity — Point d'entrée de l'application.
  * Vérifie la sécurité (time-bomb) avant de router vers MainActivity ou LockActivity.
  */
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +32,7 @@ public class SplashActivity extends AppCompatActivity {
             int daysLeft = security.getRemainingDays();
             TextView tvDays = findViewById(R.id.tvTrialDays);
             if (tvDays != null && daysLeft < 14) {
-                tvDays.setText("Période d'essai : " + daysLeft + " jour(s) restant(s)");
+                tvDays.setText(I18n.t("Période d'essai : ") + daysLeft + I18n.t(" jour(s) restant(s)"));
             }
             // Démarrage normal après 1.5s
             new Handler(Looper.getMainLooper()).postDelayed(() -> {

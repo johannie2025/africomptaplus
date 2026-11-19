@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.activities;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,7 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /** Rapport financier : onglets Jour/Mois/Trim./Sem./Année + graphique + export PDF. */
-public class ReportActivity extends AppCompatActivity {
+public class ReportActivity extends BaseActivity {
 
     private ReportService rs;
     private FinancialReport current;
@@ -36,7 +38,7 @@ public class ReportActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report);
         rs = new ReportService(this);
-        UiKit.topBar(this, "Rapport financier");
+        UiKit.topBar(this, I18n.t("Rapport financier"));
         UiKit.topAction(this, "Exporter PDF", R.drawable.ic_download, v -> exportPdf());
         BottomNav.attach(this, BottomNav.REPORTS);
 
@@ -61,10 +63,10 @@ public class ReportActivity extends AppCompatActivity {
                 for (int i = 0; i < tabs.length; i++) tabs[i].setSelected(i == tabs.length - 1);
                 loadReport();
             }, y, m, d);
-            d2.setTitle("Date de fin");
+            d2.setTitle(I18n.t("Date de fin"));
             d2.show();
         }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
-        d1.setTitle("Date de début");
+        d1.setTitle(I18n.t("Date de début"));
         d1.show();
     }
 
@@ -106,7 +108,7 @@ public class ReportActivity extends AppCompatActivity {
         box.removeAllViews();
         if (rows == null || rows.isEmpty()) {
             TextView t = new TextView(this);
-            t.setText("Aucune vente sur la période");
+            t.setText(I18n.t("Aucune vente sur la période"));
             t.setTextColor(getResources().getColor(R.color.text_secondary));
             t.setPadding(0, 12, 0, 4);
             box.addView(t);
@@ -118,7 +120,7 @@ public class ReportActivity extends AppCompatActivity {
             ((TextView) v.findViewById(R.id.tvRank)).setText(String.valueOf(i + 1));
             ((TextView) v.findViewById(R.id.tvRankName)).setText(r[0]);
             TextView sub = v.findViewById(R.id.tvRankSub);
-            if (product) sub.setText(r[1] + " vente(s)"); else sub.setVisibility(View.GONE);
+            if (product) sub.setText(r[1] + I18n.t(" vente(s)")); else sub.setVisibility(View.GONE);
             double amt = Double.parseDouble(product ? r[2] : r[1]);
             ((TextView) v.findViewById(R.id.tvRankValue)).setText(UiKit.xaf(amt));
             box.addView(v);
@@ -128,7 +130,7 @@ public class ReportActivity extends AppCompatActivity {
     private void exportPdf() {
         if (current == null) return;
         Uri uri = new ReportPdfExporter(this).export(current, periodNames[Arrays.asList(periods).indexOf(currentPeriod)]);
-        if (uri == null) { Toast.makeText(this, "Erreur de génération du PDF", Toast.LENGTH_SHORT).show(); return; }
+        if (uri == null) { Toast.makeText(this, I18n.t("Erreur de génération du PDF"), Toast.LENGTH_SHORT).show(); return; }
         Intent share = new Intent(Intent.ACTION_SEND);
         share.setType("application/pdf");
         share.putExtra(Intent.EXTRA_STREAM, uri);

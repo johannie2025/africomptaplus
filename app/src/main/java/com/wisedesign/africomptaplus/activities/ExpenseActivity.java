@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.activities;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +30,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class ExpenseActivity extends AppCompatActivity {
+public class ExpenseActivity extends BaseActivity {
 
     public static final String EXTRA_OPEN_ADD = "open_add";
 
@@ -53,7 +55,7 @@ public class ExpenseActivity extends AppCompatActivity {
         adapter = new ExpenseAdapter(expenses);
         rv.setAdapter(adapter);
 
-        UiKit.topBar(this, "Dépenses");
+        UiKit.topBar(this, I18n.t("Dépenses"));
         UiKit.topAction(this, "Nouvelle", R.drawable.ic_plus, v -> showAddDialog());
         BottomNav.attach(this, BottomNav.NONE);
 
@@ -83,22 +85,22 @@ public class ExpenseActivity extends AppCompatActivity {
         spCategory.setAdapter(catAdapter);
 
         new AlertDialog.Builder(this)
-                .setTitle("Nouvelle Dépense")
+                .setTitle(I18n.t("Nouvelle Dépense"))
                 .setView(dialogView)
-                .setPositiveButton("Enregistrer", (dialog, which) -> {
+                .setPositiveButton(I18n.t("Enregistrer"), (dialog, which) -> {
                     String category = spCategory.getSelectedItem().toString();
                     String desc     = etDesc.getText().toString().trim();
                     String amtStr   = etAmount.getText().toString().trim();
 
                     if (amtStr.isEmpty()) {
-                        Toast.makeText(this, "Montant requis", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, I18n.t("Montant requis"), Toast.LENGTH_SHORT).show();
                         return;
                     }
 
                     double amount;
                     try { amount = Double.parseDouble(amtStr); }
                     catch (NumberFormatException e) {
-                        Toast.makeText(this, "Montant invalide", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, I18n.t("Montant invalide"), Toast.LENGTH_SHORT).show();
                         return;
                     }
 
@@ -107,10 +109,10 @@ public class ExpenseActivity extends AppCompatActivity {
                     long id = expenseService.save(expense);
                     if (id > 0) {
                         loadExpenses();
-                        Toast.makeText(this, "Dépense enregistrée", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, I18n.t("Dépense enregistrée"), Toast.LENGTH_SHORT).show();
                     }
                 })
-                .setNegativeButton("Annuler", null)
+                .setNegativeButton(I18n.t("Annuler"), null)
                 .show();
     }
 
@@ -140,12 +142,12 @@ public class ExpenseActivity extends AppCompatActivity {
 
             h.itemView.setOnLongClickListener(v -> {
                 new AlertDialog.Builder(ExpenseActivity.this)
-                        .setTitle("Supprimer cette dépense ?")
-                        .setPositiveButton("Oui", (d, w) -> {
+                        .setTitle(I18n.t("Supprimer cette dépense ?"))
+                        .setPositiveButton(I18n.t("Oui"), (d, w) -> {
                             expenseService.delete(e.id);
                             loadExpenses();
                         })
-                        .setNegativeButton("Non", null)
+                        .setNegativeButton(I18n.t("Non"), null)
                         .show();
                 return true;
             });

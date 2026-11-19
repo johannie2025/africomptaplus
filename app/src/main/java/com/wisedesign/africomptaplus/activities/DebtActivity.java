@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.activities;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
@@ -14,7 +16,7 @@ import com.wisedesign.africomptaplus.ui.BottomNav;
 import com.wisedesign.africomptaplus.ui.UiKit;
 import java.util.*;
 
-public class DebtActivity extends AppCompatActivity {
+public class DebtActivity extends BaseActivity {
 
     private DebtService   debtService;
     private List<Debt>    debts = new ArrayList<>();
@@ -26,7 +28,7 @@ public class DebtActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_debt);
-        UiKit.topBar(this, "Dettes");
+        UiKit.topBar(this, I18n.t("Dettes"));
         debtService  = new DebtService(this);
         BottomNav.attach(this, BottomNav.DEBTS);
         tvTotalDebts = findViewById(R.id.tvTotalDebts);
@@ -36,7 +38,7 @@ public class DebtActivity extends AppCompatActivity {
         rv.setAdapter(adapter);
         UiKit.topAction(this, "Soldées", R.drawable.ic_history, v -> {
             showAll = !showAll;
-            ((TextView) findViewById(R.id.tvTopAction)).setText(showAll ? "En cours" : "Soldées");
+            ((TextView) findViewById(R.id.tvTopAction)).setText(showAll ? I18n.t("En cours") : I18n.t("Soldées"));
             loadDebts();
         });
         loadDebts();
@@ -50,26 +52,26 @@ public class DebtActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
         double total = debtService.totalOutstanding();
         tvTotalDebts.setText(UiKit.xaf(total));
-        ((TextView) findViewById(R.id.tvDebtCount)).setText(debts.size() + " dette(s)");
+        ((TextView) findViewById(R.id.tvDebtCount)).setText(debts.size() + I18n.t(" dette(s)"));
         findViewById(R.id.tvEmpty).setVisibility(debts.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     private void showPaymentDialog(Debt debt) {
         EditText et = new EditText(this);
         et.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        et.setHint("Montant payé");
+        et.setHint(I18n.t("Montant payé"));
         new AlertDialog.Builder(this)
-                .setTitle("Paiement — " + debt.clientName)
-                .setMessage("Restant : " + UiKit.xaf(debt.remainingAmount()))
+                .setTitle(I18n.t("Paiement — ") + debt.clientName)
+                .setMessage(I18n.t("Restant : ") + UiKit.xaf(debt.remainingAmount()))
                 .setView(et)
-                .setPositiveButton("Enregistrer", (d, w) -> {
+                .setPositiveButton(I18n.t("Enregistrer"), (d, w) -> {
                     String v = et.getText().toString().trim();
                     if (v.isEmpty()) return;
                     debtService.recordPayment(debt.id, Double.parseDouble(v));
                     loadDebts();
-                    Toast.makeText(this, "Paiement enregistré", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, I18n.t("Paiement enregistré"), Toast.LENGTH_SHORT).show();
                 })
-                .setNegativeButton("Annuler", null).show();
+                .setNegativeButton(I18n.t("Annuler"), null).show();
     }
 
     // ── Adapter ───────────────────────────────────────────────────────────────
@@ -95,7 +97,7 @@ public class DebtActivity extends AppCompatActivity {
             h.tvStatus.setTextColor(getResources().getColor(partial ? R.color.primary : R.color.accent));
             boolean hasDue = d.dueDate != null && !d.dueDate.isEmpty();
             h.rowDue.setVisibility(hasDue ? View.VISIBLE : View.GONE);
-            if (hasDue) h.tvDue.setText("Échéance : " + d.dueDate);
+            if (hasDue) h.tvDue.setText(I18n.t("Échéance : ") + d.dueDate);
             h.itemView.setOnClickListener(v -> startActivity(new android.content.Intent(DebtActivity.this, DebtDetailActivity.class)
                     .putExtra(DebtDetailActivity.EXTRA_DEBT_ID, d.id)));
             UiKit.pressScale(h.itemView);

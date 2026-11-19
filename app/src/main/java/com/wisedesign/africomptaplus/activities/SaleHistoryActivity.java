@@ -1,5 +1,7 @@
 package com.wisedesign.africomptaplus.activities;
 
+import com.wisedesign.africomptaplus.ui.I18n;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class SaleHistoryActivity extends AppCompatActivity {
+public class SaleHistoryActivity extends BaseActivity {
 
     private SaleService    saleService;
     private InvoiceManager invoiceManager;
@@ -36,7 +38,7 @@ public class SaleHistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sale_history);
 
-        UiKit.topBar(this, "Historique");
+        UiKit.topBar(this, I18n.t("Historique"));
         BottomNav.attach(this, BottomNav.NONE);
         saleService    = new SaleService(this);
         invoiceManager = new InvoiceManager(this);
@@ -58,7 +60,7 @@ public class SaleHistoryActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
         double total = 0;
         for (Sale s : sales) total += s.totalAmount;
-        ((TextView) findViewById(R.id.tvSummary)).setText(sales.size() + " facture(s) — " + UiKit.xaf(total));
+        ((TextView) findViewById(R.id.tvSummary)).setText(sales.size() + I18n.t(" facture(s) — ") + UiKit.xaf(total));
         findViewById(R.id.tvEmpty).setVisibility(sales.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
@@ -106,6 +108,21 @@ public class SaleHistoryActivity extends AppCompatActivity {
                         startActivity(Intent.createChooser(shareIntent, "Partager la facture via"));
                     }
                 }
+            });
+            // Appui long : supprimer la vente (stock remis ; supprimée aussi sur le web à la synchro)
+            h.itemView.setOnLongClickListener(v -> {
+                new androidx.appcompat.app.AlertDialog.Builder(SaleHistoryActivity.this)
+                    .setTitle(I18n.t("Supprimer la vente ?"))
+                    .setMessage(s.invoiceNumber + "\n" + I18n.t("Le stock sera remis et la vente supprimée aussi sur le panel web."))
+                    .setNegativeButton(I18n.t("Annuler"), null)
+                    .setPositiveButton(I18n.t("Supprimer"), (dlg, w) -> {
+                        if (saleService.deleteSale(s.id)) {
+                            android.widget.Toast.makeText(SaleHistoryActivity.this, I18n.t("Vente supprimée"), android.widget.Toast.LENGTH_SHORT).show();
+                            loadSales();
+                            com.wisedesign.africomptaplus.services.SyncService sy = new com.wisedesign.africomptaplus.services.SyncService(SaleHistoryActivity.this); if (sy.enabled()) sy.syncNow(null);
+                        }
+                    }).show();
+                return true;
             });
         }
 
