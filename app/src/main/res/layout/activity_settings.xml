@@ -12,6 +12,37 @@
 
             <!-- ───────── LICENCE ───────── -->
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="16dp" android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_card">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Langue" android:textSize="15sp" android:textStyle="bold" android:textColor="@color/text_primary"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Par défaut : langue de votre appareil" android:textSize="12sp" android:textColor="@color/text_secondary"/>
+                <Spinner android:id="@+id/spLanguage" android:layout_width="match_parent" android:layout_height="48dp"
+                    android:layout_marginTop="6dp"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="16dp" android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_card">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Synchronisation avec le panel web" android:textSize="15sp" android:textStyle="bold" android:textColor="@color/text_primary"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Produits, clients, ventes, dépenses et achats partagés entre l'appli et le panel web" android:textSize="12sp" android:textColor="@color/text_secondary"/>
+                <com.google.android.material.switchmaterial.SwitchMaterial android:id="@+id/swWebSync"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp" android:text="Activer la synchronisation"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp" android:text="Produit existant des deux côtés (1re synchro) : stock à garder" android:textSize="12sp" android:textColor="@color/text_secondary"/>
+                <Spinner android:id="@+id/spSyncMerge" android:layout_width="match_parent" android:layout_height="48dp"/>
+                <TextView android:id="@+id/tvSyncInfo" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp" android:textColor="@color/text_secondary" android:textSize="12sp"/>
+                <Button android:id="@+id/btnSyncNow" style="@style/PrimaryButton"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp" android:text="Synchroniser maintenant"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:orientation="vertical" android:padding="16dp" android:background="@drawable/bg_card">
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:orientation="horizontal" android:gravity="center_vertical">
