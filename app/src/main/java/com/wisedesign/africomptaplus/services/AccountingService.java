@@ -259,7 +259,7 @@ public class AccountingService {
                 e.label = ec.getString(3); e.ref = "SAI-" + ec.getLong(0); e.kind = "manual";
                 e.line(ec.getString(4), ec.getDouble(6), 0, "").line(ec.getString(5), 0, ec.getDouble(6), "");
                 out.add(e);
-            }
+            } 
         } finally { ec.close(); }
 
         Collections.sort(out, (x, y) -> x.date.compareTo(y.date));
