@@ -35,4 +35,20 @@
             <TextView style="@style/QuickLabel" android:text="Ma boutique"/>
         </LinearLayout>
     </LinearLayout>
+
+    <LinearLayout android:id="@+id/qaAccRow" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:layout_marginTop="10dp" android:visibility="gone">
+        <LinearLayout android:id="@+id/qaAccounting" style="@style/QuickAction" android:layout_marginEnd="5dp">
+            <ImageView style="@style/QuickIcon" android:background="@drawable/bg_icon_green" android:src="@drawable/ic_cash" android:tint="@color/success"/>
+            <TextView style="@style/QuickLabel" android:text="Comptabilité"/>
+        </LinearLayout>
+        <LinearLayout android:id="@+id/qaInventory" style="@style/QuickAction" android:layout_marginStart="5dp" android:layout_marginEnd="5dp">
+            <ImageView style="@style/QuickIcon" android:background="@drawable/bg_icon_violet" android:src="@drawable/ic_box" android:tint="@color/violet"/>
+            <TextView style="@style/QuickLabel" android:text="Inventaire"/>
+        </LinearLayout>
+        <LinearLayout android:id="@+id/qaMove" style="@style/QuickAction" android:layout_marginStart="5dp">
+            <ImageView style="@style/QuickIcon" android:background="@drawable/bg_icon_orange" android:src="@drawable/ic_store" android:tint="@color/accent"/>
+            <TextView style="@style/QuickLabel" android:text="Mouvements"/>
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>
