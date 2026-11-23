@@ -173,7 +173,7 @@ public class SyncService {
     // ── Cycle complet ───────────────────────────────────────────────────────
     private int lastConflicts = 0, lastMerged = 0;
     private String runBlocking() throws Exception {
-        lastConflicts = 0; lastMerged = 0;
+        lastConflicts = 0; lastMerged = 0; new AccountingService(ctx);
         d = db.getWritableDatabase();
         resumeInflight();
         JSONObject req = new JSONObject();
@@ -247,7 +247,7 @@ public class SyncService {
                     .put("name", s(c, 3)).put("phone", s(c, 4)).put("subtotal", c.getDouble(5)).put("tax", c.getDouble(6)).put("total", c.getDouble(7))
                     .put("payment", s(c, 8)).put("created_at", toUtc(s(c, 9)));
             JSONArray items = new JSONArray();
-            Cursor ci = d.rawQuery("SELECT si.product_id, p.name, si.quantity, si.unit_price, p.buying_price FROM sale_items si LEFT JOIN products p ON p.id=si.product_id WHERE si.sale_id=?", new String[]{String.valueOf(id)});
+            Cursor ci = d.rawQuery("SELECT si.product_id, p.name, si.quantity, si.unit_price, CASE WHEN si.unit_cost>0 THEN si.unit_cost ELSE p.buying_price END FROM sale_items si LEFT JOIN products p ON p.id=si.product_id WHERE si.sale_id=?", new String[]{String.valueOf(id)});
             while (ci.moveToNext()) items.put(new JSONObject().put("product_uid", uidOf("products", ci.getLong(0))).put("name", s(ci, 1)).put("qty", ci.getInt(2)).put("price", ci.getDouble(3)).put("buy", ci.getDouble(4)));
             ci.close(); o.put("items", items);
             JSONArray pays = new JSONArray(); String due = "";
@@ -293,6 +293,36 @@ public class SyncService {
             jd.put(o); pending.add(new Object[]{"documents", id, hh, null});
         }
         c.close(); req.put("documents", jd);
+
+        // mouvements de stock (registre, insertion unique ; le stock voyage par deltas de produits)
+        JSONArray jmv = new JSONArray();
+        c = d.rawQuery("SELECT id,product_id,product_name,kind,qty,unit_cost,move_date,reason,note FROM stock_moves", null);
+        while (c.moveToNext()) {
+            long id = c.getLong(0); String hh = h("mv", id);
+            if (hh.equals(hashOfMap("stock_moves", id))) continue;
+            String pu = uidOf("products", c.getLong(1));
+            String mu = q1("SELECT uid FROM sync_map WHERE entity='stock_moves' AND local_id=?", String.valueOf(id));
+            if (mu == null) { if ("opening".equals(s(c, 3))) { mu = "op-" + pu; mapUid("stock_moves", id, mu); } else mu = uidOf("stock_moves", id); }
+            jmv.put(new JSONObject().put("uid", mu).put("product_uid", pu).put("name", s(c, 2)).put("kind", s(c, 3)).put("qty", c.getInt(4)).put("cost", c.getDouble(5))
+                    .put("date", toUtc(s(c, 6))).put("reason", s(c, 7)).put("note", s(c, 8)));
+            pending.add(new Object[]{"stock_moves", id, hh, null});
+        }
+        c.close(); req.put("stock_moves", jmv);
+
+        // inventaires physiques (insertion unique)
+        JSONArray jiv = new JSONArray();
+        c = d.rawQuery("SELECT id,reference,inv_date,note,created_at FROM inventories", null);
+        while (c.moveToNext()) {
+            long id = c.getLong(0); String hh = h("inv", s(c, 1));
+            if (hh.equals(hashOfMap("inventories", id))) continue;
+            JSONObject o = new JSONObject().put("uid", uidOf("inventories", id)).put("reference", s(c, 1)).put("date", s(c, 2)).put("note", s(c, 3)).put("created_at", toUtc(s(c, 4)));
+            JSONArray items = new JSONArray();
+            Cursor ci = d.rawQuery("SELECT product_id, product_name, theoretical, counted, cmp FROM inventory_items WHERE inventory_id=?", new String[]{String.valueOf(id)});
+            while (ci.moveToNext()) items.put(new JSONObject().put("product_uid", uidOf("products", ci.getLong(0))).put("name", s(ci, 1)).put("theoretical", ci.getInt(2)).put("counted", ci.getInt(3)).put("cmp", ci.getDouble(4)));
+            ci.close(); o.put("items", items);
+            jiv.put(o); pending.add(new Object[]{"inventories", id, hh, null});
+        }
+        c.close(); req.put("inventories", jiv);
 
         // écritures comptables manuelles + comptes personnalisés
         JSONArray jn = new JSONArray(); Set<Long> seenN = new HashSet<>();
@@ -375,6 +405,8 @@ public class SyncService {
             applySales(r.optJSONArray("sales"));
             applyPurchases(r.optJSONArray("purchases"));
             applyDocuments(r.optJSONArray("documents"));
+            applyStockMoves(r.optJSONArray("stock_moves"));
+            applyInventories(r.optJSONArray("inventories"));
             applyEntries(r.optJSONArray("entries"));
             applyAccounts(r.optJSONArray("accounts"));
             db.setConfig("web_sync_token", r.optString("token", ""));
@@ -489,7 +521,7 @@ public class SyncService {
                 if (its != null) for (int k = 0; k < its.length(); k++) {
                     JSONObject it = its.optJSONObject(k); long pid = it == null ? -1 : localId("products", it.optString("product_uid")); if (pid < 0) continue;
                     ContentValues ic = new ContentValues(); int q = it.optInt("qty", 1); double pr = it.optDouble("price", 0);
-                    ic.put("sale_id", id); ic.put("product_id", pid); ic.put("quantity", q); ic.put("unit_price", pr); ic.put("total_price", q * pr);
+                    ic.put("sale_id", id); ic.put("product_id", pid); ic.put("quantity", q); ic.put("unit_price", pr); ic.put("total_price", q * pr); ic.put("unit_cost", it.optDouble("buy", 0));
                     d.insert("sale_items", null, ic);   // le stock n'est PAS modifié : il arrive déjà tel quel du serveur
                 }
                 debtId = -1;
@@ -583,6 +615,39 @@ public class SyncService {
                 d.update("documents", cv, "id=?", new String[]{String.valueOf(id)});
             }
             setHash("documents", id, hDoc(id), null);
+        }
+    }
+    private void applyStockMoves(JSONArray a) {
+        if (a == null) return;
+        for (int i = 0; i < a.length(); i++) {
+            JSONObject o = a.optJSONObject(i); if (o == null) continue; String uid = o.optString("uid");
+            if (uid.isEmpty() || localId("stock_moves", uid) >= 0) continue;
+            long pid = localId("products", o.optString("product_uid")); int qty = o.optInt("qty"); if (pid < 0 || qty < 1) continue;
+            String kind = o.optString("kind", "in");
+            if ("opening".equals(kind) && q1("SELECT 1 FROM stock_moves WHERE product_id=? AND kind='opening'", String.valueOf(pid)) != null) continue;
+            ContentValues cv = new ContentValues(); cv.put("product_id", pid); cv.put("product_name", o.optString("name")); cv.put("kind", kind); cv.put("qty", qty); cv.put("unit_cost", o.optDouble("cost", 0));
+            cv.put("move_date", fromUtc(o.optString("date", nowLocal()))); cv.put("reason", o.optString("reason")); cv.put("note", o.optString("note"));
+            long id = d.insert("stock_moves", null, cv); if (id < 0) continue; mapUid("stock_moves", id, uid); setHash("stock_moves", id, h("mv", id), null);
+        }
+    }
+    private void applyInventories(JSONArray a) {
+        if (a == null) return;
+        for (int i = 0; i < a.length(); i++) {
+            JSONObject o = a.optJSONObject(i); if (o == null) continue; String uid = o.optString("uid");
+            if (uid.isEmpty() || localId("inventories", uid) >= 0) continue;
+            String ref = o.optString("reference");
+            if (ref.isEmpty() || q1("SELECT 1 FROM inventories WHERE reference=?", ref) != null) ref = ref + "-W";
+            if (q1("SELECT 1 FROM inventories WHERE reference=?", ref) != null) continue;
+            ContentValues cv = new ContentValues(); cv.put("reference", ref); cv.put("inv_date", o.optString("date")); cv.put("note", o.optString("note")); cv.put("created_at", fromUtc(o.optString("created_at", nowLocal())));
+            long id = d.insert("inventories", null, cv); if (id < 0) continue; mapUid("inventories", id, uid);
+            JSONArray its = o.optJSONArray("items");
+            if (its != null) for (int k = 0; k < its.length(); k++) {
+                JSONObject it = its.optJSONObject(k); if (it == null) continue; long pid = localId("products", it.optString("product_uid"));
+                ContentValues ic = new ContentValues(); ic.put("inventory_id", id); ic.put("product_id", pid > 0 ? pid : 0); ic.put("product_name", it.optString("name"));
+                ic.put("theoretical", it.optInt("theoretical")); ic.put("counted", it.optInt("counted")); ic.put("cmp", it.optDouble("cmp", 0));
+                d.insert("inventory_items", null, ic);
+            }
+            setHash("inventories", id, h("inv", ref), null);
         }
     }
     private void applyEntries(JSONArray a) {

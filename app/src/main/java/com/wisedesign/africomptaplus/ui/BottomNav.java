@@ -13,7 +13,7 @@ import com.wisedesign.africomptaplus.activities.*;
 
 /** Barre de navigation commune : Vente · Produits · [+] · Clients · Dettes · Rapports. */
 public final class BottomNav {
-    public static final int NONE = 0, SALE = 1, PRODUCTS = 2, CLIENTS = 3, DEBTS = 4, REPORTS = 5;
+    public static final int NONE = 0, SALE = 1, PRODUCTS = 2, CLIENTS = 3, DEBTS = 4, REPORTS = 5, ACCOUNTING = 6;
 
     private BottomNav() {}
 
@@ -24,11 +24,29 @@ public final class BottomNav {
         bind(a, R.id.navDebts,    R.id.navDebtsIcon,    R.id.navDebtsLabel,    DebtActivity.class,        DEBTS == selected);
         bind(a, R.id.navReports,  R.id.navReportsIcon,  R.id.navReportsLabel,  ReportActivity.class,      REPORTS == selected);
 
+        View acc = a.findViewById(R.id.navAccounting);
+        if (acc != null) {
+            boolean on = accOn(a);
+            acc.setVisibility(on ? View.VISIBLE : View.GONE);
+            if (on) bind(a, R.id.navAccounting, R.id.navAccountingIcon, R.id.navAccountingLabel, AccountingActivity.class, ACCOUNTING == selected);
+        }
         View fab = a.findViewById(R.id.navFab);
         if (fab != null) {
             fab.setOnClickListener(v -> showQuickActions(a, selected));
             UiKit.pressScale(fab);
         }
+    }
+
+    private static boolean accOn(Activity a) {
+        try { String m = com.wisedesign.africomptaplus.db.DatabaseHelper.getInstance(a).getConfig("acct_mode"); return m != null && !m.isEmpty() && !"off".equals(m); }
+        catch (Exception e) { return false; }
+    }
+
+    private static void openAcc(Activity a, String tab) {
+        Intent i = new Intent(a, AccountingActivity.class);
+        if (tab != null) i.putExtra("tab", tab);
+        a.startActivity(i);
+        if (!(a instanceof MainActivity) && !(a instanceof AccountingActivity)) a.finish();
     }
 
     private static void bind(Activity a, int boxId, int iconId, int labelId, Class<?> target, boolean selected) {
@@ -73,6 +91,12 @@ public final class BottomNav {
         });
         click(v, R.id.qaHistory, dlg, () -> a.startActivity(new Intent(a, SaleHistoryActivity.class)));
         click(v, R.id.qaSettings, dlg, () -> a.startActivity(new Intent(a, SettingsActivity.class)));
+        if (accOn(a)) {
+            v.findViewById(R.id.qaAccRow).setVisibility(View.VISIBLE);
+            click(v, R.id.qaAccounting, dlg, () -> openAcc(a, null));
+            click(v, R.id.qaInventory, dlg, () -> openAcc(a, "Inventaire"));
+            click(v, R.id.qaMove, dlg, () -> openAcc(a, "Mouvements"));
+        }
         dlg.show();
     }
 

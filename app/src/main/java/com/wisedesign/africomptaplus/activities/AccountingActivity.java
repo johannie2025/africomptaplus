@@ -34,7 +34,7 @@ import java.util.*;
 public class AccountingActivity extends BaseActivity {
     private AccountingService svc;
     private String mode, q = "", from = "", to = "";
-    private String[] tabs;
+    private String[] tabs, keys;
     private int tab = 0;
     private ReportTable current;
     private final List<TextView> tabViews = new ArrayList<>();
@@ -45,16 +45,18 @@ public class AccountingActivity extends BaseActivity {
         super.onCreate(b);
         setContentView(R.layout.activity_accounting);
         UiKit.topBar(this, I18n.t("Comptabilité"));
-        BottomNav.attach(this, BottomNav.NONE);
+        BottomNav.attach(this, BottomNav.ACCOUNTING);
         svc = new AccountingService(this);
         mode = svc.mode();
         if ("off".equals(mode)) {
             Toast.makeText(this, I18n.t("Activez la comptabilité dans Réglages"), Toast.LENGTH_LONG).show();
             finish(); return;
         }
-        tabs = "double".equals(mode)
-                ? new String[]{I18n.t("Journal"), I18n.t("Grand livre"), I18n.t("Balance"), I18n.t("Résultat"), I18n.t("Bilan"), I18n.t("Analytique"), I18n.t("Plan"), I18n.t("Saisies")}
-                : new String[]{I18n.t("Livre de caisse"), I18n.t("Synthèse"), I18n.t("Saisies")};
+        keys = "double".equals(mode)
+                ? new String[]{"Journal", "Grand livre", "Balance", "Résultat", "Bilan", "Analytique", "Inventaire", "Mouvements", "Comptages", "Plan", "Saisies"}
+                : new String[]{"Livre de caisse", "Synthèse", "Inventaire", "Mouvements", "Comptages", "Saisies"};
+        tabs = new String[keys.length];
+        for (int i = 0; i < keys.length; i++) tabs[i] = I18n.t(keys[i]);
 
         RecyclerView rv = findViewById(R.id.rvTable);
         rv.setLayoutManager(new LinearLayoutManager(this));
@@ -76,9 +78,15 @@ public class AccountingActivity extends BaseActivity {
             t.setOnClickListener(x -> { tab = idx; reload(); });
             ll.addView(t); tabViews.add(t);
         }
+        String want = getIntent().getStringExtra("tab");
+        if (want != null) for (int i = 0; i < keys.length; i++) if (keys[i].equals(want)) tab = i;
         FilterBar.attach(this, (qq, f, t) -> { q = qq; from = f; to = t; reload(); });
         findViewById(R.id.btnAddEntry).setOnClickListener(v -> {
-            if ("Plan".equals(tabs[tab])) addAccountDialog(); else entryDialog();
+            String k = keys[tab];
+            if ("Plan".equals(k)) addAccountDialog();
+            else if ("Mouvements".equals(k)) moveDialog();
+            else if ("Inventaire".equals(k) || "Comptages".equals(k)) startActivity(new Intent(this, InventoryCountActivity.class));
+            else entryDialog();
         });
         findViewById(R.id.btnExportTable).setOnClickListener(v -> export());
         UiKit.pressScale(findViewById(R.id.btnAddEntry), findViewById(R.id.btnExportTable));
@@ -88,7 +96,7 @@ public class AccountingActivity extends BaseActivity {
     private int dp(int v) { return (int) (v * getResources().getDisplayMetrics().density); }
 
     private ReportTable build() {
-        switch (tabs[tab]) {
+        switch (keys[tab]) {
             case "Journal":        return svc.journal(from, to, q);
             case "Grand livre":    return svc.ledger(from, to, q);
             case "Balance":        return svc.balance(from, to, q);
@@ -97,6 +105,9 @@ public class AccountingActivity extends BaseActivity {
             case "Analytique":     return svc.analytic(from, to);
             case "Plan":           return svc.plan(q);
             case "Saisies":        return svc.manualList(from, to, q);
+            case "Inventaire":     return svc.inventory(q);
+            case "Mouvements":     return svc.stockCard(0, from, to, q);
+            case "Comptages":      return svc.counts(from, to);
             case "Synthèse":       return svc.simpleSummary(from, to);
             default:               return svc.cashBook(from, to, q);
         }
@@ -105,9 +116,11 @@ public class AccountingActivity extends BaseActivity {
     private String subtitle() {
         String p = (from.isEmpty() && to.isEmpty()) ? "Toutes périodes"
                 : "Du " + (from.isEmpty() ? "début" : from) + " au " + (to.isEmpty() ? "ce jour" : to);
-        if ("Bilan".equals(tabs[tab])) p = "Situation cumulée " + (to.isEmpty() ? "à ce jour" : "au " + to);
+        if ("Bilan".equals(keys[tab])) p = "Situation cumulée " + (to.isEmpty() ? "à ce jour" : "au " + to);
         return p + " · " + ("double".equals(mode) ? "Comptabilité générale & analytique (SYSCOHADA)" : "Comptabilité simple");
     }
+
+    @Override protected void onResume() { super.onResume(); if (current != null) reload(); }
 
     private void reload() {
         for (int i = 0; i < tabViews.size(); i++) {
@@ -120,7 +133,7 @@ public class AccountingActivity extends BaseActivity {
             t.setBackground(g);
             t.setTextColor(sel ? Color.WHITE : 0xFF64748B);
         }
-        ((TextView) findViewById(R.id.btnAddEntry)).setText("Plan".equals(tabs[tab]) ? "+ Compte" : "+ Écriture");
+        ((TextView) findViewById(R.id.btnAddEntry)).setText("Plan".equals(keys[tab]) ? I18n.t("+ Compte") : "Mouvements".equals(keys[tab]) ? I18n.t("+ Mouvement") : ("Inventaire".equals(keys[tab]) || "Comptages".equals(keys[tab])) ? I18n.t("+ Comptage") : I18n.t("+ Écriture"));
         current = build();
         ((TextView) findViewById(R.id.tvInfo)).setText(subtitle());
 
@@ -145,7 +158,7 @@ public class AccountingActivity extends BaseActivity {
 
     private void export() {
         if (current == null) return;
-        Uri u = TablePdf.export(this, current, subtitle(), "compta_" + tabs[tab].replace(' ', '_') + "_" + System.currentTimeMillis());
+        Uri u = TablePdf.export(this, current, subtitle(), "compta_" + keys[tab].replace(' ', '_') + "_" + System.currentTimeMillis());
         if (u == null) { Toast.makeText(this, I18n.t("Erreur de génération du PDF"), Toast.LENGTH_SHORT).show(); return; }
         Intent s = new Intent(Intent.ACTION_SEND);
         s.setType("application/pdf");
@@ -240,6 +253,45 @@ public class AccountingActivity extends BaseActivity {
                 .setNegativeButton(I18n.t("Annuler"), null).show();
     }
 
+    private void moveDialog() {
+        final List<long[]> ps = new ArrayList<>(); final List<String> names = new ArrayList<>(); final List<Double> costs = new ArrayList<>();
+        Map<Long, Double> cmp = svc.cmpMap();
+        android.database.Cursor c = com.wisedesign.africomptaplus.db.DatabaseHelper.getInstance(this).getReadableDatabase()
+                .rawQuery("SELECT id, name, stock, buying_price FROM products WHERE archived=0 ORDER BY name COLLATE NOCASE", null);
+        try { while (c.moveToNext()) { ps.add(new long[]{c.getLong(0), c.getInt(2)}); names.add(c.getString(1) + " (" + c.getInt(2) + ")"); Double cm = cmp.get(c.getLong(0)); costs.add(cm != null ? cm : c.getDouble(3)); } } finally { c.close(); }
+        if (ps.isEmpty()) { Toast.makeText(this, I18n.t("Produit introuvable"), Toast.LENGTH_LONG).show(); return; }
+        LinearLayout box = new LinearLayout(this); box.setOrientation(LinearLayout.VERTICAL); box.setPadding(dp(20), dp(8), dp(20), 0);
+        Spinner spP = new Spinner(this); spP.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, names));
+        Spinner spK = new Spinner(this); spK.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, new String[]{I18n.t("Entrée"), I18n.t("Sortie")}));
+        final String[] rs = {"Retour client", "Don reçu", "Correction de stock", "Casse / perte", "Vol", "Usage personnel", "Don", "Péremption", "Retour fournisseur"};
+        final String[] rsT = new String[rs.length]; for (int i = 0; i < rs.length; i++) rsT[i] = I18n.t(rs[i]);
+        Spinner spR = new Spinner(this); spR.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, rsT));
+        EditText etQ = input(I18n.t("Qté"), InputType.TYPE_CLASS_NUMBER);
+        EditText etC = input(I18n.t("Coût unitaire (entrée)"), InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        EditText etN = input(I18n.t("Note (facultatif)"), InputType.TYPE_CLASS_TEXT);
+        TextView hint = new TextView(this); hint.setText(I18n.t("Pour un réapprovisionnement fournisseur, utilisez un achat (Fournisseurs) : stock, CMP, dette et écritures sont mis à jour.")); hint.setTextSize(11);
+        box.addView(hint); box.addView(spP); box.addView(spK); box.addView(etQ); box.addView(etC); box.addView(spR); box.addView(etN);
+        spP.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(AdapterView<?> p, View v, int i, long id) { etC.setText(String.valueOf(Math.round(costs.get(i)))); }
+            @Override public void onNothingSelected(AdapterView<?> p) {}
+        });
+        spK.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(AdapterView<?> p, View v, int i, long id) { etC.setEnabled(i == 0); }
+            @Override public void onNothingSelected(AdapterView<?> p) {}
+        });
+        new AlertDialog.Builder(this).setTitle(I18n.t("Mouvement de stock")).setView(box)
+                .setPositiveButton(I18n.t("Enregistrer"), (d, w) -> {
+                    int qty; double cost;
+                    try { qty = Integer.parseInt(etQ.getText().toString().trim()); } catch (Exception e) { qty = 0; }
+                    try { cost = Double.parseDouble(etC.getText().toString().trim().replace(',', '.')); } catch (Exception e) { cost = 0; }
+                    String err = svc.saveMove(ps.get(spP.getSelectedItemPosition())[0], spK.getSelectedItemPosition() == 1, qty, cost, rs[spR.getSelectedItemPosition()], etN.getText().toString().trim());
+                    if (err != null) { Toast.makeText(this, err, Toast.LENGTH_LONG).show(); return; }
+                    Toast.makeText(this, I18n.t("Mouvement enregistré ✓"), Toast.LENGTH_SHORT).show();
+                    com.wisedesign.africomptaplus.services.SyncService sy = new com.wisedesign.africomptaplus.services.SyncService(this); if (sy.enabled()) sy.syncNow(null);
+                    reload();
+                }).setNegativeButton(I18n.t("Annuler"), null).show();
+    }
+
     private void addAccountDialog() {
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
@@ -273,6 +325,16 @@ public class AccountingActivity extends BaseActivity {
             for (int c = 0; c < r.length; c++) row.addView(cell(r[c], current.weights[c], current.right[c], bold, 0xFF0F172A));
             final long id = current.ids.get(pos);
             if (id < 0) { row.setOnClickListener(null); row.setClickable(false); }
+            else if ("Comptages".equals(keys[tab])) row.setOnClickListener(v -> new AlertDialog.Builder(AccountingActivity.this)
+                    .setTitle(r[0]).setMessage(svc.countDetail(id))
+                    .setPositiveButton("OK", null)
+                    .setNeutralButton("PDF", (d, w) -> {
+                        com.wisedesign.africomptaplus.services.ReportTable ct = svc.countTable(id);
+                        Uri u = TablePdf.export(this, ct, ct.title, "inventaire_" + id + "_" + System.currentTimeMillis());
+                        if (u == null) { Toast.makeText(this, I18n.t("Erreur de génération du PDF"), Toast.LENGTH_SHORT).show(); return; }
+                        Intent s = new Intent(Intent.ACTION_SEND); s.setType("application/pdf"); s.putExtra(Intent.EXTRA_STREAM, u); s.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(Intent.createChooser(s, "Partager l'état"));
+                    }).show());
             else row.setOnClickListener(v -> new AlertDialog.Builder(AccountingActivity.this)
                     .setTitle(I18n.t("Supprimer cette écriture ?")).setMessage(r[2])
                     .setPositiveButton(I18n.t("Supprimer"), (d, w) -> { svc.deleteManual(id); reload(); })

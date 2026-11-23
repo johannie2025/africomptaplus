@@ -23,7 +23,7 @@ import java.util.*;
  */
 public class AccountingService {
     public static final String CASH = "571", MOBILE = "5712", CLIENTS = "411", SALES = "7011",
-            VAT = "4431", COGS = "6011", STOCK = "311", SUPPLIERS = "401", MISC_INCOME = "758", MISC_EXPENSE = "658";
+            VAT = "4431", COGS = "6011", STOCK = "311", SUPPLIERS = "401", MISC_INCOME = "758", MISC_EXPENSE = "658", STOCK_VAR = "6031";
 
     public static class Line { public String account; public double debit, credit; public String analytic = ""; }
     public static class Entry {
@@ -37,7 +37,7 @@ public class AccountingService {
     }
 
     private final DatabaseHelper db;
-    public AccountingService(Context ctx) { db = DatabaseHelper.getInstance(ctx); }
+    public AccountingService(Context ctx) { db = DatabaseHelper.getInstance(ctx); migrateOpenings(); }
 
     public String mode() {
         String m = db.getConfig("acct_mode");
@@ -99,7 +99,7 @@ public class AccountingService {
         // ventes : ventilation par catégorie
         List<String> a1 = new ArrayList<>();
         Map<Long, List<Object[]>> cats = new HashMap<>();
-        Cursor ic = db.rawQuery("SELECT si.sale_id, COALESCE(p.category,'Général'), SUM(si.total_price), SUM(si.quantity*p.buying_price)"
+        Cursor ic = db.rawQuery("SELECT si.sale_id, COALESCE(p.category,'Général'), SUM(si.total_price), SUM(si.quantity*CASE WHEN si.unit_cost>0 THEN si.unit_cost ELSE p.buying_price END)"
                 + " FROM sale_items si JOIN sales s ON s.id=si.sale_id JOIN products p ON p.id=si.product_id WHERE 1=1"
                 + range("s.created_at", from, to, a1) + " GROUP BY si.sale_id, p.category", a1.toArray(new String[0]));
         try {
@@ -214,6 +214,39 @@ public class AccountingService {
                 out.add(e);
             }
         } finally { fc.close(); }
+
+        // inventaires physiques : écart négatif = D 6031 / C 311 ; positif = D 311 / C 6031 (valorisés au CMP)
+        List<String> aInv = new ArrayList<>();
+        Cursor vc = db.rawQuery("SELECT v.reference, v.inv_date, v.note,"
+                + " COALESCE(SUM(CASE WHEN i.counted<i.theoretical THEN (i.theoretical-i.counted)*i.cmp ELSE 0 END),0),"
+                + " COALESCE(SUM(CASE WHEN i.counted>i.theoretical THEN (i.counted-i.theoretical)*i.cmp ELSE 0 END),0)"
+                + " FROM inventories v LEFT JOIN inventory_items i ON i.inventory_id=v.id WHERE 1=1" + range("v.inv_date", from, to, aInv) + " GROUP BY v.id ORDER BY v.inv_date, v.id", aInv.toArray(new String[0]));
+        try {
+            while (vc.moveToNext()) {
+                double loss = Math.round(vc.getDouble(3)), gain = Math.round(vc.getDouble(4));
+                if (loss <= 0 && gain <= 0) continue;
+                Entry e = new Entry(); e.date = d10(vc.getString(1)); e.journal = "OD"; e.ref = vc.getString(0); e.kind = "stock";
+                e.label = I18n.t("Inventaire physique") + " " + vc.getString(0) + (vc.getString(2) != null && !vc.getString(2).isEmpty() ? " – " + vc.getString(2) : "");
+                if (loss > 0) e.line(STOCK_VAR, loss, 0, "").line(STOCK, 0, loss, "");
+                if (gain > 0) e.line(STOCK, gain, 0, "").line(STOCK_VAR, 0, gain, "");
+                out.add(e);
+            }
+        } finally { vc.close(); }
+
+        // mouvements de stock manuels : stock initial D 311 / C 101 ; entrée D 311 / C 6031 ; sortie D 6031 / C 311
+        List<String> aMv = new ArrayList<>();
+        Cursor mc = db.rawQuery("SELECT id, kind, product_name, qty, unit_cost, move_date, reason FROM stock_moves WHERE 1=1" + range("move_date", from, to, aMv) + " ORDER BY move_date, id", aMv.toArray(new String[0]));
+        try {
+            while (mc.moveToNext()) {
+                double v = Math.round(mc.getInt(3) * mc.getDouble(4)); if (v <= 0) continue;
+                String k = mc.getString(1), rs = mc.getString(6) == null ? "" : mc.getString(6);
+                Entry e = new Entry(); e.date = d10(mc.getString(5)); e.journal = "OD"; e.ref = "MVT-" + mc.getLong(0); e.kind = "stock";
+                e.label = ("opening".equals(k) ? I18n.t("Stock initial") : !rs.isEmpty() ? rs : "out".equals(k) ? I18n.t("Sortie de stock") : I18n.t("Entrée de stock")) + " – " + mc.getString(2) + " ×" + mc.getInt(3);
+                if ("out".equals(k)) e.line(STOCK_VAR, v, 0, "").line(STOCK, 0, v, "");
+                else e.line(STOCK, v, 0, "").line("opening".equals(k) ? "101" : STOCK_VAR, 0, v, "");
+                out.add(e);
+            }
+        } finally { mc.close(); }
 
         // écritures manuelles
         List<String> a5 = new ArrayList<>();
@@ -500,5 +533,245 @@ public class AccountingService {
                     e.lines.get(0).account + " → " + e.lines.get(1).account, UiKit.fmt(e.lines.get(0).debit));
         }
         return t;
+    }
+
+    // ── Inventaire valorisé au CMP ──────────────────────────────────────────
+    // ── Registre de stock & CMP exact ───────────────────────────────────────
+    /** Événements [date, type(0 entrée au coût, 1 sortie, 2 entrée au CMP), qté, coût, prio, libellé, réf] par produit. */
+    private Map<Long, List<Object[]>> events(boolean withOpening) {
+        Map<Long, List<Object[]>> ev = new HashMap<>();
+        Cursor c = db.rawQuery("SELECT pi.product_id, pi.quantity, pi.unit_cost, p.created_at, p.reference, p.supplier_name FROM purchase_items pi JOIN purchases p ON p.id=pi.purchase_id", null);
+        try { while (c.moveToNext()) add(ev, c.getLong(0), new Object[]{n(c.getString(3)), 0, (double) c.getInt(1), c.getDouble(2), 1, "Approvisionnement " + n(c.getString(5)), n(c.getString(4))}); } finally { c.close(); }
+        c = db.rawQuery("SELECT si.product_id, si.quantity, s.created_at, s.invoice_number FROM sale_items si JOIN sales s ON s.id=si.sale_id", null);
+        try { while (c.moveToNext()) add(ev, c.getLong(0), new Object[]{n(c.getString(2)), 1, (double) c.getInt(1), 0.0, 3, "Vente", n(c.getString(3))}); } finally { c.close(); }
+        c = db.rawQuery("SELECT product_id, kind, qty, unit_cost, move_date, reason, note FROM stock_moves", null);
+        try {
+            while (c.moveToNext()) {
+                String k = c.getString(1); if ("opening".equals(k) && !withOpening) continue;
+                String rs = n(c.getString(5));
+                add(ev, c.getLong(0), new Object[]{n(c.getString(4)), "out".equals(k) ? 1 : 0, (double) c.getInt(2), c.getDouble(3), "opening".equals(k) ? 0 : "out".equals(k) ? 3 : 1,
+                        "opening".equals(k) ? "Stock initial" : !rs.isEmpty() ? rs : "out".equals(k) ? "Sortie" : "Entrée", n(c.getString(6))});
+            }
+        } finally { c.close(); }
+        c = db.rawQuery("SELECT i.product_id, i.counted-i.theoretical, v.created_at, v.reference FROM inventory_items i JOIN inventories v ON v.id=i.inventory_id WHERE i.counted<>i.theoretical", null);
+        try { while (c.moveToNext()) { int dq = c.getInt(1); add(ev, c.getLong(0), new Object[]{n(c.getString(2)), dq > 0 ? 2 : 1, (double) Math.abs(dq), 0.0, dq > 0 ? 2 : 3, "Inventaire physique", n(c.getString(3))}); } } finally { c.close(); }
+        return ev;
+    }
+    private static String n(String s) { return s == null ? "" : s; }
+
+    /** CMP exact par rejeu chronologique du registre (stock initial, achats, ventes, mouvements, inventaires). */
+    public Map<Long, Double> cmpMap() {
+        Map<Long, List<Object[]>> ev = events(true);
+        Map<Long, Double> out = new HashMap<>();
+        Cursor c = db.rawQuery("SELECT id, stock, buying_price FROM products", null);
+        try {
+            while (c.moveToNext()) {
+                List<Object[]> l = ev.get(c.getLong(0));
+                out.put(c.getLong(0), replay(c.getDouble(1), c.getDouble(2), l == null ? new ArrayList<Object[]>() : l, null, null));
+            }
+        } finally { c.close(); }
+        return out;
+    }
+    private static void add(Map<Long, List<Object[]>> m, long id, Object[] e) { List<Object[]> l = m.get(id); if (l == null) { l = new ArrayList<>(); m.put(id, l); } l.add(e); }
+    /** @param trace reçoit des lignes {date, libellé, réf, entrée, sortie, coût unit., CMP, stock} */
+    static double replay(double stock, double buy, List<Object[]> events, List<double[]> traceNum, List<String[]> traceTxt) {
+        Collections.sort(events, (a, b) -> { int x = ((String) a[0]).compareTo((String) b[0]); return x != 0 ? x : Integer.compare((Integer) a[4], (Integer) b[4]); });
+        double net = 0; Double first = null;
+        for (Object[] e : events) { int t = (Integer) e[1]; double q = (Double) e[2]; if (t == 1) net -= q; else { net += q; if (t == 0 && first == null) first = (Double) e[3]; } }
+        double q = Math.max(0, stock - net), c = first != null ? first : buy;
+        if (q > 0 && traceNum != null) { traceNum.add(new double[]{q, 0, c, Math.round(c * 10000.0) / 10000.0, q}); traceTxt.add(new String[]{events.isEmpty() ? "" : (String) events.get(0)[0], "Report (stock non tracé)", ""}); }
+        for (Object[] e : events) {
+            double nq = (Double) e[2]; int t = (Integer) e[1]; double in = 0, outq = 0, uc;
+            if (t == 0) { double tt = q + nq; double cost = (Double) e[3]; c = tt > 0 ? (q * c + nq * cost) / tt : cost; q = tt; in = nq; uc = cost; }
+            else if (t == 2) { q += nq; in = nq; uc = c; }
+            else { q = Math.max(0, q - nq); outq = nq; uc = c; }
+            if (traceNum != null) { traceNum.add(new double[]{in, outq, uc, Math.round(c * 10000.0) / 10000.0, q}); traceTxt.add(new String[]{(String) e[0], (String) e[5], (String) e[6]}); }
+        }
+        return Math.round(c * 10000.0) / 10000.0;
+    }
+
+    private static volatile boolean migrated = false;
+    /** Une fois : crée le mouvement « stock initial » des produits existants (stock non tracé → valorisé exactement). */
+    private void migrateOpenings() {
+        if (migrated) return;
+        synchronized (AccountingService.class) {
+            if (migrated) return;
+            if (!"1".equals(db.getConfig("stk_mig"))) {
+                Map<Long, List<Object[]>> ev = events(false);
+                Set<Long> has = new HashSet<>();
+                Cursor c = db.rawQuery("SELECT DISTINCT product_id FROM stock_moves WHERE kind='opening'", null);
+                try { while (c.moveToNext()) has.add(c.getLong(0)); } finally { c.close(); }
+                List<Object[]> todo = new ArrayList<>();
+                c = db.rawQuery("SELECT id, name, stock, buying_price, created_at FROM products", null);
+                try {
+                    while (c.moveToNext()) {
+                        if (has.contains(c.getLong(0))) continue;
+                        List<Object[]> l = ev.get(c.getLong(0)); double net = 0; Double first = null; String d = n(c.getString(4));
+                        if (l != null) {
+                            Collections.sort(l, (a, b) -> { int x = ((String) a[0]).compareTo((String) b[0]); return x != 0 ? x : Integer.compare((Integer) a[4], (Integer) b[4]); });
+                            for (Object[] e : l) { int t = (Integer) e[1]; net += t == 1 ? -(Double) e[2] : (Double) e[2]; if (t == 0 && first == null) first = (Double) e[3]; if (((String) e[0]).compareTo(d) < 0) d = (String) e[0]; }
+                        }
+                        int q = (int) Math.max(0, c.getInt(2) - net); if (q <= 0) continue;
+                        todo.add(new Object[]{c.getLong(0), c.getString(1), q, first != null ? first : c.getDouble(3), d.isEmpty() ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date()) : d});
+                    }
+                } finally { c.close(); }
+                for (Object[] t : todo) rawMove((Long) t[0], (String) t[1], "opening", (Integer) t[2], (Double) t[3], "Stock initial", "", (String) t[4]);
+                db.setConfig("stk_mig", "1");
+            }
+            migrated = true;
+        }
+    }
+    /** Enregistre un mouvement au registre (ne modifie PAS le stock). */
+    public long rawMove(long pid, String name, String kind, int qty, double cost, String reason, String note, String date) {
+        if (qty <= 0) return -1;
+        ContentValues cv = new ContentValues();
+        cv.put("product_id", pid); cv.put("product_name", name); cv.put("kind", kind); cv.put("qty", qty); cv.put("unit_cost", Math.round(Math.max(0, cost) * 10000.0) / 10000.0);
+        cv.put("move_date", date != null ? date : new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date())); cv.put("reason", reason == null ? "" : reason); cv.put("note", note == null ? "" : note);
+        return db.getWritableDatabase().insert("stock_moves", null, cv);
+    }
+    /** Mouvement manuel : entrée (coût saisi) ou sortie (valorisée au CMP) ; le stock est mis à jour. @return null si OK, sinon message d'erreur */
+    public String saveMove(long pid, boolean out, int qty, double cost, String reason, String note) {
+        if (qty < 1) return I18n.t("Quantité invalide");
+        android.database.sqlite.SQLiteDatabase q = db.getWritableDatabase();
+        q.beginTransaction();
+        try {
+            Cursor c = q.rawQuery("SELECT name, stock, buying_price FROM products WHERE id=?", new String[]{String.valueOf(pid)});
+            String name; int st; double buy;
+            try { if (!c.moveToFirst()) return I18n.t("Produit introuvable"); name = c.getString(0); st = c.getInt(1); buy = c.getDouble(2); } finally { c.close(); }
+            if (out && qty > st) return I18n.t("Stock insuffisant : ") + name + " (" + st + ")";
+            double cm = out ? (cmpMap().containsKey(pid) ? cmpMap().get(pid) : buy) : cost;
+            q.execSQL("UPDATE products SET stock=stock" + (out ? "-" : "+") + "? WHERE id=?", new Object[]{qty, pid});
+            rawMove(pid, name, out ? "out" : "in", qty, cm, reason, note, null);
+            q.setTransactionSuccessful(); return null;
+        } finally { q.endTransaction(); }
+    }
+    /** Changement de stock via la fiche produit : trace d'un mouvement (ouverture à la création, correction ensuite). */
+    public void traceProductChange(long pid, String name, int oldStock, int newStock, double buy, boolean created) {
+        if (created) { if (newStock > 0) rawMove(pid, name, "opening", newStock, buy, "Stock initial", "", null); return; }
+        if (oldStock == newStock) return;
+        Double cm = cmpMap().get(pid);
+        rawMove(pid, name, newStock > oldStock ? "in" : "out", Math.abs(newStock - oldStock), cm != null ? cm : buy, "Correction de stock", "", null);
+    }
+
+    /** Fiche de stock (pid>0) ou journal de tous les mouvements : date, produit, opération, entrée, sortie, coût, CMP, stock, valeur. */
+    public ReportTable stockCard(long pid, String from, String to, String q) {
+        ReportTable t = new ReportTable(pid > 0 ? I18n.t("Fiche de stock") : I18n.t("Mouvements de stock"), new String[]{I18n.t("Date"), I18n.t("Produit"), I18n.t("Opération"), I18n.t("Entrée"), I18n.t("Sortie"), "CMP", I18n.t("Stock"), I18n.t("Valeur stock")},
+                new float[]{1.1f, 1.7f, 1.7f, 0.7f, 0.7f, 0.9f, 0.7f, 1.1f}, new boolean[]{false, false, false, true, true, true, true, true});
+        Map<Long, List<Object[]>> ev = events(true);
+        List<Object[]> rows = new ArrayList<>();
+        Cursor c = db.rawQuery("SELECT id, name, stock, buying_price, barcode FROM products ORDER BY name COLLATE NOCASE", null);
+        try {
+            while (c.moveToNext()) {
+                long id = c.getLong(0); if (pid > 0 && id != pid) continue; if (pid <= 0 && !match(q, c.getString(1), c.getString(4))) continue;
+                List<Object[]> l = ev.get(id); List<double[]> tn = new ArrayList<>(); List<String[]> tt = new ArrayList<>();
+                replay(c.getDouble(2), c.getDouble(3), l == null ? new ArrayList<Object[]>() : l, tn, tt);
+                for (int i = 0; i < tn.size(); i++) {
+                    String d = d10(tt.get(i)[0]); if (!from.isEmpty() && d.compareTo(from) < 0) continue; if (!to.isEmpty() && d.compareTo(to) > 0) continue;
+                    rows.add(new Object[]{tt.get(i)[0], c.getString(1), tt.get(i)[1], tn.get(i)});
+                }
+            }
+        } finally { c.close(); }
+        Collections.sort(rows, (a, b) -> ((String) a[0]).compareTo((String) b[0]));
+        for (Object[] r : rows) {
+            double[] x = (double[]) r[3];
+            t.add(false, dshow(d10((String) r[0])), (String) r[1], I18n.t((String) r[2]), x[0] > 0 ? String.valueOf((long) x[0]) : "", x[1] > 0 ? String.valueOf((long) x[1]) : "", UiKit.fmt(x[3]), String.valueOf((long) x[4]), UiKit.fmt(x[4] * x[3]));
+        }
+        return t;
+    }
+
+    /** Inventaire valorisé : quantités en stock × CMP, valeur de vente, marge latente ; rapprochement avec le compte 311. */
+    public ReportTable inventory(String q) {
+        ReportTable t = new ReportTable(I18n.t("Inventaire valorisé (CMP)"), new String[]{I18n.t("Produit"), I18n.t("Qté"), "CMP", I18n.t("Valeur CMP"), I18n.t("Valeur vente")},
+                new float[]{2.4f, 0.7f, 1f, 1.2f, 1.2f}, new boolean[]{false, true, true, true, true});
+        Map<Long, Double> cmp = cmpMap();
+        Cursor c = db.rawQuery("SELECT id, name, barcode, COALESCE(category,'Général'), stock, min_stock, buying_price, selling_price FROM products WHERE archived=0 ORDER BY 4, 2 COLLATE NOCASE", null);
+        String cur = null; double gq = 0, gv = 0, gs = 0, tq = 0, tv = 0, ts = 0;
+        try {
+            while (c.moveToNext()) {
+                if (!match(q, c.getString(1), c.getString(2), c.getString(3))) continue;
+                String cat = c.getString(3);
+                if (cur == null || !cur.equals(cat)) {
+                    if (cur != null) t.add(true, I18n.t("Sous-total") + " " + cur, fmtN(gq), "", UiKit.fmt(gv), UiKit.fmt(gs));
+                    t.add(true, cat, "", "", "", ""); cur = cat; gq = gv = gs = 0;
+                }
+                double cm = cmp.containsKey(c.getLong(0)) ? cmp.get(c.getLong(0)) : c.getDouble(6);
+                int st = c.getInt(4); double v = st * cm, sv = st * c.getDouble(7);
+                t.add(false, "   " + c.getString(1) + (st <= 0 ? " ⛔" : st <= c.getInt(5) ? " ⚠" : ""), String.valueOf(st), UiKit.fmt(cm), UiKit.fmt(v), UiKit.fmt(sv));
+                gq += st; gv += v; gs += sv; tq += st; tv += v; ts += sv;
+            }
+        } finally { c.close(); }
+        if (cur != null) t.add(true, I18n.t("Sous-total") + " " + cur, fmtN(gq), "", UiKit.fmt(gv), UiKit.fmt(gs));
+        t.add(true, I18n.t("TOTAL INVENTAIRE"), fmtN(tq), "", UiKit.fmt(tv), UiKit.fmt(ts));
+        t.add(true, I18n.t("Marge latente (vente − CMP)"), "", "", "", UiKit.fmt(ts - tv));
+        double[] b = totals("", "").get(STOCK); double book = b == null ? 0 : b[0] - b[1];
+        t.add(false, I18n.t("Solde comptable du compte 311"), "", "", UiKit.fmt(book), "");
+        t.add(false, I18n.t("Écart inventaire − comptabilité"), "", "", UiKit.fmt(tv - book), "");
+        return t;
+    }
+    private static String fmtN(double v) { return String.valueOf((long) v); }
+
+    /** Historique des inventaires physiques (ids = id d'inventaire : toucher pour le détail). */
+    public ReportTable counts(String from, String to) {
+        ReportTable t = new ReportTable(I18n.t("Inventaires physiques (comptages)"), new String[]{I18n.t("Date"), I18n.t("Référence"), I18n.t("Art."), I18n.t("Écart qté"), I18n.t("Écart valeur")},
+                new float[]{1.1f, 1.9f, 0.6f, 0.9f, 1.2f}, new boolean[]{false, false, true, true, true});
+        List<String> a = new ArrayList<>();
+        Cursor c = db.rawQuery("SELECT v.id, v.inv_date, v.reference, COUNT(i.id), COALESCE(SUM(i.counted-i.theoretical),0), COALESCE(SUM((i.counted-i.theoretical)*i.cmp),0)"
+                + " FROM inventories v LEFT JOIN inventory_items i ON i.inventory_id=v.id WHERE 1=1" + range("v.inv_date", from, to, a) + " GROUP BY v.id ORDER BY v.inv_date DESC, v.id DESC", a.toArray(new String[0]));
+        try { while (c.moveToNext()) t.add(false, c.getLong(0), dshow(c.getString(1)), c.getString(2), String.valueOf(c.getInt(3)), String.valueOf(c.getLong(4)), UiKit.fmt(c.getDouble(5))); }
+        finally { c.close(); }
+        return t;
+    }
+    /** Détail d'un inventaire physique sous forme de tableau (export PDF). */
+    public ReportTable countTable(long id) {
+        String ref = ""; Cursor h = db.rawQuery("SELECT reference, inv_date, note FROM inventories WHERE id=?", new String[]{String.valueOf(id)});
+        try { if (h.moveToFirst()) ref = h.getString(0) + " — " + dshow(h.getString(1)) + (h.getString(2) == null || h.getString(2).isEmpty() ? "" : " — " + h.getString(2)); } finally { h.close(); }
+        ReportTable t = new ReportTable(I18n.t("Inventaire physique") + " " + ref, new String[]{I18n.t("Produit"), I18n.t("Théorique"), I18n.t("Compté"), I18n.t("Écart"), "CMP", I18n.t("Écart valeur")},
+                new float[]{2.4f, 0.9f, 0.9f, 0.8f, 1f, 1.2f}, new boolean[]{false, true, true, true, true, true});
+        double tv = 0; long tq = 0;
+        Cursor c = db.rawQuery("SELECT product_name, theoretical, counted, cmp FROM inventory_items WHERE inventory_id=? ORDER BY product_name COLLATE NOCASE", new String[]{String.valueOf(id)});
+        try { while (c.moveToNext()) { int dq = c.getInt(2) - c.getInt(1); double dv = dq * c.getDouble(3); tv += dv; tq += dq; t.add(false, c.getString(0), String.valueOf(c.getInt(1)), String.valueOf(c.getInt(2)), String.valueOf(dq), UiKit.fmt(c.getDouble(3)), UiKit.fmt(dv)); } } finally { c.close(); }
+        t.add(true, "TOTAL", "", "", String.valueOf(tq), "", UiKit.fmt(tv));
+        return t;
+    }
+    public String countDetail(long id) {
+        StringBuilder sb = new StringBuilder(); double tv = 0;
+        Cursor c = db.rawQuery("SELECT product_name, theoretical, counted, cmp FROM inventory_items WHERE inventory_id=? ORDER BY product_name COLLATE NOCASE", new String[]{String.valueOf(id)});
+        try {
+            while (c.moveToNext()) {
+                int dq = c.getInt(2) - c.getInt(1); double dv = dq * c.getDouble(3); tv += dv;
+                sb.append(c.getString(0)).append(" : ").append(c.getInt(1)).append(" → ").append(c.getInt(2)).append(" (").append(dq > 0 ? "+" : "").append(dq).append(")  ").append(UiKit.fmt(dv)).append("\n");
+            }
+        } finally { c.close(); }
+        return sb.append("\n").append(I18n.t("Écart valorisé : ")).append(UiKit.xaf(tv)).toString();
+    }
+
+    /** Valide un comptage : stock ajusté aux quantités comptées (écart valorisé au CMP, écriture 6031/311 générée). @return id d'inventaire ou -1 */
+    public long saveCount(String note, Map<Long, Integer> counted) {
+        if (counted == null || counted.isEmpty()) return -1;
+        Map<Long, Double> cmp = cmpMap();
+        android.database.sqlite.SQLiteDatabase q = db.getWritableDatabase();
+        q.beginTransaction();
+        try {
+            Date now = new Date();
+            String ref = "INVT-" + new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(now);
+            ContentValues h = new ContentValues();
+            h.put("reference", ref); h.put("inv_date", new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(now)); h.put("note", note == null ? "" : note);
+            h.put("created_at", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(now));
+            long iid = q.insert("inventories", null, h); if (iid < 0) return -1;
+            for (Map.Entry<Long, Integer> e : counted.entrySet()) {
+                Cursor c = q.rawQuery("SELECT name, stock, buying_price FROM products WHERE id=?", new String[]{String.valueOf(e.getKey())});
+                try {
+                    if (!c.moveToFirst()) continue;
+                    int cnt = Math.max(0, e.getValue());
+                    ContentValues iv = new ContentValues();
+                    iv.put("inventory_id", iid); iv.put("product_id", e.getKey()); iv.put("product_name", c.getString(0)); iv.put("theoretical", c.getInt(1)); iv.put("counted", cnt);
+                    iv.put("cmp", cmp.containsKey(e.getKey()) ? cmp.get(e.getKey()) : c.getDouble(2));
+                    q.insert("inventory_items", null, iv);
+                    if (cnt != c.getInt(1)) q.execSQL("UPDATE products SET stock=? WHERE id=?", new Object[]{cnt, e.getKey()});
+                } finally { c.close(); }
+            }
+            q.setTransactionSuccessful();
+            return iid;
+        } finally { q.endTransaction(); }
     }
 }

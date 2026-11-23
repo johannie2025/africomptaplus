@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME    = "africompta.db";
-    private static final int    DB_VERSION = 8; // v8 : archivage (produits/clients/fournisseurs) + base de fusion synchro
+    private static final int    DB_VERSION = 10; // v10 : registre de stock (mouvements) + coût des ventes
 
     // ── Tables ──────────────────────────────────────────────────────────────
     public static final String T_PRODUCTS     = "products";
@@ -190,6 +190,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createV6Tables(db);
         createV7Tables(db);
         createV8Tables(db);
+        createV9Tables(db);
+        createV10Tables(db);
 
         // Client passager par défaut
         db.execSQL("INSERT OR IGNORE INTO " + T_CLIENTS
@@ -248,6 +250,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (oldVersion < 6) createV6Tables(db);
         if (oldVersion < 7) createV7Tables(db);
         if (oldVersion < 8) createV8Tables(db);
+        if (oldVersion < 9) createV9Tables(db);
+        if (oldVersion < 10) createV10Tables(db);
+    }
+
+    private void createV10Tables(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS stock_moves (id INTEGER PRIMARY KEY AUTOINCREMENT, product_id INTEGER NOT NULL, product_name TEXT NOT NULL DEFAULT '', kind TEXT NOT NULL,"
+                + " qty INTEGER NOT NULL, unit_cost REAL NOT NULL DEFAULT 0, move_date TEXT NOT NULL, reason TEXT DEFAULT '', note TEXT DEFAULT '');");
+        try { db.execSQL("ALTER TABLE sale_items ADD COLUMN unit_cost REAL NOT NULL DEFAULT 0"); } catch (Exception ignored) { /* déjà présent */ }
+    }
+
+    private void createV9Tables(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS inventories (id INTEGER PRIMARY KEY AUTOINCREMENT, reference TEXT UNIQUE NOT NULL, inv_date TEXT NOT NULL, note TEXT DEFAULT '', created_at TEXT NOT NULL);");
+        db.execSQL("CREATE TABLE IF NOT EXISTS inventory_items (id INTEGER PRIMARY KEY AUTOINCREMENT, inventory_id INTEGER NOT NULL, product_id INTEGER NOT NULL, product_name TEXT NOT NULL,"
+                + " theoretical INTEGER NOT NULL DEFAULT 0, counted INTEGER NOT NULL DEFAULT 0, cmp REAL NOT NULL DEFAULT 0,"
+                + " FOREIGN KEY(inventory_id) REFERENCES inventories(id) ON DELETE CASCADE);");
     }
 
     private void createV8Tables(SQLiteDatabase db) {

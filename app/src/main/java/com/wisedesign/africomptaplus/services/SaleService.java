@@ -12,7 +12,8 @@ import java.util.*;
 
 public class SaleService {
     private final DatabaseHelper db;
-    public SaleService(Context ctx) { db = DatabaseHelper.getInstance(ctx); }
+    private final Context ctx;
+    public SaleService(Context ctx) { this.ctx = ctx.getApplicationContext(); db = DatabaseHelper.getInstance(ctx); }
 
     /**
      * Crée une vente avec client associé.
@@ -29,6 +30,7 @@ public class SaleService {
                            long clientId, String clientName, String clientPhone,
                            String dueDate, String invoiceOverride, String createdOverride) {
         if (items == null || items.isEmpty()) return -1;
+        Map<Long, Double> cmp = new AccountingService(ctx).cmpMap();
         SQLiteDatabase sqdb = db.getWritableDatabase();
         sqdb.beginTransaction();
         try {
@@ -64,6 +66,7 @@ public class SaleService {
                 ic.put(DatabaseHelper.COL_QUANTITY,    item.quantity);
                 ic.put(DatabaseHelper.COL_UNIT_PRICE,  item.unitPrice);
                 ic.put(DatabaseHelper.COL_TOTAL_PRICE, item.totalPrice);
+                Double uc = cmp.get(item.productId); if (uc != null) ic.put("unit_cost", uc);
                 sqdb.insert(DatabaseHelper.T_SALE_ITEMS, null, ic);
                 // Décrément stock dans la même transaction
                 sqdb.execSQL("UPDATE " + DatabaseHelper.T_PRODUCTS

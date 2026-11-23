@@ -13,16 +13,22 @@ import java.util.List;
 public class ProductService {
 
     private final DatabaseHelper db;
+    private Context ctx;
 
     public ProductService(Context context) {
-        this.db = DatabaseHelper.getInstance(context);
+        this.db = DatabaseHelper.getInstance(context); this.ctx = context.getApplicationContext();
     }
 
     public long save(Product p) {
         ContentValues cv = toContentValues(p);
         if (p.id == 0) {
-            return db.insert(DatabaseHelper.T_PRODUCTS, cv);
+            long nid = db.insert(DatabaseHelper.T_PRODUCTS, cv);
+            if (nid > 0) new AccountingService(ctx).traceProductChange(nid, p.name, 0, p.stock, p.buyingPrice, true);
+            return nid;
         } else {
+            Product old = findById(p.id);
+            AccountingService as = new AccountingService(ctx);
+            if (old != null && old.stock != p.stock) as.traceProductChange(p.id, p.name, old.stock, p.stock, p.buyingPrice, false);
             db.update(DatabaseHelper.T_PRODUCTS, cv,
                     DatabaseHelper.COL_ID + "=?", new String[]{String.valueOf(p.id)});
             return p.id;
