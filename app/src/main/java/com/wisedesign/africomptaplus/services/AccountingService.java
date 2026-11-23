@@ -250,17 +250,17 @@ public class AccountingService {
 
         // écritures manuelles
         List<String> a5 = new ArrayList<>();
-        Cursor mc = db.rawQuery("SELECT id, entry_date, journal, label, debit_account, credit_account, amount FROM acct_entries WHERE 1=1"
+        Cursor ec = db.rawQuery("SELECT id, entry_date, journal, label, debit_account, credit_account, amount FROM acct_entries WHERE 1=1"
                 + range("entry_date", from, to, a5) + " ORDER BY entry_date, id", a5.toArray(new String[0]));
         try {
-            while (mc.moveToNext()) {
+            while (ec.moveToNext()) {
                 Entry e = new Entry();
-                e.manualId = mc.getLong(0); e.date = d10(mc.getString(1)); e.journal = mc.getString(2);
-                e.label = mc.getString(3); e.ref = "SAI-" + mc.getLong(0); e.kind = "manual";
-                e.line(mc.getString(4), mc.getDouble(6), 0, "").line(mc.getString(5), 0, mc.getDouble(6), "");
+                e.manualId = ec.getLong(0); e.date = d10(ec.getString(1)); e.journal = ec.getString(2);
+                e.label = ec.getString(3); e.ref = "SAI-" + ec.getLong(0); e.kind = "manual";
+                e.line(ec.getString(4), ec.getDouble(6), 0, "").line(ec.getString(5), 0, ec.getDouble(6), "");
                 out.add(e);
             }
-        } finally { mc.close(); }
+        } finally { ec.close(); }
 
         Collections.sort(out, (x, y) -> x.date.compareTo(y.date));
         return out;
