@@ -250,17 +250,22 @@ public class AccountingService {
 
         // écritures manuelles
         List<String> a5 = new ArrayList<>();
-        Cursor ec = db.rawQuery("SELECT id, entry_date, journal, label, debit_account, credit_account, amount FROM acct_entries WHERE 1=1"
+        Cursor manualCursor = db.rawQuery("SELECT id, entry_date, journal, label, debit_account, credit_account, amount FROM acct_entries WHERE 1=1"
                 + range("entry_date", from, to, a5) + " ORDER BY entry_date, id", a5.toArray(new String[0]));
         try {
-            while (ec.moveToNext()) {
+            while (manualCursor.moveToNext()) {
                 Entry e = new Entry();
-                e.manualId = ec.getLong(0); e.date = d10(ec.getString(1)); e.journal = ec.getString(2);
-                e.label = ec.getString(3); e.ref = "SAI-" + ec.getLong(0); e.kind = "manual";
-                e.line(ec.getString(4), ec.getDouble(6), 0, "").line(ec.getString(5), 0, ec.getDouble(6), "");
+                e.manualId = manualCursor.getLong(0);
+                e.date = d10(manualCursor.getString(1));
+                e.journal = manualCursor.getString(2);
+                e.label = manualCursor.getString(3);
+                e.ref = "SAI-" + manualCursor.getLong(0);
+                e.kind = "manual";
+                e.line(manualCursor.getString(4), manualCursor.getDouble(6), 0, "")
+                 .line(manualCursor.getString(5), 0, manualCursor.getDouble(6), "");
                 out.add(e);
-            } 
-        } finally { ec.close(); }
+            }
+        } finally { manualCursor.close(); }
 
         Collections.sort(out, (x, y) -> x.date.compareTo(y.date));
         return out;
