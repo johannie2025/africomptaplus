@@ -46,6 +46,7 @@
         <activity android:name=".activities.DebtDetailActivity"  android:exported="false"/>
         <activity android:name=".activities.DocumentListActivity" android:exported="false"/>
         <activity android:name=".activities.AccountingActivity"   android:exported="false"/>
+        <activity android:name=".activities.InventoryCountActivity" android:exported="false"/>
         <activity android:name=".activities.SupplierActivity"       android:exported="false"/>
         <activity android:name=".activities.SupplierDetailActivity" android:exported="false"/>
         <activity android:name=".activities.PurchaseActivity"       android:exported="false"/>
