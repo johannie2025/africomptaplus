@@ -26,10 +26,8 @@ jobs:
           cache: gradle
 
       # ── 3. Android SDK ───────────────────────────────────────────────────────
-      - name: Setup Android SDK
+      - name: Set up Android SDK
         uses: android-actions/setup-android@v3
-        with:
-          packages: platform-tools
 
       # ── 4. Gradle permissions ────────────────────────────────────────────────
       - name: Grant execute permission for gradlew
