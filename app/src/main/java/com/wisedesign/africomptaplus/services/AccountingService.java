@@ -37,7 +37,7 @@ public class AccountingService {
     }
 
     private final DatabaseHelper db;
-    public AccountingService(Context ctx) { db = DatabaseHelper.getInstance(ctx); migrateOpenings(); }
+    public AccountingService(Context ctx) { db = DatabaseHelper.getInstance(ctx); try { migrateOpenings(); } catch (Exception e) { android.util.Log.w("AccountingService", "migration stock: " + e); } }
 
     public String mode() {
         String m = db.getConfig("acct_mode");
@@ -250,22 +250,17 @@ public class AccountingService {
 
         // écritures manuelles
         List<String> a5 = new ArrayList<>();
-        Cursor manualCursor = db.rawQuery("SELECT id, entry_date, journal, label, debit_account, credit_account, amount FROM acct_entries WHERE 1=1"
+        Cursor mc = db.rawQuery("SELECT id, entry_date, journal, label, debit_account, credit_account, amount FROM acct_entries WHERE 1=1"
                 + range("entry_date", from, to, a5) + " ORDER BY entry_date, id", a5.toArray(new String[0]));
         try {
-            while (manualCursor.moveToNext()) {
+            while (mc.moveToNext()) {
                 Entry e = new Entry();
-                e.manualId = manualCursor.getLong(0);
-                e.date = d10(manualCursor.getString(1));
-                e.journal = manualCursor.getString(2);
-                e.label = manualCursor.getString(3);
-                e.ref = "SAI-" + manualCursor.getLong(0);
-                e.kind = "manual";
-                e.line(manualCursor.getString(4), manualCursor.getDouble(6), 0, "")
-                 .line(manualCursor.getString(5), 0, manualCursor.getDouble(6), "");
+                e.manualId = mc.getLong(0); e.date = d10(mc.getString(1)); e.journal = mc.getString(2);
+                e.label = mc.getString(3); e.ref = "SAI-" + mc.getLong(0); e.kind = "manual";
+                e.line(mc.getString(4), mc.getDouble(6), 0, "").line(mc.getString(5), 0, mc.getDouble(6), "");
                 out.add(e);
             }
-        } finally { manualCursor.close(); }
+        } finally { mc.close(); }
 
         Collections.sort(out, (x, y) -> x.date.compareTo(y.date));
         return out;
@@ -607,17 +602,17 @@ public class AccountingService {
                 Cursor c = db.rawQuery("SELECT DISTINCT product_id FROM stock_moves WHERE kind='opening'", null);
                 try { while (c.moveToNext()) has.add(c.getLong(0)); } finally { c.close(); }
                 List<Object[]> todo = new ArrayList<>();
-                c = db.rawQuery("SELECT id, name, stock, buying_price, created_at FROM products", null);
+                c = db.rawQuery("SELECT id, name, stock, buying_price FROM products", null);
                 try {
                     while (c.moveToNext()) {
                         if (has.contains(c.getLong(0))) continue;
-                        List<Object[]> l = ev.get(c.getLong(0)); double net = 0; Double first = null; String d = n(c.getString(4));
+                        List<Object[]> l = ev.get(c.getLong(0)); double net = 0; Double first = null; String d = "9999";
                         if (l != null) {
                             Collections.sort(l, (a, b) -> { int x = ((String) a[0]).compareTo((String) b[0]); return x != 0 ? x : Integer.compare((Integer) a[4], (Integer) b[4]); });
-                            for (Object[] e : l) { int t = (Integer) e[1]; net += t == 1 ? -(Double) e[2] : (Double) e[2]; if (t == 0 && first == null) first = (Double) e[3]; if (((String) e[0]).compareTo(d) < 0) d = (String) e[0]; }
+                            for (Object[] e : l) { int t = (Integer) e[1]; net += t == 1 ? -(Double) e[2] : (Double) e[2]; if (t == 0 && first == null) first = (Double) e[3]; if (!((String) e[0]).isEmpty() && ((String) e[0]).compareTo(d) < 0) d = (String) e[0]; }
                         }
                         int q = (int) Math.max(0, c.getInt(2) - net); if (q <= 0) continue;
-                        todo.add(new Object[]{c.getLong(0), c.getString(1), q, first != null ? first : c.getDouble(3), d.isEmpty() ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date()) : d});
+                        todo.add(new Object[]{c.getLong(0), c.getString(1), q, first != null ? first : c.getDouble(3), d.equals("9999") ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date()) : d});
                     }
                 } finally { c.close(); }
                 for (Object[] t : todo) rawMove((Long) t[0], (String) t[1], "opening", (Integer) t[2], (Double) t[3], "Stock initial", "", (String) t[4]);

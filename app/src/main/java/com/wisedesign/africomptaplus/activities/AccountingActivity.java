@@ -330,14 +330,8 @@ public class AccountingActivity extends BaseActivity {
                     .setPositiveButton("OK", null)
                     .setNeutralButton("PDF", (d, w) -> {
                         com.wisedesign.africomptaplus.services.ReportTable ct = svc.countTable(id);
-                        // Line 333
-Uri u = TablePdf.export(AccountingActivity.this, ct, ct.title, "inventaire_" + id + "_" + System.currentTimeMillis());
-
-// Line 334
-if (u == null) { 
-    Toast.makeText(AccountingActivity.this, I18n.t("Erreur de génération du PDF"), Toast.LENGTH_SHORT).show(); 
-    return; 
-}
+                        Uri u = TablePdf.export(AccountingActivity.this, ct, ct.title, "inventaire_" + id + "_" + System.currentTimeMillis());
+                        if (u == null) { Toast.makeText(AccountingActivity.this, I18n.t("Erreur de génération du PDF"), Toast.LENGTH_SHORT).show(); return; }
                         Intent s = new Intent(Intent.ACTION_SEND); s.setType("application/pdf"); s.putExtra(Intent.EXTRA_STREAM, u); s.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         startActivity(Intent.createChooser(s, "Partager l'état"));
                     }).show());
